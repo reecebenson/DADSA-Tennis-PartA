@@ -47,9 +47,15 @@ class Season():
         return self._rounds
 
     def set_rounds(self):
-        for gender in self._rounds_raw:
-            for rnd in self._rounds_raw[gender]:
-                print(rnd)
+        for rnd in self._rounds_raw:
+            for gdr in self._rounds_raw[rnd]:
+                # If the Gender category doesn't exist within the rounds, create it
+                if(not gdr in self._rounds):
+                    self._rounds[gdr] = [ ]
+
+                # Populate our dictionary with our match data
+                for match in self._rounds_raw[rnd][gdr]:
+                    self._rounds[gdr].append(match)
 
     def set_rounds_raw(self, rounds):
         self._rounds_raw = rounds
