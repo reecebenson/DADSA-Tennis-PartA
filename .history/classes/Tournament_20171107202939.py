@@ -43,4 +43,5 @@ class Tournament():
             ret += "{0}".format("\n".join([ "  #{0}: £{1:,}".format(i, int(t)) for i, t in enumerate(self.prize_money(), 1) ])) + "\n"
         else:
             ret = "An unknown error has been handled..."
+        input("hi")
         return ret

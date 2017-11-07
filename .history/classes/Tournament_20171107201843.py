@@ -40,7 +40,7 @@ class Tournament():
             ret += "The difficulty multiplier for this tournament has been set as: {0}".format(self.difficulty()) + "\n"
         elif(detail == "prize_money"):
             ret += "Prize Money:" + "\n"
-            ret += "{0}".format("\n".join([ "  #{0}: £{1:,}".format(i, int(t)) for i, t in enumerate(self.prize_money(), 1) ])) + "\n"
+            ret += "  {0}".format(", ".join([ "#{0}: {1}".format(i, t) for i, t in enumerate(self.prize_money(), 1) ])) + "\n"
         else:
             ret = "An unknown error has been handled..."
         return ret

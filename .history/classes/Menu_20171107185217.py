@@ -1,7 +1,6 @@
 # DADSA - Assignment 1
 # Reece Benson
 
-from functools import partial
 from os import system as call
 from collections import OrderedDict
 
@@ -43,6 +42,8 @@ class Menu():
             # Create our menu options
             self._menu[seasonVar+"_select"] = { }
             self._menu[seasonVar+"_players"] = { }
+            self._menu[seasonVar+"_prizemoney"] = lambda: print(season.display("prize_money"))
+            self._menu[seasonVar+"_difficulty"] = lambda: print(season.display("difficulty"))
             self._menu[seasonVar+"_details"] = lambda: print(season.display("details"))
 
             # Fill our menu options with extra options
@@ -57,14 +58,8 @@ class Menu():
 
                     self._menu[seasonVar+"_select_"+tournament_name+"_"+gdr] = { }
                     for rnd in season.rounds()[gdr]:
-                        self._menu[seasonVar+"_select_"+tournament_name+"_"+gdr].update({ seasonVar+"_select_"+tournament_name+"-"+gdr+"-"+rnd: "Round {0}".format(rnd) })
-                        self._menu[seasonVar+"_select_"+tournament_name+"-"+gdr+"-"+rnd] = partial(print, season.name(), tournament_name, gdr, rnd)
+                        self._menu[seasonVar+"_select_"+tournament_name+"_"+gdr].update({ seasonVar+"_select_"+tournament_name+"_"+gdr+"_"+rnd: "Round {0}".format(rnd) })
                     self._menu[seasonVar+"_select_"+tournament_name+"_"+gdr].update({ "back": "Back" })
-
-                # Add tournament specific options
-                self._menu[seasonVar+"_select_"+tournament_name].update({ seasonVar+"_select_"+tournament_name+"_difficulty": "View Difficulty", seasonVar+"_select_"+tournament_name+"_prizemoney": "View Prize Money" })
-                self._menu[seasonVar+"_select_"+tournament_name+"_difficulty"] = partial(print, season.tournament(tournament_name).display("difficulty"))
-                self._menu[seasonVar+"_select_"+tournament_name+"_prizemoney"] = partial(print, season.tournament(tournament_name).display("prize_money"))
 
                 # Add our back option
                 self._menu[seasonVar+"_select_"+tournament_name].update({ "back": "Back" })

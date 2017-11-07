@@ -63,8 +63,9 @@ class Menu():
 
                 # Add tournament specific options
                 self._menu[seasonVar+"_select_"+tournament_name].update({ seasonVar+"_select_"+tournament_name+"_difficulty": "View Difficulty", seasonVar+"_select_"+tournament_name+"_prizemoney": "View Prize Money" })
-                self._menu[seasonVar+"_select_"+tournament_name+"_difficulty"] = partial(print, season.tournament(tournament_name).display("difficulty"))
-                self._menu[seasonVar+"_select_"+tournament_name+"_prizemoney"] = partial(print, season.tournament(tournament_name).display("prize_money"))
+                self._menu[seasonVar+"_select_"+tournament_name+"_difficulty"] = partial(season.tournament(tournament_name).display, "difficulty")
+                self._menu[seasonVar+"_select_"+tournament_name+"_prizemoney"] = partial(season.tournament(tournament_name).display, "prize_money")
+                input("halt")
 
                 # Add our back option
                 self._menu[seasonVar+"_select_"+tournament_name].update({ "back": "Back" })
