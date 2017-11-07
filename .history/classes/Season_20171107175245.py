@@ -58,9 +58,7 @@ class Season():
             ret += "\n" + "Tournaments in this season:" + "\n"
             for tournament_name in self.tournaments():
                 tournament = self.tournament(tournament_name)
-                ret += " -> {0} — Difficulty: {1}".format(tournament_name, tournament.difficulty()) + "\n"
-                ret += "    Prize Money:" + "\n"
-                ret += "      {0}".format(", ".join([ "#{0}: {1}".format(i, t) for i, t in enumerate(tournament.prize_money(), 1) ])) + "\n"
+                ret += " -> {0}\t\r\r— Difficulty: {1}".format(tournament_name, tournament.difficulty()) + "\n"
         else:
             ret = "An unknown error has been handled..."
 

@@ -56,7 +56,7 @@ class Handler():
 
                 # Create our Tournament
                 tournament = Tournament.Tournament(self.app, tournament_name)
-                tournament.set_prize_money([tournament_json[money] for money in tournament_json if(not "_difficulty" in money)])
+                tournament.set_prize_money([money for money in tournament_json if(not "_difficulty" in money)])
                 tournament.set_difficulty(float(tournament_json['_difficulty']))
 
                 # Add our Tournament to our Season

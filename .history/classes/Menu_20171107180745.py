@@ -50,20 +50,9 @@ class Menu():
             # > "Select Tournament"
             for tournament_name in season.tournaments():
                 self._menu[seasonVar+"_select"].update({ seasonVar+"_select_"+tournament_name: "Select {0}".format(tournament_name) })
-
-                # Set our gender specifiers within the tournament
-                self._menu[seasonVar+"_select_"+tournament_name] = { }
-                for gdr in season.rounds():
-                    self._menu[seasonVar+"_select_"+tournament_name].update({ seasonVar+"_select_"+tournament_name+"_"+gdr: "View {0} Rounds".format(gdr) })
-
-                    self._menu[seasonVar+"_select_"+tournament_name+"_"+gdr] = { }
-                    for rnd in season.rounds()[gdr]:
-                        self._menu[seasonVar+"_select_"+tournament_name+"_"+gdr].update({ seasonVar+"_select_"+tournament_name+"_"+gdr+"_"+rnd: "Round {0}".format(rnd) })
-                        self._menu[seasonVar+"_select_"+tournament_name+"_"+gdr+"_"+rnd] = lambda: print("view round {0}".format(rnd))
-                    self._menu[seasonVar+"_select_"+tournament_name+"_"+gdr].update({ "back": "Back" })
-                    
-                # Add our back option
-                self._menu[seasonVar+"_select_"+tournament_name].update({ "back": "Back" })
+                self._menu[seasonVar+"_select_"+tournament_name] = {[ "{0}: ".format(g) for g in season.rounds() ] }
+                print(self._menu[seasonVar+"_select_"+tournament_name])
+                input(" hold! ")
 
             # > "View Players"
             for gdr in season.players():

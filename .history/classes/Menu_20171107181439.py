@@ -58,7 +58,7 @@ class Menu():
 
                     self._menu[seasonVar+"_select_"+tournament_name+"_"+gdr] = { }
                     for rnd in season.rounds()[gdr]:
-                        self._menu[seasonVar+"_select_"+tournament_name+"_"+gdr].update({ seasonVar+"_select_"+tournament_name+"_"+gdr+"_"+rnd: "Round {0}".format(rnd) })
+                        self._menu[seasonVar+"_select_"+tournament_name+"_"+gdr].update({ seasonVar+"_select_"+tournament_name+"_"+gdr+"_"+rnd: lambda: print("view round {0}".format(rnd)) })
                         self._menu[seasonVar+"_select_"+tournament_name+"_"+gdr+"_"+rnd] = lambda: print("view round {0}".format(rnd))
                     self._menu[seasonVar+"_select_"+tournament_name+"_"+gdr].update({ "back": "Back" })
                     
