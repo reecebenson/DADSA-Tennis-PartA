@@ -1,8 +1,8 @@
 # DADSA - Assignment 1
 # Reece Benson
 
-from classes import Menu as Menu
-from classes import Handler as Handler
+from classes import Menu
+from classes import Handler
 
 class App():
     # Define the variables we will be using

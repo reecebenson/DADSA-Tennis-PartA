@@ -25,6 +25,9 @@ class Match():
     def player_two(self):
         return [ self._player_two, self._player_two_score ]
 
+    def versuses(self):
+        return "{0} vs. {1}".format(self.player_one()[0].name(), self.player_two()[0].name())
+
     def winner(self):
         if(self._player_one_score > self._player_two_score):
             self._winner = self.player_one()

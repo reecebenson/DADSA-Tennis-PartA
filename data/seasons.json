@@ -2,6 +2,7 @@
     "season_1": {
         "settings": {
             "editable": false,
+
             "round_count": 5,
 
             "male_cap": 3,

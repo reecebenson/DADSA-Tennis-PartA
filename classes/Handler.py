@@ -3,11 +3,12 @@
 
 import json
 import random
-from classes import Player as Player
-from classes import Season as Season
-from classes import Tournament as Tournament
-from classes import Round as Round
-from classes import Match as Match
+from math import ceil, floor
+from classes import Player
+from classes import Season
+from classes import Tournament
+from classes import Round
+from classes import Match
 
 class Handler():
     # Define the variables we will be using
@@ -49,32 +50,57 @@ class Handler():
             season = self.get_season(seasonId)
             players = season.players()
 
-            # Our Round Data should be completely empty
-            round_data = { }
-
             # Generate our rounds
             for gender in players:
-                # Generate 'x' amount of rounds
-                for r in range(season.settings()['round_count']):
-                    # Default Values
+                # Default Values
+                round_cap = 3
+
+                # Do we have a Round Cap overrider for this gender?
+                if(gender + "_cap" in season.settings()):
+                    round_cap = season.settings()[gender + "_cap"]
+
+                # Create our first round
+                _round_one = Round.Round(self.app, gender, "round_1")
+                _round_one.set_cap(round_cap)
+
+                # Create our first round data
+                rand_players = random.sample(players[gender], len(players[gender]))
+                for i in range(len(rand_players) // 2):
+                    # Grab our versus players
+                    p_one = rand_players[i * 2]
+                    p_two = rand_players[(i * 2) + 1]
+
+                    # Generate some scores
+                    p_one_score = random.randint(0, round_cap - 1)
+                    p_two_score = random.randint(0, round_cap - 1)
+
+                    # Make a random player the winner
+                    who = random.randint(0, 1)
+                    if(who == 0):   p_one_score = round_cap
+                    else:           p_two_score = round_cap
+
+                    # Append our random data as a Match
+                    _round_one.add_match(Match.Match(_round_one, p_one, p_two, p_one_score, p_two_score))
+
+                # Append our first round to our season
+                season.add_round(gender, _round_one)
+
+                # Get the winners from each round
+                for r in range(2, season.settings()['round_count'] + 1):
+                    # Define variables
                     round_name = "round_"+str(r)
-                    round_cap = 3
 
-                    # Create our gendered rounds
-                    if(not gender in round_data):
-                        # Do we have a Round Cap overrider for this gender?
-                        if(gender + "_cap" in season.settings()):
-                            roundCap = season.settings()[gender + "_cap"]
-                        
-                        # Update our round data
-                        round_data.update({ round_name: { gender: [ ] } })
+                    # Define our Round
+                    _round = Round.Round(self.app, gender, round_name)
 
-                    # Create our match data from players
-                    rand_players = random.sample(players[gender], len(players[gender]))
-                    for i in range(int(len(rand_players) / 2 )):
+                    # Get our winners from the previous Round
+                    prev_round_name = "round_"+str(r-1)
+                    _prev_round = season.round(gender, prev_round_name)
+                    _winners = _prev_round.winners()
+                    for w in range(len(_winners) // 2):
                         # Grab our versus players
-                        p_one = rand_players[i * 2]
-                        p_two = rand_players[(i * 2) + 1]
+                        p_one = _winners[w * 2]
+                        p_two = _winners[(w * 2) + 1]
 
                         # Generate some scores
                         p_one_score = random.randint(0, round_cap - 1)
@@ -84,14 +110,13 @@ class Handler():
                         who = random.randint(0, 1)
                         if(who == 0):   p_one_score = round_cap
                         else:           p_two_score = round_cap
-
+                    
                         # Append our random data as a Match
-                        #round_data[gender].append({ p_one.name(): p_one_score, p_two.name(): p_two_score })
-                        round_data[round_name][gender].append(Match.Match(round_name, p_one, p_two, p_one_score, p_two_score))
-    
-                # Set our Round Data to our season
-                season.set_rounds_raw(round_data)
-            
+                        _round.add_match(Match.Match(_round, p_one, p_two, p_one_score, p_two_score))
+
+                    # Add our round to the season
+                    season.add_round(gender, _round)
+           
             # Debug
             if(self.app.debug):
                 print("[LOAD]: Generated {1} rounds for season: '{0}'".format(season.name(), season.settings()['round_count']))

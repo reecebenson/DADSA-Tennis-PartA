@@ -1,7 +1,8 @@
 # DADSA - Assignment 1
 # Reece Benson
 
-from classes import Player as Player
+from classes import Player
+from classes import Round
 
 class Season():
     _app = None
@@ -39,12 +40,26 @@ class Season():
     def add_player(self, name, gender):
         if(not gender in self.players()):
             self._players[gender] = [ ]
+            self._rounds[gender] = [ ]
 
         # Append our Players to their specific gender category
         self._players[gender].append(Player.Player(name, gender, len(self.players()[gender])))
 
+    def round(self, gender, rnd_name):
+        if(rnd_name in self.rounds()[gender]):
+            return self.rounds()[gender][rnd_name]
+        else:
+            return None
+
     def rounds(self):
         return self._rounds
+
+    def add_round(self, gender, _round):
+        if(not gender in self.rounds()):
+            self._rounds[gender] = { }
+
+        self._rounds[gender].update({ _round.name(): _round })
+        return self._rounds[gender][_round.name()]
 
     def set_rounds(self):
         for rnd in self._rounds_raw:
@@ -55,7 +70,10 @@ class Season():
 
                 # Populate our dictionary with our match data
                 for match in self._rounds_raw[rnd][gdr]:
-                    self._rounds[gdr].append(match)
+                    _round._matches.append(match)
+
+                # Append our Round
+                self._rounds[gdr].append(_round)
 
     def set_rounds_raw(self, rounds):
         self._rounds_raw = rounds
