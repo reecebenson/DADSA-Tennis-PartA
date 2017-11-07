@@ -135,8 +135,7 @@ class Menu():
                 self._current_menu = menu_selected
                 self.display(menu_selected)
                 print(menu_selected)
-            elif(callable(menu_selected)):
-                print("exec func")
+            elif
             else:
                 print("no menu", resp)
 

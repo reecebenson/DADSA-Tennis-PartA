@@ -109,10 +109,11 @@ class Menu():
                 print("found menu @ {0}: {1} {2}".format(menu_counter, menu_name, m))
 
                 # Check if it's a function or a submenu
-                if(callable(self._menu[m])):
+                print(m)
+                if(callable(m)):
                     # Call our function
-                    print("function call")
-                    menu_found = self._menu[m]
+                    print("function called")
+                    menu_found = True
                 else:
                     menu_found = m
         return menu_found
@@ -131,12 +132,10 @@ class Menu():
             
             # Validate input from current menu
             menu_selected = self.menu_exists(resp)
-            if(menu_selected != None and callable(menu_selected) != True):
+            if(menu_selected != None and menu_selected != True):
                 self._current_menu = menu_selected
                 self.display(menu_selected)
                 print(menu_selected)
-            elif(callable(menu_selected)):
-                print("exec func")
             else:
                 print("no menu", resp)
 

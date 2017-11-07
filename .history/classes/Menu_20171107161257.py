@@ -21,31 +21,20 @@ class Menu():
         # Create our Menu
         self._menu['main'] = { "new_season": "New Season", "load_season": "Load Season" }
         self._menu['new_season'] = { "ns_players": "Players", "ns_tournaments": "Tournaments", "ns_prizemoney": "Prize Money", "ns_difficulty": "Difficulty", "back": "Back" }
-        self._menu['back'] = lambda: self.goback()
-        self._menu['ns_players'] = { "ns_viewplayers": "View Players", "ns_viewplayer": "View Player", "back": "Back" }
-        self._menu['ns_tournaments'] = { "ns_viewtournaments": "Example Tournament 1", "back": "Back" }
-        self._menu['ns_prizemoney'] = { "ns_setprizemoney": "Set Prize Money", "ns_viewprizemoney": "View Prize Money", "back": "Back" }
-        self._menu['ns_difficulty'] = { "ns_setdifficulty": "Set Difficulty", "ns_viewdifficulty": "View Difficulty", "back": "Back" }
         self._menu['load_season'] = { }
 
         # Append our Seasons to the "Load Season" Menu
         for seasonId in self._app.handler.get_seasons():
             season = self._app.handler.get_season(seasonId)
-            self._menu['load_season'].update({ "ls_"+str(seasonId): season.name() })
-
-            # Create our menu option for loading a season
-            self._menu['ls_'+str(seasonId)] = { "back": "Back" }
+            self._menu["load_season"].update({ "ls_"+str(seasonId): season.name() })
         self._menu["load_season"].update({ "back": "Back" })
 
         # Display our Menu
         self.display("main")
 
-    def go_back(self):
-        print("attempt to go back")
-
     def display(self, index = None, error = None):
         # Clear our terminal window
-        #call("cls")
+        call("cls")
 
         # Define our variables
         cur_count = 0
@@ -109,12 +98,13 @@ class Menu():
                 print("found menu @ {0}: {1} {2}".format(menu_counter, menu_name, m))
 
                 # Check if it's a function or a submenu
-                if(callable(self._menu[m])):
+                if(callable(m)):
                     # Call our function
-                    print("function call")
-                    menu_found = self._menu[m]
+                    print("function called")
+                    menu_found = True
                 else:
                     menu_found = m
+
         return menu_found
 
     def get_input(self):
@@ -131,12 +121,9 @@ class Menu():
             
             # Validate input from current menu
             menu_selected = self.menu_exists(resp)
-            if(menu_selected != None and callable(menu_selected) != True):
+            if(menu_selected != None and menu_selected != True):
                 self._current_menu = menu_selected
                 self.display(menu_selected)
-                print(menu_selected)
-            elif(callable(menu_selected)):
-                print("exec func")
             else:
                 print("no menu", resp)
 
