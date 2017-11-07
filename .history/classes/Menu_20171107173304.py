@@ -42,9 +42,9 @@ class Menu():
             # Create our menu options
             self._menu[seasonVar+"_select"] = { }
             self._menu[seasonVar+"_players"] = { }
-            self._menu[seasonVar+"_prizemoney"] = lambda: print(season.display("prize_money"))
-            self._menu[seasonVar+"_difficulty"] = lambda: print(season.display("difficulty"))
-            self._menu[seasonVar+"_details"] = lambda: print(season.display("details"))
+            self._menu[seasonVar+"_prizemoney"] = lambda: print("prize money")
+            self._menu[seasonVar+"_difficulty"] = lambda: print("difficulty")
+            self._menu[seasonVar+"_details"] = lambda: print(season.display_details())
 
             # Fill our menu options with extra options
             # > "Select Tournament"

@@ -37,14 +37,10 @@ class Menu():
             self._menu['load_season'].update({ seasonVar: season.name() })
 
             # Create our menu option for loading a season
-            self._menu[seasonVar] = { seasonVar+"_select": "Select Tournament", seasonVar+"_players": "View Players", seasonVar+"_prizemoney": "View Prize Money", seasonVar+"_difficulty": "View Difficulty", seasonVar+"_details": "View Details", "back": "Back" }
+            self._menu[seasonVar] = { seasonVar+"_select": "Select Tournament", seasonVar+"_players": "View Players", seasonVar+"_details": "View Details", "back": "Back" }
 
             # Create our menu options
-            self._menu[seasonVar+"_select"] = { }
-            self._menu[seasonVar+"_players"] = { }
-            self._menu[seasonVar+"_prizemoney"] = lambda: print(season.display("prize_money"))
-            self._menu[seasonVar+"_difficulty"] = lambda: print(season.display("difficulty"))
-            self._menu[seasonVar+"_details"] = lambda: print(season.display("details"))
+            self._menu[seasonVar+"_details"] = lambda: print(season.display_details())
 
             # Fill our menu options with extra options
             # > "Select Tournament"

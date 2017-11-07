@@ -39,25 +39,13 @@ class Season():
         # What detail are we handling?
         ret = None
         if(detail == "details"):
-            # Set our header text
-            ret = "Details about '{0}':".format(self.name()) + "\n"
-            ret += "---------------------------------------------------------------" + "\n"
-            
-            # Add details to the return string
-            ret += "There have been {0} genders defined within this season".format(len(self.players())) + "\n"
-            for gdr in self.players():
-                ret += " -> The gender '{0}' has {1} players stored within it:".format(gdr, len(self.players()[gdr])) + "\n"
-                ret += " ALL: " + ", ".join([p.name() for p in self.players()[gdr] ]) + "\n"
-            
-            # Add settings
-            ret += "\n" + "Settings for this season:" + "\n"
-            for setting in self.settings():
-                ret += " -> The setting '{0}' is set to '{1}'".format(setting, self.settings()[setting]) + "\n"
+            ret = "some details about " + self.name()
+        elif(detail == "prize_money"):
+            ret = "prize money"
+        elif(detail == "difficulty"):
+            ret = "difficulty"
         else:
             ret = "An unknown error has been handled..."
-
-        # Returning as a string, so if there was a GUI I could
-        # append this to a Label instead of printing to console
         return ret
 
     def tournaments(self):

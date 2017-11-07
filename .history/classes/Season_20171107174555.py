@@ -46,8 +46,7 @@ class Season():
             # Add details to the return string
             ret += "There have been {0} genders defined within this season".format(len(self.players())) + "\n"
             for gdr in self.players():
-                ret += " -> The gender '{0}' has {1} players stored within it:".format(gdr, len(self.players()[gdr])) + "\n"
-                ret += " ALL: " + ", ".join([p.name() for p in self.players()[gdr] ]) + "\n"
+                ret += " -> The gender '{0}' has {1} players stored within it".format(gdr, len(self.players()[gdr])) + "\n"
             
             # Add settings
             ret += "\n" + "Settings for this season:" + "\n"

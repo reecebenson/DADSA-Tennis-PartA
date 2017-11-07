@@ -33,31 +33,16 @@ class Menu():
         # Append our Seasons to the "Load Season" Menu
         for seasonId in self._app.handler.get_seasons():
             season = self._app.handler.get_season(seasonId)
-            seasonVar = 'ls_'+str(seasonId)
-            self._menu['load_season'].update({ seasonVar: season.name() })
+            self._menu['load_season'].update({ "ls_"+str(seasonId): season.name() })
 
             # Create our menu option for loading a season
-            self._menu[seasonVar] = { seasonVar+"_select": "Select Tournament", seasonVar+"_players": "View Players", seasonVar+"_prizemoney": "View Prize Money", seasonVar+"_difficulty": "View Difficulty", seasonVar+"_details": "View Details", "back": "Back" }
+            seasonVar = 'ls_'+str(seasonId)
+            self._menu[seasonVar] = { seasonVar+"_select": "Select Tournmanet", seasonVar+"_players": "View Players", seasonVar+"_details": "View Details", "back": "Back" }
 
             # Create our menu options
-            self._menu[seasonVar+"_select"] = { }
-            self._menu[seasonVar+"_players"] = { }
-            self._menu[seasonVar+"_prizemoney"] = lambda: print(season.display("prize_money"))
-            self._menu[seasonVar+"_difficulty"] = lambda: print(season.display("difficulty"))
-            self._menu[seasonVar+"_details"] = lambda: print(season.display("details"))
-
-            # Fill our menu options with extra options
-            # > "Select Tournament"
-            for tournament_name in season.tournaments():
-                self._menu[seasonVar+"_select"].update({ seasonVar+"_select_"+tournament_name: "Select {0}".format(tournament_name) })
-
-            # > "View Players"
-            for gdr in season.players():
-                self._menu[seasonVar+"_players"].update({ seasonVar+"_players_"+gdr: "List {0}s".format(gdr) })
-
-            # > Add the back options to each submenu
-            self._menu[seasonVar+"_select"].update({ "back": "Back" })
-            self._menu[seasonVar+"_players"].update({ "back": "Back" })
+            self._menu[seasonVar+"_select"] = { "back": "Back" }
+            self._menu[seasonVar+"_players"] = { "back": "Back" }
+            self._menu[seasonVar+"_details"] = lambda: print(season.display_details())
         self._menu["load_season"].update({ "back": "Back" })
 
         # Display our Menu
@@ -180,17 +165,12 @@ class Menu():
                 self._current_menu = menu_selected
                 self.display(menu_selected)
             elif(callable(menu_selected)):
-                # Clear our screen
-                call("cls")
-
                 # Call our function
                 menu_selected()
 
                 # Hold the user so they can see the result (if back hasn't just been called)
                 if(self.just_called_back == False):
                     input("\n>>> Press <Return> to continue...")
-                else:
-                    self.just_called_back = False
         
                 # Display our menu again to stop from program termination
                 self.display(self._current_menu)
@@ -203,3 +183,6 @@ class Menu():
         except ValueError:
             self.display(self._current_menu, "Please select a valid option!")
 
+    def load_action(self, menu_id):
+        #TODO: Load Action from Menu_ID
+        print("Load Action")
