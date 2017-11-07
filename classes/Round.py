@@ -12,10 +12,6 @@ class Round():
         # Set our application
         self._app = app
 
-        # Debug
-        if(self._app.debug):
-            print("[LOAD] Round: {}, Gender: {}".format(name, gender))
-
         # Set our variables
         self._name = name
         self._gender = gender

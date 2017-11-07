@@ -9,6 +9,7 @@ class Season():
     _j_data = None
     _name = None
     _players = { }
+    _tournaments = { }
     _rounds = { }
     _rounds_raw = { }
     _settings = { }
@@ -34,6 +35,24 @@ class Season():
     def settings(self):
         return self._settings
 
+    def tournaments(self):
+        return self._tournaments
+
+    def tournament(self, name):
+        if(name in self.tournaments()):
+            return self._tournaments[name]
+        else:
+            return None
+
+    def add_tournament(self, name, tournament):
+        self._tournaments.update({ name: tournament })
+
+        # Debug
+        if(self._app.debug):
+            print("[LOAD]: Loaded Tournament '{0}' for '{1}'".format(name, self.name()))
+
+        return self.tournament(name)
+
     def players(self):
         return self._players
 
@@ -46,8 +65,11 @@ class Season():
         self._players[gender].append(Player.Player(name, gender, len(self.players()[gender])))
 
     def round(self, gender, rnd_name):
-        if(rnd_name in self.rounds()[gender]):
-            return self.rounds()[gender][rnd_name]
+        if(gender in self.rounds()):
+            if(rnd_name in self.rounds()[gender]):
+                return self.rounds()[gender][rnd_name]
+            else:
+                return None
         else:
             return None
 
@@ -59,6 +81,11 @@ class Season():
             self._rounds[gender] = { }
 
         self._rounds[gender].update({ _round.name(): _round })
+
+        # Debug
+        #if(self._app.debug):
+        #    print("[LOAD]: Loaded Round: '{0}' – {2} matches – {1}".format(_round.name(), _round.gender(), _round.match_count()))
+
         return self._rounds[gender][_round.name()]
 
     def set_rounds(self):
@@ -74,7 +101,3 @@ class Season():
 
                 # Append our Round
                 self._rounds[gdr].append(_round)
-
-    def set_rounds_raw(self, rounds):
-        self._rounds_raw = rounds
-        self.set_rounds()

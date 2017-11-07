@@ -7,6 +7,7 @@ from classes import Handler
 class App():
     # Define the variables we will be using
     debug = True
+    menu = None
     handler = None
 
     # Define all of the properties we will need to use
@@ -18,12 +19,16 @@ class App():
         # Generate rounds
         self.handler.generate_rounds()
 
+        # Show Menu
+        self.menu = Menu.Menu(self)
+        self.menu.load()
+
         # Hold the program
         self.exit()
 
     # A method which exits the program after the user has pressed the Return key
     def exit(self):
-        input(">>> Press <Return> to terminate the program")
+        input("\n\n>>> Press <Return> to terminate the program")
         exit()
 
 App()

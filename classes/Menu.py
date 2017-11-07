@@ -3,10 +3,16 @@
 
 class Menu():
     # Define the variables we will be using
-    menu = None
+    _app = None
+    _menu = None
+    _current_menu = [ 0 ]
 
-    def __init__(self):
-        #TODO: Define our Menu
+    def __init__(self, app):
+        # Set our Application
+        self._app = app
+
+    def load(self):
+        # Define our Menu
         self.menu = {
             'Item 1': {
                 'Sub Item 1': self.load_action,
@@ -35,7 +41,13 @@ class Menu():
 
     def display(self):
         #TODO: Display the current Menu
-        print("Display Stuff")
+        self.get_current_menu()
+
+    def get_current_menu(self):
+        # Retrieve our current index [x, y, z]
+        index = self._current_menu
+
+        # 
 
     def get_input(self):
         #TODO: Get user's input from defined menu
