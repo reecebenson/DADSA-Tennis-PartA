@@ -5,6 +5,174 @@ from functools import partial
 from os import system as call
 from collections import OrderedDict
 
+class Builder():
+    _app = None
+    _menu = None
+    _tree = None
+    _current = None
+
+    @staticmethod
+    def init(app):
+        # Set our variables
+        Builder._app = app
+        Builder._menu = { }
+        Builder._tree = [ "main" ]
+        Builder._current = "main"
+
+    @staticmethod
+    def add_menu(menu, name, ref):
+        # Check if this submenu exists
+        if(not menu in Builder._menu):
+            Builder._menu[menu] = { }
+
+        # Update our Menu
+        Builder._menu[menu].update({ ref: name })
+
+    @staticmethod
+    def add_func(name, ref, func):
+        Builder._menu[ref] = func
+
+    @staticmethod
+    def get_item(ref):
+        if(not ref in Builder._menu):
+            return None
+        else:
+            return Builder._menu[ref]
+        return None
+
+    @staticmethod
+    def call_func(ref):
+        if(Builder.is_func(ref)):
+            Builder.get_item(ref)()
+        else:
+            return None
+
+    @staticmethod
+    def is_func(ref):
+        return callable(Builder.get_item(ref))
+
+    @staticmethod
+    def is_menu(ref):
+        return not Builder.is_func(ref)
+
+    @staticmethod
+    def find_menu(index):
+        # Get our current menu to check the items for
+        cur_menu_items = Builder.get_item(Builder.current_menu())
+        # Check that our menu exists
+        if(cur_menu_items == None):
+            print("There was an error with grabbing the selected menu!")
+            Builder.set_current_menu("main")
+            input("")
+            return False
+        else:
+            # Iterate through our items to find our index
+            for i, (k, v) in enumerate(cur_menu_items.items(), 1):
+                if(index == i):
+                    return { "menu": Builder.is_menu(k), "ref": k, "name": v }
+
+            # Return Data
+            return False
+
+        # Fall back returning statement
+        return False
+
+    @staticmethod
+    def show():
+        print(Builder._menu)
+
+    @staticmethod
+    def current_menu():
+        return Builder._current
+
+    @staticmethod
+    def set_current_menu(new_menu):
+        Builder._current = new_menu
+        return Builder.current_menu()
+
+    @staticmethod
+    def get_menu_tree():
+        return "/".join([ m for m in Builder._tree ])
+
+    @staticmethod
+    def monitor_input():
+        try:
+            # Validate our input
+            resp = input("\n>>> ")
+
+            # Validate response
+            if(resp.lower() == "exit" or resp.lower() == "quit"):
+                # Terminate the program after user confirmation
+                raise KeyboardInterrupt
+            elif(resp == ""):
+                # Invalid Input from User
+                return Builder.show_current_menu(True, True, "You have entered an invalid option")
+
+            # Check that the menu option exists
+            try:
+                # Convert our request to an integer
+                req = int(resp)
+
+                # Find the requested menu
+                req_menu = Builder.find_menu(req)
+                if(req_menu['menu']):
+                    # Display our menu
+                    Builder.set_current_menu(req_menu['ref'])
+                    Builder.show_current_menu()
+                else:
+                    # Double check we're executing a function
+                    if(Builder.is_func(req_menu['ref'])):
+                        # Execute
+                        Builder.call_func(req_menu['ref'])
+                        input("test")
+                    else:
+                        print("error")
+                        input("xxxxxxxxxxx")
+            except Exception as err:
+                input("errr!", err)
+                return Builder.show_current_menu(True, True)
+        except KeyboardInterrupt:
+            # User has terminated the program (Ctrl+C)
+            Builder._app.exit()
+        except ValueError:
+            # User has entered an invalid value
+            Builder.show_current_menu(True, True, "You have entered an invalid option")
+
+    @staticmethod
+    def show_current_menu(shouldClear = True, error = False, errorMsg = None):
+        cur_menu_items = Builder.get_item(Builder.current_menu())
+
+        # Should we clear our terminal window?
+        if(shouldClear):
+            call("cls")
+
+        # Have we got an error?
+        if(error):
+            if(errorMsg == None):
+                print("\nError:\nThere was an error performing your request.\n")
+            else:
+                print(errorMsg)
+
+        # Check that our Menu exists
+        if(cur_menu_items == None):
+            print("There was an error with grabbing the selected menu!")
+            print("Current menu: {}".format(Builder.current_menu()))
+            Builder.set_current_menu("main")
+        else:
+            # Print menu header
+            print("Please select an option: ({0})".format(Builder.get_menu_tree()))
+            
+            # Print out our menu
+            for i, (k, v) in enumerate(cur_menu_items.items(), 1):
+                print("{0}. {1}{2}".format(i, v, (' -> ' if Builder.is_menu(k) else '')))
+
+            # Print our back button
+            if(Builder.current_menu() is not "main"):
+                print("{0}. Back".format(i + 1))
+
+            # Get input from user
+            Builder.monitor_input()
+
 class Menu():
     # Define the variables we will be using
     _app = None
@@ -18,7 +186,26 @@ class Menu():
         self._app = app
 
     def load(self):
-        # Define our Menu (reset vars)
+        # Create our Menu
+        Builder.init(self._app)
+
+        ## MAIN
+        Builder.add_menu("main", "Load Season", "load_season")
+        Builder.add_menu("main", "See Developer Information", "info")
+        Builder.add_func("main", "info", lambda: self.dev_info())
+
+        ## LOAD SEASON
+        for season_id in self._app.handler.get_seasons():
+            season = self._app.handler.get_season(season_id)
+            Builder.add_menu("load_season", season.name(), "ls_[{0}]".format(season.name()))
+
+        ## SHOW MENU
+        Builder.show_current_menu()
+
+        ## HALT
+        """input("HALT!")
+
+        # Clear our menu variables
         self._menu = { }
         self._current = [ "main" ]
         self._current_menu = "main"
@@ -94,7 +281,7 @@ class Menu():
         self._menu["load_season"].update({ "back": "Back" })
 
         # Display our Menu
-        self.display("main")
+        self.display("main")"""
 
     def dev_info(self):
         # Display Developer Information
