@@ -74,8 +74,7 @@ class Menu():
                     self._menu[tournamentVar+"_"+gdr].update({ "back": "Back" })
 
                 # Add tournament specific options
-                self._menu[tournamentVar].update({ tournamentVar+"_leaderboard": "View Leaderboard", tournamentVar+"_difficulty": "View Difficulty", tournamentVar+"_prizemoney": "View Prize Money" })
-                self._menu[tournamentVar+"_leaderboard"] = partial(print, season.tournament(tournament_name).display("leaderboard"))
+                self._menu[tournamentVar].update({ tournamentVar+"_difficulty": "View Difficulty", tournamentVar+"_prizemoney": "View Prize Money" })
                 self._menu[tournamentVar+"_difficulty"] = partial(print, season.tournament(tournament_name).display("difficulty"))
                 self._menu[tournamentVar+"_prizemoney"] = partial(print, season.tournament(tournament_name).display("prize_money"))
 
@@ -85,7 +84,7 @@ class Menu():
 
             # > "View Players"
             for gdr in season.players():
-                self._menu[seasonVar+"_players"].update({ seasonVar+"_players_"+gdr: "List {0}s".format(gdr.title()) })
+                self._menu[seasonVar+"_players"].update({ seasonVar+"_players_"+gdr: "List {0}s".format(gdr) })
                 self._menu[seasonVar+"_players_"+gdr] = partial(print, season.display("players", gdr))
 
             # Add the back options to each submenu

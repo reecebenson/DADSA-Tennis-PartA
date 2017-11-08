@@ -42,7 +42,7 @@ class Tournament():
             ret += "Prize Money:" + "\n"
             ret += "{0}".format("\n".join([ "  #{0}: £{1:,}".format(i, int(t)) for i, t in enumerate(self.prize_money(), 1) ])) + "\n"
         elif(detail == "leaderboard"):
-            ret += "leaderboard data"
+            
         else:
             ret = "An unknown error has been handled..."
         return ret

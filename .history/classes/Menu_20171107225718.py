@@ -18,7 +18,7 @@ class Menu():
         self._app = app
 
     def load(self):
-        # Define our Menu (reset vars)
+        # Define our Menu
         self._menu = { }
         self._current = [ "main" ]
         self._current_menu = "main"
@@ -49,46 +49,33 @@ class Menu():
             for tournament_name in season.tournaments():
                 tournamentVar = seasonVar+"_select_"+tournament_name
 
-                # Define menu holders
-                self._menu[tournamentVar] = { }
-                self._menu[tournamentVar+"_rselect"] = { }
-
-                # Tournament Selecter
                 self._menu[seasonVar+"_select"].update({ tournamentVar: "Select {0}".format(tournament_name) })
 
-                # > "View Rounds"
-                self._menu[tournamentVar].update({ tournamentVar+"_rselect": "View Rounds" })
-
-                # > Populate "View Rounds" with Round specific otpions
+                # Set our gender specifiers within the tournament
+                self._menu[tournamentVar] = { }
                 for gdr in season.rounds():
-                    # List genderd rounds
-                    self._menu[tournamentVar+"_rselect"].update({ tournamentVar+"_"+gdr: "{0} rounds".format(gdr).title() })
+                    self._menu[tournamentVar].update({ tournamentVar+"_"+gdr: "View {0} Rounds".format(gdr) })
 
-                    # List the available rounds within the menu
                     self._menu[tournamentVar+"_"+gdr] = { }
                     for r, rnd in enumerate(season.rounds()[gdr], 1):
                         self._menu[tournamentVar+"_"+gdr].update({ tournamentVar+"-"+gdr+"-"+rnd: "Round {0}".format(r) })
                         self._menu[tournamentVar+"-"+gdr+"-"+rnd] = partial(print, "\n".join([ "{0} — Winner: {1}, updated score: {2}".format(m.versuses(True), m.winner()[0].name(), season.round(gdr, rnd).get_rank()) for m in season.round(gdr, rnd).matches() ]))
-
-                    # Add the back option
                     self._menu[tournamentVar+"_"+gdr].update({ "back": "Back" })
 
                 # Add tournament specific options
-                self._menu[tournamentVar].update({ tournamentVar+"_leaderboard": "View Leaderboard", tournamentVar+"_difficulty": "View Difficulty", tournamentVar+"_prizemoney": "View Prize Money" })
-                self._menu[tournamentVar+"_leaderboard"] = partial(print, season.tournament(tournament_name).display("leaderboard"))
+                self._menu[tournamentVar].update({ tournamentVar+"_difficulty": "View Difficulty", tournamentVar+"_prizemoney": "View Prize Money" })
                 self._menu[tournamentVar+"_difficulty"] = partial(print, season.tournament(tournament_name).display("difficulty"))
                 self._menu[tournamentVar+"_prizemoney"] = partial(print, season.tournament(tournament_name).display("prize_money"))
 
-                # Add the back option
+                # Add our back option
                 self._menu[tournamentVar].update({ "back": "Back" })
-                self._menu[tournamentVar+"_rselect"].update({ "back": "Back" })
 
             # > "View Players"
             for gdr in season.players():
-                self._menu[seasonVar+"_players"].update({ seasonVar+"_players_"+gdr: "List {0}s".format(gdr.title()) })
+                self._menu[seasonVar+"_players"].update({ seasonVar+"_players_"+gdr: "List {0}s".format(gdr) })
                 self._menu[seasonVar+"_players_"+gdr] = partial(print, season.display("players", gdr))
 
-            # Add the back options to each submenu
+            # > Add the back options to each submenu
             self._menu[seasonVar+"_select"].update({ "back": "Back" })
             self._menu[seasonVar+"_players"].update({ "back": "Back" })
         self._menu["load_season"].update({ "back": "Back" })
