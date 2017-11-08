@@ -253,7 +253,47 @@ class Menu():
         ## LOAD SEASON
         for season_id in self._app.handler.get_seasons():
             season = self._app.handler.get_season(season_id)
+
+            # Import Season(s) into our menu
             Builder.add_menu("load_season", season.name(), "ls_[{0}]".format(season.name()))
+
+            ## LOAD TOURNAMENT
+            for tournament_name in season.tournaments():
+                tournament = season.tournament(tournament_name)
+
+                Builder.add_menu("ls_[{0}]".format(season.name()), tournament_name, "ls_[{0}]_[{1}]".format(season.name(), tournament_name))
+
+                # Import Tournament Options
+                tournament_option_name = "ls_[{0}]_[{1}]".format(season.name(), tournament_name)
+                Builder.add_menu(tournament_option_name, "Select Round", "{0}_{1}".format(tournament_option_name, "rs"))
+                Builder.add_menu(tournament_option_name, "View Difficulty", "{0}_{1}".format(tournament_option_name, "vd"))
+                Builder.add_menu(tournament_option_name, "View Prize Money", "{0}_{1}".format(tournament_option_name, "vpm"))
+
+                ## LOAD ROUNDS
+                for gdr in season.rounds():
+                    Builder.add_menu("{0}_{1}".format(tournament_option_name, "rs"), "{0} Rounds".format(gdr).title(), "{0}_{1}_{2}".format(tournament_option_name, "rs", "g"))
+
+                    ## IMPORT ROUNDS
+                    for r, rnd in enumerate(season.rounds()[gdr], 1):
+                        Builder.add_menu("{0}_{1}_{2}".format(tournament_option_name, "rs", "g"), "Round {0}".format(r), "{0}_{1}_{2}".format(tournament_option_name, "vr", rnd))
+                        Builder.add_func("{0}_{1}_{2}".format(tournament_option_name, "vr", rnd), "{0}_{1}_{2}".format(tournament_option_name, "vr", rnd), lambda: self.dev_info())
+
+
+                """# > Populate "View Rounds" with Round specific otpions
+                for gdr in season.rounds():
+                    # List genderd rounds
+                    self._menu[tournamentVar+"_rselect"].update({ tournamentVar+"_"+gdr: "{0} rounds".format(gdr).title() })
+
+                    # List the available rounds within the menu
+                    self._menu[tournamentVar+"_"+gdr] = { }
+                    for r, rnd in enumerate(season.rounds()[gdr], 1):
+                        self._menu[tournamentVar+"_"+gdr].update({ tournamentVar+"-"+gdr+"-"+rnd: "Round {0}".format(r) })
+                        self._menu[tournamentVar+"-"+gdr+"-"+rnd] = partial(print, "\n".join([ "{0} — Winner: {1}, updated score: {2}".format(m.versuses(True), m.winner()[0].name(), season.round(gdr, rnd).get_rank()) for m in season.round(gdr, rnd).matches() ]))
+
+                    # Add the back option
+                    self._menu[tournamentVar+"_"+gdr].update({ "back": "Back" })"""
+
+
 
         ## SHOW MENU
         Builder.show_current_menu()
