@@ -1,6 +1,7 @@
 # DADSA - Assignment 1
 # Reece Benson
 
+import traceback
 from functools import partial
 from os import system as call
 from collections import OrderedDict
@@ -52,18 +53,39 @@ class Builder():
         return callable(Builder.get_item(ref))
 
     @staticmethod
+    def item_exists(ref):
+        return (ref in Builder._menu)
+
+    @staticmethod
     def is_menu(ref):
-        return not Builder.is_func(ref)
+        is_a_menu = True
+        
+        # Check if the "menu" exists
+        if(not ref in Builder._menu):
+            is_a_menu = False
+
+        # Check if the menu is a dictionary
+        if(type(Builder.get_item(ref)) != dict):
+            is_a_menu = False
+
+        return is_a_menu
+
+    @staticmethod
+    def strikeOut(text):
+        result = ''
+        for c in text:
+            result = result + c + '\u0336'
+        return result
 
     @staticmethod
     def find_menu(index):
         # Get our current menu to check the items for
         cur_menu_items = Builder.get_item(Builder.current_menu())
+
         # Check that our menu exists
         if(cur_menu_items == None):
             print("There was an error with grabbing the selected menu!")
             Builder.set_current_menu("main")
-            input("")
             return False
         else:
             # Iterate through our items to find our index
@@ -91,8 +113,26 @@ class Builder():
         return Builder.current_menu()
 
     @staticmethod
+    def add_menu_tree(ref):
+        Builder._tree.append(ref)
+
+    @staticmethod
     def get_menu_tree():
         return "/".join([ m for m in Builder._tree ])
+
+    @staticmethod
+    def go_back():
+        # Set our flag to true
+        Builder.just_called_back = True
+
+        # Pop off the last item of the list
+        Builder._tree.pop()
+
+        # Set our current menu to the last element of the list
+        Builder._current = Builder._tree[-1]
+
+        # Display our menu
+        return Builder.show_current_menu()
 
     @staticmethod
     def monitor_input():
@@ -115,21 +155,34 @@ class Builder():
 
                 # Find the requested menu
                 req_menu = Builder.find_menu(req)
-                if(req_menu['menu']):
-                    # Display our menu
-                    Builder.set_current_menu(req_menu['ref'])
-                    Builder.show_current_menu()
-                else:
-                    # Double check we're executing a function
-                    if(Builder.is_func(req_menu['ref'])):
-                        # Execute
-                        Builder.call_func(req_menu['ref'])
-                        input("test")
+                if(type(req_menu) == dict):
+                    if(req_menu['menu']):
+                        # Display our menu
+                        Builder.set_current_menu(req_menu['ref'])
+                        Builder.add_menu_tree(req_menu['ref'])
+                        Builder.show_current_menu()
                     else:
-                        print("error")
-                        input("xxxxxxxxxxx")
+                        # Double check we're executing a function
+                        if(Builder.is_func(req_menu['ref'])):
+                            # Clear Terminal
+                            call("cls")
+
+                            # Execute
+                            Builder.call_func(req_menu['ref'])
+                            return Builder.show_current_menu()
+                        else:
+                            if(not Builder.item_exists(req_menu['ref'])):
+                                return Builder.show_current_menu(True, True, "That option is unavailable")
+                else:
+                    # Check if we pressed the Back button
+                    current_menu = Builder.get_item(Builder._current)
+                    if(req == (len(current_menu) + 1) and Builder._current is not "main"):
+                        return Builder.go_back()
+                    else:
+                        return Builder.show_current_menu(True, True, "You have entered an invalid option")
             except Exception as err:
-                input("errr!", err)
+                traceback.print_exc()
+                input("t")
                 return Builder.show_current_menu(True, True)
         except KeyboardInterrupt:
             # User has terminated the program (Ctrl+C)
@@ -151,7 +204,7 @@ class Builder():
             if(errorMsg == None):
                 print("\nError:\nThere was an error performing your request.\n")
             else:
-                print(errorMsg)
+                print("\nError:\n{0}.\n".format(errorMsg))
 
         # Check that our Menu exists
         if(cur_menu_items == None):
@@ -164,7 +217,10 @@ class Builder():
             
             # Print out our menu
             for i, (k, v) in enumerate(cur_menu_items.items(), 1):
-                print("{0}. {1}{2}".format(i, v, (' -> ' if Builder.is_menu(k) else '')))
+                if(Builder.item_exists(k)):
+                    print("{0}. {1}{2}".format(i, v, (' -> ' if Builder.is_menu(k) else '')))
+                else:
+                    print(Builder.strikeOut("{0}. {1}{2}".format(i, v, (' -> ' if Builder.is_menu(k) else ''))))
 
             # Print our back button
             if(Builder.current_menu() is not "main"):
@@ -297,7 +353,6 @@ class Menu():
 
         # Go back to the menu
         input("\n>>> Press <Return> to continue...")
-        self.display(self._current_menu)
 
     def go_back(self):
         # Set our flag to true
