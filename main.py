@@ -17,9 +17,10 @@ class App():
         self.handler.load()
 
         # Generate rounds
-        self.handler.generate_rounds()
+        # self.handler.generate_rounds()
 
         # Show Menu
+        input("load menu")
         self.menu = Menu.Menu(self)
         self.menu.load()
 

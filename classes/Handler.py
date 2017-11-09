@@ -3,6 +3,7 @@
 
 import json
 import random
+from os import system as call
 from math import ceil, floor
 from classes import Player
 from classes import Season
@@ -32,8 +33,6 @@ class Handler():
         self.load_players()
         self.load_prize_money()
 
-        #TODO: Implement load_seasons()
-
     # Used to load seasons into memory
     def load_seasons(self):
         with open('./data/seasons.json') as tData:
@@ -44,6 +43,47 @@ class Handler():
                 if(not season in self.get_seasons()):
                     self.seasons.update({ season: Season.Season(self.app, season, data[season]) })
 
+                    # Check how the user would like to load data
+                    _season = self.get_season(season)
+                    self.load_rounds(season)
+
+    # Load our rounds for each season
+    def load_rounds(self, seasonId, error = False):
+        # Get our Season Object
+        season = self.get_season(seasonId)
+
+        # Clear Terminal
+        call("cls")
+
+        # Was there an error?
+        if(error):
+            print("\nError:\nThere was an error performing your request.\n")
+
+        # Question our user on how they would like to load data
+        print("How would you like to load the data for '{0}'?".format(season.name()))
+        print("1. Generate Data")
+        print("2. Load Previous Data")
+        print("3. Manual Input Data")
+        resp = input(">>> ")
+        if(resp.isdigit()):
+            req = int(resp)
+            if(req >= 1 and req <= 2):
+                if(req == 1):
+                    # Generate Round Data
+                    self.generate_rounds()
+                elif(req == 2):
+                    # Load Data from previous terminal instance
+                    print("load from previous")
+                elif(req == 3):
+                    # Manually input data (now)
+                    print("Manually input data")
+
+                input("halt")
+            else:
+                self.load_rounds(seasonId, True)
+        else:
+            self.load_rounds(seasonId, True)
+
     # Load our tournaments for each season
     def load_tournaments(self):
         for seasonId in self.seasons:
@@ -52,6 +92,10 @@ class Handler():
             
             # Grab Tournaments from raw JSON data stored in the Season
             for tournament_name in season._j_data['tournaments']:
+                # Make sure that we're importing a tournament
+                if("round" in tournament_name):
+                    continue
+
                 tournament_json = season._j_data['tournaments'][tournament_name]
 
                 # Create our Tournament
@@ -167,6 +211,14 @@ class Handler():
                         # Update our player count
                         if(len(self.get_season(season).players()[gender]) > self.player_count):
                             self.player_count = len(self.get_season(season).players()[gender])
+
+    def get_round_status(self):
+
+        pass
+
+    def write_round(self):
+
+        pass
 
     def get_seasons(self):
         return self.seasons

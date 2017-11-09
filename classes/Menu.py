@@ -255,7 +255,9 @@ class Menu():
         ## MAIN
         Builder.add_menu("main", "Load Season", "load_season")
         Builder.add_menu("main", "See Developer Information", "info")
+        Builder.add_menu("main", "See Debug Information", "d_info")
         Builder.add_func("main", "info", lambda: self.dev_info())
+        Builder.add_func("main", "d_info", lambda: self.debug_info())
 
         ## LOAD SEASON
         for season_id in self._app.handler.get_seasons():
@@ -394,6 +396,39 @@ class Menu():
         # Display our Menu
         self.display("main")"""
 
+    def debug_info(self):
+        print("What season would you like to debug?")
+        for seasonId in self._app.handler.get_seasons():
+            season = self._app.handler.get_season(seasonId)
+            print("-> {0}".format(season.name()))
+
+        id = input(">>> ") or "season_1"
+        if(self._app.handler.get_season(id) != None):
+            season = self._app.handler.get_season(seasonId)
+            
+            #PRINT DEBUG
+            print("Name: {0}".format(season.name()))
+            print("Gender Count: {0}".format(len(season.rounds())))
+            for g in season.rounds():
+                print("Round Count for {0}: {1}".format(g, len(season.rounds()[g])))
+            print("Tournament Count: {0}".format(len(season.tournaments())))
+            print("Tournament Names: {0}".format([ t for t in season.tournaments() ]))
+            print("Settings: {0}".format(season._j_data['settings']))
+
+            #ACTIONS
+            print("Perform an action:")
+            action = input(">>> ")
+            if(action == "gen"):
+                self._app.handler.generate_rounds()
+            elif(action == "del rounds"):
+                season._rounds = { }
+            else:
+                input("\nError:\nAction does not exist.\nPress <Return> to continue...")
+        else:
+            input("\nError:\nSeason does not exist.\nPress <Return> to continue...")
+        
+        self.debug_info()
+        
     def dev_info(self):
         # Display Developer Information
         print("Python - Design and Analysis of Data Structures and Algorithms")
