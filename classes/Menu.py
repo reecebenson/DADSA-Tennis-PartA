@@ -141,7 +141,7 @@ class Builder():
             resp = input("\n>>> ")
 
             # Validate response
-            if(resp.lower() == "exit" or resp.lower() == "quit"):
+            if(resp.lower() == "exit" or resp.lower() == "quit" or resp.lower() == "x"):
                 # Terminate the program after user confirmation
                 raise KeyboardInterrupt
             elif(resp == ""):
@@ -150,6 +150,10 @@ class Builder():
 
             # Check that the menu option exists
             try:
+                # See if we're trying to go back a page
+                if(resp.lower() == "b" and Builder._current is not "main"):
+                    return Builder.go_back()
+
                 # Convert our request to an integer
                 req = int(resp)
 
@@ -187,16 +191,21 @@ class Builder():
                         return Builder.go_back()
                     else:
                         return Builder.show_current_menu(True, True, "You have entered an invalid option")
+            except KeyboardInterrupt:
+                raise KeyboardInterrupt
+            except ValueError:
+                raise ValueError
             except Exception as err:
-                traceback.print_exc()
-                input("t")
-                return Builder.show_current_menu(True, True)
+                raise Exception
         except KeyboardInterrupt:
             # User has terminated the program (Ctrl+C)
-            Builder._app.exit()
+            return Builder._app.exit()
         except ValueError:
             # User has entered an invalid value
-            Builder.show_current_menu(True, True, "You have entered an invalid option")
+            return Builder.show_current_menu(True, True, "You have entered an invalid option")
+        except Exception as err:
+            # input(traceback.print_exc())
+            return Builder.show_current_menu(True, True)
 
     @staticmethod
     def show_current_menu(shouldClear = True, error = False, errorMsg = None):

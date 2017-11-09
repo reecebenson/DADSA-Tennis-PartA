@@ -20,7 +20,6 @@ class App():
         # self.handler.generate_rounds()
 
         # Show Menu
-        input("load menu")
         self.menu = Menu.Menu(self)
         self.menu.load()
 
