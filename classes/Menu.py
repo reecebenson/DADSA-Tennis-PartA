@@ -167,8 +167,15 @@ class Builder():
                             # Clear Terminal
                             call("cls")
 
+                            # Print Function Header
+                            print("——————————————————————————————————————————————————————————————")
+
                             # Execute
                             Builder.call_func(req_menu['ref'])
+
+                            # Hold user (to display output from function)
+                            input("\n>>> Press <Return> to continue...")
+
                             return Builder.show_current_menu()
                         else:
                             if(not Builder.item_exists(req_menu['ref'])):
@@ -265,18 +272,26 @@ class Menu():
 
                 # Import Tournament Options
                 tournament_option_name = "ls_[{0}]_[{1}]".format(season.name(), tournament_name)
+                Builder.add_menu(tournament_option_name, "Emulate Tournament", "{0}_{1}".format(tournament_option_name, "et"))
                 Builder.add_menu(tournament_option_name, "Select Round", "{0}_{1}".format(tournament_option_name, "rs"))
                 Builder.add_menu(tournament_option_name, "View Difficulty", "{0}_{1}".format(tournament_option_name, "vd"))
                 Builder.add_menu(tournament_option_name, "View Prize Money", "{0}_{1}".format(tournament_option_name, "vpm"))
+                Builder.add_menu(tournament_option_name, "View Leaderboard", "{0}_{1}".format(tournament_option_name, "vlb"))
+
+                # Import Tournament Functions
+                Builder.add_func(tournament_option_name, "{0}_{1}".format(tournament_option_name, "et"), partial(season.tournament(tournament_name).emulate, season))
+                Builder.add_func(tournament_option_name, "{0}_{1}".format(tournament_option_name, "vd"), partial(print, season.tournament(tournament_name).display("difficulty")))
+                Builder.add_func(tournament_option_name, "{0}_{1}".format(tournament_option_name, "vpm"), partial(print, season.tournament(tournament_name).display("prize_money")))
+                Builder.add_func(tournament_option_name, "{0}_{1}".format(tournament_option_name, "vlb"), partial(print, season.tournament(tournament_name).display("leaderboard")))
 
                 ## LOAD ROUNDS
                 for gdr in season.rounds():
-                    Builder.add_menu("{0}_{1}".format(tournament_option_name, "rs"), "{0} Rounds".format(gdr).title(), "{0}_{1}_{2}".format(tournament_option_name, "rs", "g"))
+                    Builder.add_menu("{0}_{1}".format(tournament_option_name, "rs"), "{0} Rounds".format(gdr).title(), "{0}_{1}_{2}".format(tournament_option_name, "rs", gdr))
 
                     ## IMPORT ROUNDS
                     for r, rnd in enumerate(season.rounds()[gdr], 1):
-                        Builder.add_menu("{0}_{1}_{2}".format(tournament_option_name, "rs", "g"), "Round {0}".format(r), "{0}_{1}_{2}".format(tournament_option_name, "vr", rnd))
-                        Builder.add_func("{0}_{1}_{2}".format(tournament_option_name, "vr", rnd), "{0}_{1}_{2}".format(tournament_option_name, "vr", rnd), lambda: self.dev_info())
+                        Builder.add_menu("{0}_{1}_{2}".format(tournament_option_name, "rs", gdr), "Round {0}".format(r), "{0}_{1}_{2}".format(tournament_option_name, "vr", gdr+"_"+rnd))
+                        Builder.add_func("{0}_{1}_{2}".format(tournament_option_name, "vr", rnd), "{0}_{1}_{2}".format(tournament_option_name, "vr", gdr+"_"+rnd), partial(season.tournament(tournament_name).emulate_round, season, gdr, rnd))
 
 
                 """# > Populate "View Rounds" with Round specific otpions
@@ -390,9 +405,6 @@ class Menu():
         print("")
         print("The GitHub repository can be found @ http://github.com/reecebenson/DADSA-Tennis (private repo)")
         print("Thanks!")
-
-        # Go back to the menu
-        input("\n>>> Press <Return> to continue...")
 
     def go_back(self):
         # Set our flag to true

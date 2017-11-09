@@ -29,6 +29,20 @@ class Tournament():
     def set_difficulty(self, difficulty):
         self._difficulty = difficulty
 
+    def emulate(self, season):
+        # Start the emulation of our tournament (? from where we left off)
+        # Get our Round Genders
+        for i, gdr in enumerate(season.rounds(), 1):
+            # Get our Rounds
+            for r, rnd in enumerate(season.rounds()[gdr], 1):
+                self.emulate_round(season, gdr, rnd)
+                print(">>>>>>>>>>>>>>>> END OF ROUND")
+
+    def emulate_round(self, season = None, gdr = None, rnd = None):
+        # Get our Matches
+        for m, match in enumerate(season.round(gdr, rnd).matches(), 1):
+            print(match.versuses(True))
+
     def display(self, detail):
         # Set our header text
         ret = "Details about '{0}':".format(self.name()) + "\n"
