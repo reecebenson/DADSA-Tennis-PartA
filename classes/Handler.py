@@ -60,7 +60,7 @@ class Handler():
                             self.seasons[season]._j_data['settings'].update({ "loaded": True })
 
     # Load our rounds for each season
-    def load_rounds(self, seasonId, error = False):
+    def load_rounds(self, seasonId, error = False, errorMsg = None):
         # Get our Season Object
         season = self.get_season(seasonId)
 
@@ -69,30 +69,42 @@ class Handler():
 
         # Was there an error?
         if(error):
-            print("\nError:\nThere was an error performing your request.\n")
+            if(errorMsg != None):
+                print("\nError:\n{0}\n".format(errorMsg))
+            else:
+                print("\nError:\nThere was an error performing your request.\n")
 
         # Question our user on how they would like to load data
         print("How would you like to load the data for '{0}'?".format(season.name()))
-        print("1. Generate New Data")
-        print(Menu.Builder.strikeOut("2. Load Previous Data"))
+        print("1. Generate New Data\n   -> This will override previous stored data!\n")
+        print("2. Load Previous Data" if self.prev_rounds_exist(seasonId) else Menu.Builder.notAvailable("2. Load Previous Data"))
+        print("   -> Import data from the `seasons.json` file\n")
         print("3. Manual Input Data")
-        resp = input(">>> ")
-        if(resp.isdigit()):
-            req = int(resp)
-            if(req >= 1 and req <= 2):
-                if(req == 1):
-                    # Generate Round Data
-                    self.round_mode[seasonId] = partial(self.generate_rounds, seasonId)
-                elif(req == 2):
-                    # Load Data from previous terminal instance
-                    self.round_mode[seasonId] = partial(self.load_previous_rounds, seasonId)
-                elif(req == 3):
-                    # Manually input data (now)
-                    print("Manually input data")
+        print("   -> Import data manually using the terminal window\n")
+
+        try:
+            resp = input(">>> ")
+            if(resp.isdigit()):
+                req = int(resp)
+                if(req >= 1 and req <= 2):
+                    if(req == 1):
+                        # Generate Round Data
+                        self.round_mode[seasonId] = partial(self.generate_rounds, seasonId)
+                    elif(req == 2):
+                        if(self.prev_rounds_exist(seasonId)):
+                            # Load Data from previous terminal instance
+                            self.round_mode[seasonId] = partial(self.load_previous_rounds, seasonId)
+                        else:
+                            self.load_rounds(seasonId, True, "That option is unavailable.")
+                    elif(req == 3):
+                        # Manually input data (now)
+                        print("Manually input data")
+                else:
+                    self.load_rounds(seasonId, True)
             else:
                 self.load_rounds(seasonId, True)
-        else:
-            self.load_rounds(seasonId, True)
+        except KeyboardInterrupt:
+            self.app.exit()
 
     # Load our tournaments for each season
     def load_tournaments(self, seasonId):

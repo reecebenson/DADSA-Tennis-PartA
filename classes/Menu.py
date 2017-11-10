@@ -71,11 +71,8 @@ class Builder():
         return is_a_menu
 
     @staticmethod
-    def strikeOut(text):
-        result = ''
-        for c in text:
-            result = result + c + '\u0336'
-        return result
+    def notAvailable(text):
+        return text + " (Not Available)"
 
     @staticmethod
     def find_menu(index):
@@ -236,7 +233,7 @@ class Builder():
                 if(Builder.item_exists(k)):
                     print("{0}. {1}{2}".format(i, v, (' -> ' if Builder.is_menu(k) else '')))
                 else:
-                    print(Builder.strikeOut("{0}. {1}{2}".format(i, v, (' -> ' if Builder.is_menu(k) else ''))))
+                    print(Builder.notAvailable("{0}. {1}{2}".format(i, v, (' -> ' if Builder.is_menu(k) else ''))))
 
             # Print our back button
             if(Builder.current_menu() is not "main"):

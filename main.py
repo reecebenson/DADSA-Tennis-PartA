@@ -1,6 +1,7 @@
 # DADSA - Assignment 1
 # Reece Benson
 
+import traceback
 from classes import Menu
 from classes import Handler
 
