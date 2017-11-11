@@ -3,6 +3,7 @@
 
 from classes import Player
 from classes import Round
+from classes.File import File
 
 class Season():
     _app = None
@@ -91,11 +92,14 @@ class Season():
 
         return self.tournament(name)
 
-    def add_gender(self, gender_name):
-        self._players.update({ gender_name: [ ] })
+    def add_gender(self, name, cap):
+        # Update Memory
+        self._players.update({ name: [ ] })
+        self._rounds.update({ name: [ ] })
+        self._j_data['settings'].update({ name + "_cap": cap })
 
-    def genders(self):
-        return self._players
+        # Update Files
+        File.add_gender(self.name(), name, cap)
 
     def players(self):
         return self._players

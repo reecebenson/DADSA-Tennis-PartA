@@ -144,18 +144,32 @@ class Handler():
         gender = input(">>> ")
 
         # Push our gender to the Season players object
-        if(gender.lower() in season.players() or gender == None or gender == ""):
+        if(gender.lower() in season.rounds() or gender == None or gender == ""):
             call("cls")
             return self.new_gender(seasonId, True)
         else:
-            season.add_gender(gender.lower())
-            print("'{0}' has successfully been added as a gender for '{1}'.".format(gender, season.name()))
+            # Get a round cap
+            try:
+                print("Please enter a Round Cap for {0}:".format(gender))
+                cap = input(">>> ") or 3
+                season.add_gender(gender.lower(), cap)
+                input("xd")
+                print("'{0}' has successfully been added as a gender for '{1}'.".format(gender, season.name()))
+            except Exception as err:
+                print(err)
+                input("Error!")
 
     def new_player(self, seasonId):
         print("new player")
 
     def new_tournament(self, seasonId):
         print("new tournament")
+
+    def view_genders(self, seasonId):
+        # Get our Season Object
+        season = self.get_season(seasonId)
+
+        print("Here are a list of the Genders for {0}:\n{1}".format(season.name(), "\n".join([g for g in season.rounds()])))
 
     # Start the manual input of data for the Season
     def input_manual_rounds(self, seasonId):
@@ -171,15 +185,16 @@ class Handler():
         Builder.add_menu("main", "View Players", "view_players")
         Builder.add_menu("main", "View Tournaments", "view_tournaments")
         Builder.add_menu("main", "End Editing", "end_manual_rounds")
+        Builder.add_menu("end_manual_rounds", "Stop Editing", "return")
 
         # Add Functionality
-        Builder.add_func("main", "view_genders", partial(print, "Here are a list of the Genders for {0}:\n{1}".format(season.name(), "\n".join([g for g in season.players()]))))
+        Builder.add_func("main", "view_genders", partial(self.view_genders, seasonId))
         Builder.add_func("main", "view_players", partial(print, "View Players"))
         Builder.add_func("main", "view_tournaments", partial(print, "View Tournaments"))
         Builder.add_func("main", "new_gender", partial(self.new_gender, seasonId))
         Builder.add_func("main", "new_player", partial(self.new_player, seasonId))
         Builder.add_func("main", "new_tournament", partial(self.new_tournament, seasonId))
-        Builder.add_func("main", "end_manual_rounds", "return")
+        Builder.add_func("end_manual_rounds", "return", None)
 
         # Display Menu
         Builder.show_current_menu()
