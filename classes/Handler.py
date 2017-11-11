@@ -11,7 +11,7 @@ from classes import Season
 from classes import Tournament
 from classes import Round
 from classes import Match
-from classes import Menu
+from classes.Menu import Builder
 
 class Handler():
     # Define the variables we will be using
@@ -58,6 +58,9 @@ class Handler():
                         if(callable(self.round_mode[season])):
                             self.round_mode[season]()
                             self.seasons[season]._j_data['settings'].update({ "loaded": True })
+                        else:
+                            # Let's go back to loading rounds
+                            self.load_rounds(season, True, "The option you selected is unavailable.")
 
     # Load our rounds for each season
     def load_rounds(self, seasonId, error = False, errorMsg = None):
@@ -77,7 +80,7 @@ class Handler():
         # Question our user on how they would like to load data
         print("How would you like to load the data for '{0}'?".format(season.name()))
         print("1. Generate New Data\n   -> This will override previous stored data!\n")
-        print("2. Load Previous Data" if self.prev_rounds_exist(seasonId) else Menu.Builder.notAvailable("2. Load Previous Data"))
+        print("2. Load Previous Data" if self.prev_rounds_exist(seasonId) else Builder.notAvailable("2. Load Previous Data"))
         print("   -> Import data from the `seasons.json` file\n")
         print("3. Manual Input Data")
         print("   -> Import data manually using the terminal window\n")
@@ -86,7 +89,7 @@ class Handler():
             resp = input(">>> ")
             if(resp.isdigit()):
                 req = int(resp)
-                if(req >= 1 and req <= 2):
+                if(req >= 1 and req <= 3):
                     if(req == 1):
                         # Generate Round Data
                         self.round_mode[seasonId] = partial(self.generate_rounds, seasonId)
@@ -97,8 +100,7 @@ class Handler():
                         else:
                             self.load_rounds(seasonId, True, "That option is unavailable.")
                     elif(req == 3):
-                        # Manually input data (now)
-                        print("Manually input data")
+                        self.round_mode[seasonId] = partial(self.input_manual_rounds, seasonId)
                 else:
                     self.load_rounds(seasonId, True)
             else:
@@ -127,6 +129,41 @@ class Handler():
             # Add our Tournament to our Season
             season.add_tournament(tournament_name, tournament)
 
+    # Start the manual input of data for the Season
+    def input_manual_rounds(self, seasonId):
+        # Get our Season Object
+        season = self.get_season(seasonId)
+
+        # Variables we will use to update the season
+        genders = [ ]       # This will hold the Gender Names       #> genders["male"]
+        players = { }       # This will hold the Gender + Player    #> players["male"]["MP01"]
+        tournaments = { }   # This will hold the Tournaments        #> tournaments["TAC1"]
+
+        # Build our menu
+        Builder.init(self.app, "[Editing '{0}'] Please select an option:".format(season.name()))
+        Builder.add_menu("main", "New Gender", "new_gender")
+        Builder.add_menu("main", "New Player", "new_player")
+        Builder.add_menu("main", "New Tournament", "new_tournament")
+        Builder.add_menu("main", "View Genders", "view_genders")
+        Builder.add_menu("main", "View Players", "view_players")
+        Builder.add_menu("main", "View Tournaments", "view_tournaments")
+
+        # Add Functionality
+        Builder.add_func("main", "view_genders", partial(print, "View Genders"))
+        Builder.add_func("main", "view_players", partial(print, "View Players"))
+        Builder.add_func("main", "view_tournaments", partial(print, "View Tournaments"))
+
+        # Display Menu
+        Builder.show_current_menu()
+
+        # Start the input of Genders
+        #print("Please enter the genders used within '{0}', separating them by commas".format(season.name()))
+        #genders = input(">>> ").lower().split(",")
+
+        # Start the input of players
+
+
+    # Check if previous round data exists within the Season
     def prev_rounds_exist(self, seasonId):
         # Get our Season Object
         season = self.get_season(seasonId)
@@ -143,7 +180,7 @@ class Handler():
 
         # Check if the season has previous round data
         if(self.prev_rounds_exist(seasonId)):
-            return 
+            return
         
         # Round exists, lets import our data to our season
         input("data exists, yay")

@@ -11,14 +11,16 @@ class Builder():
     _menu = None
     _tree = None
     _current = None
+    _title = None
 
     @staticmethod
-    def init(app):
+    def init(app, title = False):
         # Set our variables
         Builder._app = app
         Builder._menu = { }
         Builder._tree = [ "main" ]
         Builder._current = "main"
+        Builder._title = "Please select an option:" if not title else title
 
     @staticmethod
     def add_menu(menu, name, ref):
@@ -226,7 +228,7 @@ class Builder():
             Builder.set_current_menu("main")
         else:
             # Print menu header
-            print("Please select an option: ({0})".format(Builder.get_menu_tree()))
+            print("{0} ({1})".format(Builder._title, Builder.get_menu_tree()))
             
             # Print out our menu
             for i, (k, v) in enumerate(cur_menu_items.items(), 1):
