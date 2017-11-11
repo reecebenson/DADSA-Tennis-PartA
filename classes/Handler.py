@@ -100,6 +100,7 @@ class Handler():
                         else:
                             self.load_rounds(seasonId, True, "That option is unavailable.")
                     elif(req == 3):
+                        self.round_temp = { "genders": None, "players": None, "tournaments": None }
                         self.round_mode[seasonId] = partial(self.input_manual_rounds, seasonId)
                 else:
                     self.load_rounds(seasonId, True)
@@ -129,15 +130,37 @@ class Handler():
             # Add our Tournament to our Season
             season.add_tournament(tournament_name, tournament)
 
+    # Manual Input Functions
+    def new_gender(self, seasonId, error = False):
+        # Get our Season Object
+        season = self.get_season(seasonId)
+
+        # Check for errors
+        if(error):
+            print("\nError:\nThe specified gender already exists!\n")
+
+        # Get our New Gender
+        print("Please enter a gender:")
+        gender = input(">>> ")
+
+        # Push our gender to the Season players object
+        if(gender.lower() in season.players() or gender == None or gender == ""):
+            call("cls")
+            return self.new_gender(seasonId, True)
+        else:
+            season.add_gender(gender.lower())
+            print("'{0}' has successfully been added as a gender for '{1}'.".format(gender, season.name()))
+
+    def new_player(self, seasonId):
+        print("new player")
+
+    def new_tournament(self, seasonId):
+        print("new tournament")
+
     # Start the manual input of data for the Season
     def input_manual_rounds(self, seasonId):
         # Get our Season Object
         season = self.get_season(seasonId)
-
-        # Variables we will use to update the season
-        genders = [ ]       # This will hold the Gender Names       #> genders["male"]
-        players = { }       # This will hold the Gender + Player    #> players["male"]["MP01"]
-        tournaments = { }   # This will hold the Tournaments        #> tournaments["TAC1"]
 
         # Build our menu
         Builder.init(self.app, "[Editing '{0}'] Please select an option:".format(season.name()))
@@ -147,11 +170,16 @@ class Handler():
         Builder.add_menu("main", "View Genders", "view_genders")
         Builder.add_menu("main", "View Players", "view_players")
         Builder.add_menu("main", "View Tournaments", "view_tournaments")
+        Builder.add_menu("main", "End Editing", "end_manual_rounds")
 
         # Add Functionality
-        Builder.add_func("main", "view_genders", partial(print, "View Genders"))
+        Builder.add_func("main", "view_genders", partial(print, "Here are a list of the Genders for {0}:\n{1}".format(season.name(), "\n".join([g for g in season.players()]))))
         Builder.add_func("main", "view_players", partial(print, "View Players"))
         Builder.add_func("main", "view_tournaments", partial(print, "View Tournaments"))
+        Builder.add_func("main", "new_gender", partial(self.new_gender, seasonId))
+        Builder.add_func("main", "new_player", partial(self.new_player, seasonId))
+        Builder.add_func("main", "new_tournament", partial(self.new_tournament, seasonId))
+        Builder.add_func("main", "end_manual_rounds", "return")
 
         # Display Menu
         Builder.show_current_menu()

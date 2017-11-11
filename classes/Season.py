@@ -91,6 +91,12 @@ class Season():
 
         return self.tournament(name)
 
+    def add_gender(self, gender_name):
+        self._players.update({ gender_name: [ ] })
+
+    def genders(self):
+        return self._players
+
     def players(self):
         return self._players
 
