@@ -79,7 +79,8 @@ class Handler():
 
         # Question our user on how they would like to load data
         print("How would you like to load the data for '{0}'?".format(season.name()))
-        print("1. Generate New Data\n   -> This will override previous stored data!\n")
+        print("1. Generate New Data")
+        print("   -> This will override previous stored data!\n")
         print("2. Load Previous Data" if self.prev_rounds_exist(seasonId) else Builder.notAvailable("2. Load Previous Data"))
         print("   -> Import data from the `seasons.json` file\n")
         print("3. Manual Input Data")

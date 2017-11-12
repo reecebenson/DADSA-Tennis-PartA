@@ -184,8 +184,9 @@ class Builder():
                             if(not Builder.item_exists(req_menu['ref'])):
                                 return Builder.show_current_menu(True, True, "That option is unavailable")
                             else:
-                                # User wants to go back to the default menu
-                                input("You are now going to the main menu. If data has not been added, rounds will not exist.")
+                                if(req_menu['ref'] == "return"):
+                                    # User wants to go back to the default menu
+                                    input("\nYou are now going to the main menu!\nWarning: If data has not been added, rounds will not exist!")
                 else:
                     # Check if we pressed the Back button
                     current_menu = Builder.get_item(Builder._current)
