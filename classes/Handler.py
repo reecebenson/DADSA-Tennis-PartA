@@ -131,46 +131,14 @@ class Handler():
             # Add our Tournament to our Season
             season.add_tournament(tournament_name, tournament)
 
-    # Manual Input Functions
-    def new_gender(self, seasonId, error = False):
+    # Input manual scores
+    def input_scores(self, seasonId, gender, roundId):
         # Get our Season Object
         season = self.get_season(seasonId)
+        _round = season.round(gender, roundId)
 
-        # Check for errors
-        if(error):
-            print("\nError:\nThe specified gender already exists!\n")
-
-        # Get our New Gender
-        print("Please enter a gender:")
-        gender = input(">>> ")
-
-        # Push our gender to the Season players object
-        if(gender.lower() in season.rounds() or gender == None or gender == ""):
-            call("cls")
-            return self.new_gender(seasonId, True)
-        else:
-            # Get a round cap
-            try:
-                print("Please enter a Round Cap for {0}:".format(gender))
-                cap = input(">>> ") or 3
-                season.add_gender(gender.lower(), cap)
-                input("xd")
-                print("'{0}' has successfully been added as a gender for '{1}'.".format(gender, season.name()))
-            except Exception as err:
-                print(err)
-                input("Error!")
-
-    def new_player(self, seasonId):
-        print("new player")
-
-    def new_tournament(self, seasonId):
-        print("new tournament")
-
-    def view_genders(self, seasonId):
-        # Get our Season Object
-        season = self.get_season(seasonId)
-
-        print("Here are a list of the Genders for {0}:\n{1}".format(season.name(), "\n".join([g for g in season.rounds()])))
+        # Check if this round has any data
+        print("blah blah {}, round {}, gender {}".format(seasonId, roundId, gender))
 
     # Start the manual input of data for the Season
     def input_manual_rounds(self, seasonId):
@@ -179,33 +147,29 @@ class Handler():
 
         # Build our menu
         Builder.init(self.app, "[Editing '{0}'] Please select an option:".format(season.name()))
-        Builder.add_menu("main", "New Gender", "new_gender")
-        Builder.add_menu("main", "New Player", "new_player")
-        Builder.add_menu("main", "New Tournament", "new_tournament")
-        Builder.add_menu("main", "View Genders", "view_genders")
-        Builder.add_menu("main", "View Players", "view_players")
-        Builder.add_menu("main", "View Tournaments", "view_tournaments")
+        Builder.add_menu("main", "Input Scores", "score_input")
         Builder.add_menu("main", "End Editing", "end_manual_rounds")
         Builder.add_menu("end_manual_rounds", "Stop Editing", "return")
 
+        # Add our rounds per gender
+        for gdr in season.players():
+            # Add Menu Items
+            Builder.add_menu("score_input", "{0} Rounds".format(gdr.title()), "score_input_{0}".format(gdr))
+
+            # Add Gender Specific Menu Items
+            for r in range(1, (season.settings()["round_count"] + 1)):
+                # Display Round
+                rnd = season.round(seasonId, r)
+                Builder.add_menu("score_input_{0}".format(gdr), "Round {0} {1}".format(r, ("(No Previous Data)" if rnd == None else "")), "score_input_{0}_{1}".format(r, gdr))
+
+                # Add menu functionality
+                Builder.add_func("score_input", "score_input_{0}_{1}".format(r, gdr), partial(self.input_scores, seasonId, gdr, r))
+
         # Add Functionality
-        Builder.add_func("main", "view_genders", partial(self.view_genders, seasonId))
-        Builder.add_func("main", "view_players", partial(print, "View Players"))
-        Builder.add_func("main", "view_tournaments", partial(print, "View Tournaments"))
-        Builder.add_func("main", "new_gender", partial(self.new_gender, seasonId))
-        Builder.add_func("main", "new_player", partial(self.new_player, seasonId))
-        Builder.add_func("main", "new_tournament", partial(self.new_tournament, seasonId))
         Builder.add_func("end_manual_rounds", "return", None)
 
         # Display Menu
         Builder.show_current_menu()
-
-        # Start the input of Genders
-        #print("Please enter the genders used within '{0}', separating them by commas".format(season.name()))
-        #genders = input(">>> ").lower().split(",")
-
-        # Start the input of players
-
 
     # Check if previous round data exists within the Season
     def prev_rounds_exist(self, seasonId):
@@ -284,6 +248,8 @@ class Handler():
         # Debug
         if(self.app.debug):
             print("[LOAD]: Generated {1} rounds for season: '{0}'".format(season.name(), season.settings()['round_count']))
+
+        # Write to Rounds
         
         # End of generate_rounds()
 
