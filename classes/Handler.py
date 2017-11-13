@@ -202,74 +202,76 @@ class Handler():
         season = self.get_season(seasonId)
         players = season.players()
 
-        # Generate our rounds
-        for gender in players:
-            for r in range(0, season.settings()["round_count"]):
-                # Make sure we're not generating over our requested generation amount
-                if((r - 1) < minRoundId):
-                    # HIT BELOW MINIMUM (used for generating rounds on the fly)
-                    if(self.app.debug):
-                        input("hit below minimum, continuing [min:{0} - r:{1}]".format(minRoundId, r))
-                    continue
-                elif((r - 1) >= maxRoundId):
-                    # HIT ABOVE MAXIMUM (don't want to generate above this round)
-                    if(self.app.debug):
-                        input("reached maximum, breaking out [max:{0} - r:{1}]".format(maxRoundId, r))
-                    break
-                else:
-                    # ROUND IS OKAY TO GENERATE
-                    if(self.app.debug):
-                        input("[r: {0}, min: {1}, max: {2}]".format(r, minRoundId, maxRoundId))
+        # For each tournament, generate rounds
+        for tournament_name in season.tournaments():
+            # Get our tournament object
+            tournament = season.tournament(tournament_name)
 
-                # Default Values
-                round_cap = 3
+            # Generate our rounds
+            for gender in players:
+                for r in range(0, season.settings()["round_count"]):
+                    # Make sure we're not generating over our requested generation amount
+                    if((r - 1) < minRoundId):
+                        # HIT BELOW MINIMUM (used for generating rounds on the fly)
+                        if(self.app.debug):
+                            input("hit below minimum, continuing [min:{0} - r:{1}]".format(minRoundId, r))
+                        continue
+                    elif((r - 1) >= maxRoundId):
+                        # HIT ABOVE MAXIMUM (don't want to generate above this round)
+                        if(self.app.debug):
+                            input("reached maximum, breaking out [max:{0} - r:{1}]".format(maxRoundId, r))
+                        break
+                    else:
+                        # ROUND IS OKAY TO GENERATE
+                        if(self.app.debug):
+                            input("[r: {0}, min: {1}, max: {2}]".format(r, minRoundId, maxRoundId))
 
-                # Do we have a Round Cap overrider for this gender?
-                if(gender + "_cap" in season.settings()):
-                    round_cap = season.settings()[gender + "_cap"]
+                    # Default Values
+                    round_cap = 3
 
-                # Define Round Variables
-                r_id = (r + 1)
-                r_name = "round_" + str(r_id)
-                _r = Round.Round(self.app, gender, r_name)
+                    # Do we have a Round Cap overrider for this gender?
+                    if(gender + "_cap" in season.settings()):
+                        round_cap = season.settings()[gender + "_cap"]
 
-                # Data to Check
-                prev_r = season.round(gender, "round_" + str(r))
+                    # Define Round Variables
+                    r_id = (r + 1)
+                    r_name = "round_" + str(r_id)
+                    _r = Round.Round(self.app, gender, r_name)
 
-                # Check if we have a round to take data from
-                rnd_players = [ ]
-                if(prev_r == None):
-                    rnd_players = random.sample(players[gender], len(players[gender]))
-                else:
-                    rnd_players = random.sample(prev_r.winners(), len(prev_r.winners()))
+                    # Data to Check
+                    prev_r = tournament.round(gender, "round_" + str(r))
 
-                # Generate our matches from the data we have
-                for w in range(len(rnd_players) // 2):
-                    # Define our players
-                    p_one = rnd_players[w * 2]
-                    p_two = rnd_players[(w * 2) + 1]
+                    # Check if we have a round to take data from
+                    rnd_players = [ ]
+                    if(prev_r == None):
+                        rnd_players = random.sample(players[gender], len(players[gender]))
+                    else:
+                        rnd_players = random.sample(prev_r.winners(), len(prev_r.winners()))
 
-                    # Generate some scores
-                    p_one_score = random.randint(0, round_cap - 1)
-                    p_two_score = random.randint(0, round_cap - 1)
+                    # Generate our matches from the data we have
+                    for w in range(len(rnd_players) // 2):
+                        # Define our players
+                        p_one = rnd_players[w * 2]
+                        p_two = rnd_players[(w * 2) + 1]
 
-                    # Make a random player the winner
-                    who = random.randint(0, 1)
-                    if(who == 0):   p_one_score = round_cap
-                    else:           p_two_score = round_cap
+                        # Generate some scores
+                        p_one_score = random.randint(0, round_cap - 1)
+                        p_two_score = random.randint(0, round_cap - 1)
 
-                    # Add the match
-                    _r.add_match(Match.Match(_r, p_one, p_two, p_one_score, p_two_score))
+                        # Make a random player the winner
+                        who = random.randint(0, 1)
+                        if(who == 0):   p_one_score = round_cap
+                        else:           p_two_score = round_cap
 
-                # Add our round to our season
-                season.add_round(gender, _r)
+                        # Add the match
+                        _r.add_match(Match.Match(_r, p_one, p_two, p_one_score, p_two_score))
+
+                    # Add our round to our season
+                    tournament.add_round(gender, _r)
         
         # Debug
         if(self.app.debug):
             print("[LOAD]: Generated {1} rounds for season: '{0}', minRound: {2}, maxRound: {3}".format(season.name(), season.settings()['round_count'], minRoundId, maxRoundId))
-
-        # Write to Rounds
-        #File.update_season_rounds(seasonId)
         
         # End of generate_rounds()
 

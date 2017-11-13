@@ -303,152 +303,77 @@ class Menu():
                 Builder.add_menu(tournament_option_name, "View Leaderboard", "{0}_{1}".format(tournament_option_name, "vlb"))
 
                 # Import Tournament Functions
-                Builder.add_func(tournament_option_name, "{0}_{1}".format(tournament_option_name, "et"), partial(season.tournament(tournament_name).emulate, season))
-                Builder.add_func(tournament_option_name, "{0}_{1}".format(tournament_option_name, "vd"), partial(print, season.tournament(tournament_name).display("difficulty")))
-                Builder.add_func(tournament_option_name, "{0}_{1}".format(tournament_option_name, "vpm"), partial(print, season.tournament(tournament_name).display("prize_money")))
-                Builder.add_func(tournament_option_name, "{0}_{1}".format(tournament_option_name, "vlb"), partial(print, season.tournament(tournament_name).display("leaderboard")))
+                Builder.add_func(tournament_option_name, "{0}_{1}".format(tournament_option_name, "et"), partial(tournament.emulate, season))
+                Builder.add_func(tournament_option_name, "{0}_{1}".format(tournament_option_name, "vd"), partial(print, tournament.display("difficulty")))
+                Builder.add_func(tournament_option_name, "{0}_{1}".format(tournament_option_name, "vpm"), partial(print, tournament.display("prize_money")))
+                Builder.add_func(tournament_option_name, "{0}_{1}".format(tournament_option_name, "vlb"), partial(print, tournament.display("leaderboard")))
 
                 ## LOAD ROUNDS
-                for gdr in season.rounds():
+                for gdr in tournament.rounds():
                     Builder.add_menu("{0}_{1}".format(tournament_option_name, "rs"), "{0} Rounds".format(gdr).title(), "{0}_{1}_{2}".format(tournament_option_name, "rs", gdr))
 
                     ## IMPORT ROUNDS
-                    for r, rnd in enumerate(season.rounds()[gdr], 1):
-                        Builder.add_menu("{0}_{1}_{2}".format(tournament_option_name, "rs", gdr), "Round {0}".format(r), "{0}_{1}_{2}".format(tournament_option_name, "vr", gdr+"_"+rnd))
-                        Builder.add_func("{0}_{1}_{2}".format(tournament_option_name, "vr", rnd), "{0}_{1}_{2}".format(tournament_option_name, "vr", gdr+"_"+rnd), partial(season.tournament(tournament_name).emulate_round, season, gdr, rnd))
+                    for r in range(1, (season.settings()['round_count'] + 1)):
+                        rId = (r + 1)
+                        r = str(r)
+                        rnd = tournament.round(gdr, "round_" + str(rId))
 
-                """# > Populate "View Rounds" with Round specific otpions
-                for gdr in season.rounds():
-                    # List genderd rounds
-                    self._menu[tournamentVar+"_rselect"].update({ tournamentVar+"_"+gdr: "{0} rounds".format(gdr).title() })
+                        # Display our Menu
+                        Builder.add_menu("{0}_{1}_{2}".format(tournament_option_name, "rs", gdr), "Round {0}".format(r), "{0}_{1}_{2}".format(tournament_option_name, "vr", gdr+"_"+r))
 
-                    # List the available rounds within the menu
-                    self._menu[tournamentVar+"_"+gdr] = { }
-                    for r, rnd in enumerate(season.rounds()[gdr], 1):
-                        self._menu[tournamentVar+"_"+gdr].update({ tournamentVar+"-"+gdr+"-"+rnd: "Round {0}".format(r) })
-                        self._menu[tournamentVar+"-"+gdr+"-"+rnd] = partial(print, "\n".join([ "{0} — Winner: {1}, updated score: {2}".format(m.versuses(True), m.winner()[0].name(), season.round(gdr, rnd).get_rank()) for m in season.round(gdr, rnd).matches() ]))
+                        # Get our Round type (whether data is available or whether to generate or enter manual data)
+                        if(rnd == None):
+                            # Generate or Get Manual Input Data
+                            Builder.add_menu("{0}_{1}_{2}".format(tournament_option_name, "vr", gdr+"_"+r), "Generate Data", "{0}_{1}_{2}_gen".format(tournament_option_name, "vr", gdr+"_"+r))
+                            Builder.add_menu("{0}_{1}_{2}".format(tournament_option_name, "vr", gdr+"_"+r), "Input Data", "{0}_{1}_{2}_input".format(tournament_option_name, "vr", gdr+"_"+r))
 
-                    # Add the back option
-                    self._menu[tournamentVar+"_"+gdr].update({ "back": "Back" })"""
+                            # Add Functionality
+                            Builder.add_func("{0}_{1}_{2}".format(tournament_option_name, "vr", gdr+"_"+r), "{0}_{1}_{2}_gen".format(tournament_option_name, "vr", gdr+"_"+r), partial(print, "gen stuff"))
+                            Builder.add_func("{0}_{1}_{2}".format(tournament_option_name, "vr", gdr+"_"+r), "{0}_{1}_{2}_input".format(tournament_option_name, "vr", gdr+"_"+r), partial(print, "input stuff"))
+                        else:
+                            Builder.add_func("{0}_{1}_{2}".format(tournament_option_name, "vr", r), "{0}_{1}_{2}".format(tournament_option_name, "vr", gdr+"_"+r), partial(tournament.emulate_round, gdr, "round_" + str(rId)))
 
-
-
-        ## SHOW MENU
+        # Display Menu
         Builder.show_current_menu()
 
-        ## HALT
-        """input("HALT!")
-
-        # Clear our menu variables
-        self._menu = { }
-        self._current = [ "main" ]
-        self._current_menu = "main"
-        self.just_called_back = False
-
-        # Create our Menu
-        self._menu['main'] = { "load_season": "Load Season", "info": "See Developer Information" }
-        self._menu['info'] = lambda: self.dev_info()
-        self._menu['back'] = lambda: self.go_back()
-        self._menu['load_season'] = { }
-
-        # Append our Seasons to the "Load Season" Menu
-        for seasonId in self._app.handler.get_seasons():
-            season = self._app.handler.get_season(seasonId)
-            seasonVar = 'ls_'+str(seasonId)
-            self._menu['load_season'].update({ seasonVar: season.name() })
-
-            # Create our menu option for loading a season
-            self._menu[seasonVar] = { seasonVar+"_select": "Select Tournament", seasonVar+"_players": "View Players", seasonVar+"_details": "View Details", "back": "Back" }
-
-            # Create our menu options
-            self._menu[seasonVar+"_select"] = { }
-            self._menu[seasonVar+"_players"] = { }
-            self._menu[seasonVar+"_details"] = lambda: print(season.display("details"))
-
-            # Fill our menu options with extra options
-            # > "Select Tournament"
-            for tournament_name in season.tournaments():
-                tournamentVar = seasonVar+"_select_"+tournament_name
-
-                # Define menu holders
-                self._menu[tournamentVar] = { }
-                self._menu[tournamentVar+"_rselect"] = { }
-
-                # Tournament Selecter
-                self._menu[seasonVar+"_select"].update({ tournamentVar: "Select {0}".format(tournament_name) })
-
-                # > "View Rounds"
-                self._menu[tournamentVar].update({ tournamentVar+"_rselect": "View Rounds" })
-
-                # > Populate "View Rounds" with Round specific otpions
-                for gdr in season.rounds():
-                    # List genderd rounds
-                    self._menu[tournamentVar+"_rselect"].update({ tournamentVar+"_"+gdr: "{0} rounds".format(gdr).title() })
-
-                    # List the available rounds within the menu
-                    self._menu[tournamentVar+"_"+gdr] = { }
-                    for r, rnd in enumerate(season.rounds()[gdr], 1):
-                        self._menu[tournamentVar+"_"+gdr].update({ tournamentVar+"-"+gdr+"-"+rnd: "Round {0}".format(r) })
-                        self._menu[tournamentVar+"-"+gdr+"-"+rnd] = partial(print, "\n".join([ "{0} — Winner: {1}, updated score: {2}".format(m.versuses(True), m.winner()[0].name(), season.round(gdr, rnd).get_rank()) for m in season.round(gdr, rnd).matches() ]))
-
-                    # Add the back option
-                    self._menu[tournamentVar+"_"+gdr].update({ "back": "Back" })
-
-                # Add tournament specific options
-                self._menu[tournamentVar].update({ tournamentVar+"_leaderboard": "View Leaderboard", tournamentVar+"_difficulty": "View Difficulty", tournamentVar+"_prizemoney": "View Prize Money" })
-                self._menu[tournamentVar+"_leaderboard"] = partial(print, season.tournament(tournament_name).display("leaderboard"))
-                self._menu[tournamentVar+"_difficulty"] = partial(print, season.tournament(tournament_name).display("difficulty"))
-                self._menu[tournamentVar+"_prizemoney"] = partial(print, season.tournament(tournament_name).display("prize_money"))
-
-                # Add the back option
-                self._menu[tournamentVar].update({ "back": "Back" })
-                self._menu[tournamentVar+"_rselect"].update({ "back": "Back" })
-
-            # > "View Players"
-            for gdr in season.players():
-                self._menu[seasonVar+"_players"].update({ seasonVar+"_players_"+gdr: "List {0}s".format(gdr.title()) })
-                self._menu[seasonVar+"_players_"+gdr] = partial(print, season.display("players", gdr))
-
-            # Add the back options to each submenu
-            self._menu[seasonVar+"_select"].update({ "back": "Back" })
-            self._menu[seasonVar+"_players"].update({ "back": "Back" })
-        self._menu["load_season"].update({ "back": "Back" })
-
-        # Display our Menu
-        self.display("main")"""
-
     def debug_info(self):
-        print("What season would you like to debug?")
-        for seasonId in self._app.handler.get_seasons():
-            season = self._app.handler.get_season(seasonId)
-            print("-> {0}".format(season.name()))
+        try:
+            print("What season would you like to debug?")
+            for seasonId in self._app.handler.get_seasons():
+                season = self._app.handler.get_season(seasonId)
+                print("-> {0}".format(season.name()))
 
-        id = input(">>> ") or "season_1"
-        if(self._app.handler.get_season(id) != None):
-            season = self._app.handler.get_season(seasonId)
-            
-            #PRINT DEBUG
-            print("Name: {0}".format(season.name()))
-            print("Gender Count: {0}".format(len(season.rounds())))
-            for g in season.rounds():
-                print("Round Count for {0}: {1}".format(g, len(season.rounds()[g])))
-            print("Tournament Count: {0}".format(len(season.tournaments())))
-            print("Tournament Names: {0}".format([ t for t in season.tournaments() ]))
-            print("Settings: {0}".format(season._j_data['settings']))
+            id = input(">>> ") or "season_1"
+            if(self._app.handler.get_season(id) != None):
+                season = self._app.handler.get_season(seasonId)
+                
+                #PRINT DEBUG
+                print("Name: {0}".format(season.name()))
+                print("Tournament Count: {0}".format(len(season.tournaments())))
+                print("Tournament Names: {0}".format([ t for t in season.tournaments() ]))
+                for tn in season.tournaments():
+                    t = season.tournament(tn)
+                    print("Gender Count: {0}".format(len(t.rounds())))
+                    for g in t.rounds():
+                        print("Round Count for {0}: {1}".format(g, len(t.rounds()[g])))
+                print("Settings: {0}".format(season._j_data['settings']))
 
-            #ACTIONS
-            print("Perform an action:")
-            action = input(">>> ")
-            if(action == "gen"):
-                self._app.handler.generate_rounds()
-            elif(action == "del rounds"):
-                season._rounds = { }
+                #ACTIONS
+                print("Perform an action:")
+                action = input(">>> ")
+                if(action == "gen"):
+                    self._app.handler.generate_rounds()
+                elif(action == "del rounds"):
+                    season._rounds = { }
+                else:
+                    input("\nError:\nAction does not exist.\nPress <Return> to continue...")
             else:
-                input("\nError:\nAction does not exist.\nPress <Return> to continue...")
-        else:
-            input("\nError:\nSeason does not exist.\nPress <Return> to continue...")
-        
-        self.debug_info()
+                input("\nError:\nSeason does not exist.\nPress <Return> to continue...")
+            
+            self.debug_info()
+        except Exception as err:
+            print(err)
+            input("Continue...")
         
     def dev_info(self):
         # Display Developer Information
