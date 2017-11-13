@@ -12,6 +12,7 @@ from classes import Tournament
 from classes import Round
 from classes import Match
 from classes.Menu import Builder
+from classes.File import File
 
 class Handler():
     # Define the variables we will be using
@@ -83,8 +84,6 @@ class Handler():
         print("   -> This will override previous stored data!\n")
         print("2. Load Previous Data" if self.prev_rounds_exist(seasonId) else Builder.notAvailable("2. Load Previous Data"))
         print("   -> Import data from the `seasons.json` file\n")
-        print("3. Manual Input Data")
-        print("   -> Import data manually using the terminal window\n")
 
         try:
             resp = input(">>> ")
@@ -100,9 +99,6 @@ class Handler():
                             self.round_mode[seasonId] = partial(self.load_previous_rounds, seasonId)
                         else:
                             self.load_rounds(seasonId, True, "That option is unavailable.")
-                    elif(req == 3):
-                        self.round_temp = { "genders": None, "players": None, "tournaments": None }
-                        self.round_mode[seasonId] = partial(self.input_manual_rounds, seasonId)
                 else:
                     self.load_rounds(seasonId, True)
             else:
@@ -242,6 +238,9 @@ class Handler():
                     # Add the match
                     _r.add_match(Match.Match(_r, p_one, p_two, p_one_score, p_two_score))
 
+                print(rnd_players)
+                input("Generated data for round {0}".format(r))
+
                 # Add our round to our season
                 season.add_round(gender, _r)
         
@@ -250,6 +249,7 @@ class Handler():
             print("[LOAD]: Generated {1} rounds for season: '{0}'".format(season.name(), season.settings()['round_count']))
 
         # Write to Rounds
+        #File.update_season_rounds(seasonId)
         
         # End of generate_rounds()
 

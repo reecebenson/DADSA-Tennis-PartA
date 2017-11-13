@@ -1,0 +1,26 @@
+PROGRAM LOAD
+
+Generate New Rounds
+-> Randomise Players for each tournament, round data for each tournament
+-> Upto Round X (example 3)
+
+Load Previous Data
+-> Loads data from seasons.json
+
+Manual Input Data
+-> Delete
+
+LOAD INTO SEASON
+
+TOURNAMENT -> WRITE TO FILE [ BOOLEAN ]
+ FALSE = WHEN UPDATING ROUNDS, DON'T SAVE DATA - KEEP IN MEMORY
+ TRUE  = WHEN UPDATING ROUNDS, WRITE STRAIGHT TO FILE
+
+(EXAMPLE USED)
+TOURNAMENT -> SELECT ROUND ->
+
+1. Round 1
+2. Round 2
+3. Round 3 - Data Unavailable (Generate / Manual)
+4. Round 4 - Data Unavailable (Generate / Manual)
+5. Round 5 - Data Unavailable (Generate / Manual)

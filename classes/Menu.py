@@ -307,7 +307,6 @@ class Menu():
                         Builder.add_menu("{0}_{1}_{2}".format(tournament_option_name, "rs", gdr), "Round {0}".format(r), "{0}_{1}_{2}".format(tournament_option_name, "vr", gdr+"_"+rnd))
                         Builder.add_func("{0}_{1}_{2}".format(tournament_option_name, "vr", rnd), "{0}_{1}_{2}".format(tournament_option_name, "vr", gdr+"_"+rnd), partial(season.tournament(tournament_name).emulate_round, season, gdr, rnd))
 
-
                 """# > Populate "View Rounds" with Round specific otpions
                 for gdr in season.rounds():
                     # List genderd rounds
