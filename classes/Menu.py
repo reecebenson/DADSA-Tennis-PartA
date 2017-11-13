@@ -320,8 +320,12 @@ class Menu():
                         r_view_round = "{0}_{1}_{2}".format(tournament_option_name, "vr", gdr+"_"+r_name)
                         rnd = tournament.round(gdr, r_name)
 
+                        # Find our next round if exists
+                        nr_name = "round_{0}".format(r + 1)
+                        n_rnd = tournament.round(gdr, nr_name)
+
                         # Build Menu
-                        Builder.add_menu("{0}_{1}_{2}".format(tournament_option_name, "rs", gdr), "Round {0}{1}".format(r, " (No Data)" if rnd == None else ""), r_view_round)
+                        Builder.add_menu("{0}_{1}_{2}".format(tournament_option_name, "rs", gdr), "Round {0}".format(r), r_view_round)
 
                         # Add Functionality
                         if(rnd == None):

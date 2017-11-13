@@ -210,10 +210,9 @@ class Handler():
 
             # Generate our rounds
             for gender in players:
-                for r in range(0, season.settings()["round_count"]):
+                for r in range(1, season.settings()["round_count"] + 1):
                     # Define Round Variables
-                    r_id = r + 1
-                    r_name = "round_" + str(r_id)
+                    r_name = "round_" + str(r)
 
                     # Make sure we're not generating over our requested generation amount
                     if    (r < minRoundId): continue
@@ -258,13 +257,11 @@ class Handler():
 
                     # Add our round to our season
                     tournament.add_round(gender, _r)
-                    #input("{} --- Round Added: [{}]".format([ w.name() for w in _r.winners() ], r_name))
         
         # Debug
         if(self.app.debug):
             print("[LOAD]: Generated {1} rounds for season: '{0}', minRound: {2}, maxRound: {3}".format(season.name(), season.settings()['round_count'], minRoundId, maxRoundId))
         
-        #input("...continue? ")
         # End of generate_rounds()
 
     # Used to load prize money
