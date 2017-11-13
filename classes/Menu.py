@@ -309,29 +309,30 @@ class Menu():
                 Builder.add_func(tournament_option_name, "{0}_{1}".format(tournament_option_name, "vlb"), partial(print, tournament.display("leaderboard")))
 
                 ## LOAD ROUNDS
-                for gdr in tournament.rounds():
+                for gdr in season.players():
                     Builder.add_menu("{0}_{1}".format(tournament_option_name, "rs"), "{0} Rounds".format(gdr).title(), "{0}_{1}_{2}".format(tournament_option_name, "rs", gdr))
 
                     ## IMPORT ROUNDS
                     for r in range(1, (season.settings()['round_count'] + 1)):
-                        rId = (r + 1)
-                        r = str(r)
-                        rnd = tournament.round(gdr, "round_" + str(rId))
+                        # Find our Round
+                        r_str = str(r)
+                        r_name = "round_{0}".format(r)
+                        r_view_round = "{0}_{1}_{2}".format(tournament_option_name, "vr", gdr+"_"+r_name)
+                        rnd = tournament.round(gdr, r_name)
 
-                        # Display our Menu
-                        Builder.add_menu("{0}_{1}_{2}".format(tournament_option_name, "rs", gdr), "Round {0}".format(r), "{0}_{1}_{2}".format(tournament_option_name, "vr", gdr+"_"+r))
+                        # Build Menu
+                        Builder.add_menu("{0}_{1}_{2}".format(tournament_option_name, "rs", gdr), "Round {0}{1}".format(r, " (No Data)" if rnd == None else ""), r_view_round)
 
-                        # Get our Round type (whether data is available or whether to generate or enter manual data)
+                        # Add Functionality
                         if(rnd == None):
-                            # Generate or Get Manual Input Data
-                            Builder.add_menu("{0}_{1}_{2}".format(tournament_option_name, "vr", gdr+"_"+r), "Generate Data", "{0}_{1}_{2}_gen".format(tournament_option_name, "vr", gdr+"_"+r))
-                            Builder.add_menu("{0}_{1}_{2}".format(tournament_option_name, "vr", gdr+"_"+r), "Input Data", "{0}_{1}_{2}_input".format(tournament_option_name, "vr", gdr+"_"+r))
+                            Builder.add_menu(r_view_round, "Generate Data", "{0}_{1}_{2}_gen".format(tournament_option_name, "vr", gdr+"_"+r_name))
+                            Builder.add_menu(r_view_round, "Input Data", "{0}_{1}_{2}_input".format(tournament_option_name, "vr", gdr+"_"+r_name))
 
                             # Add Functionality
-                            Builder.add_func("{0}_{1}_{2}".format(tournament_option_name, "vr", gdr+"_"+r), "{0}_{1}_{2}_gen".format(tournament_option_name, "vr", gdr+"_"+r), partial(print, "gen stuff"))
-                            Builder.add_func("{0}_{1}_{2}".format(tournament_option_name, "vr", gdr+"_"+r), "{0}_{1}_{2}_input".format(tournament_option_name, "vr", gdr+"_"+r), partial(print, "input stuff"))
+                            Builder.add_func(r_view_round, "{0}_{1}_{2}_gen".format(tournament_option_name, "vr", gdr+"_"+r_name), partial(print, "gen stuff"))
+                            Builder.add_func(r_view_round, "{0}_{1}_{2}_input".format(tournament_option_name, "vr", gdr+"_"+r_name), partial(print, "input stuff"))
                         else:
-                            Builder.add_func("{0}_{1}_{2}".format(tournament_option_name, "vr", r), "{0}_{1}_{2}".format(tournament_option_name, "vr", gdr+"_"+r), partial(tournament.emulate_round, gdr, "round_" + str(rId)))
+                            Builder.add_func(r_view_round, r_view_round, partial(tournament.emulate_round, gdr, r_name))
 
         # Display Menu
         Builder.show_current_menu()

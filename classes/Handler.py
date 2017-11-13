@@ -65,6 +65,12 @@ class Handler():
 
     # Set our round mode via menu
     def set_round_mode(self, **mode):
+        # Debug
+        if(self.app.debug):
+            print("Data passed to set_round_mode:")
+            for key, value in mode.items():
+                print("%s = %s" % (key, value))
+
         # Generate Data upto Round X
         if(mode['type'] == "generate"):
             self.round_mode[mode['season']] = partial(self.generate_rounds, mode['season'], 0, mode['rnd'])
@@ -72,12 +78,6 @@ class Handler():
         elif(mode['type'] == "load"):
             self.round_mode[mode['season']] = partial(self.load_previous_rounds, mode['season'])
             Builder.close_menu()
-
-        # Debug
-        if(self.app.debug):
-            print("Data passed to set_round_mode:")
-            for key, value in mode.items():
-                print("%s = %s" % (key, value))
 
     # Load our rounds for each season
     def load_rounds(self, seasonId, error = False, errorMsg = None):
@@ -174,27 +174,28 @@ class Handler():
         # Display Menu
         Builder.show_current_menu()
 
-    # Check if previous round data exists within the Season
-    def prev_rounds_exist(self, seasonId):
-        # Get our Season Object
-        season = self.get_season(seasonId)
-        raw_json = season._j_data
-
-        # Check if the season has previous round data
-        return ("rounds" in raw_json)
-        
     # Load round data from previous instance
     def load_previous_rounds(self, seasonId):
         # Get our Season Object
         season = self.get_season(seasonId)
         raw_json = season._j_data
 
-        # Check if the season has previous round data
-        if(self.prev_rounds_exist(seasonId)):
-            return
-        
-        # Round exists, lets import our data to our season
-        input("data exists, yay")
+        # Check that we have tournament data
+        if(not "tournaments" in raw_json):
+            raise("There are no tournaments within 'seasons.json'")
+
+        # Check if the season has previous round data (through raw JSON)
+        for tournament_name in raw_json['tournaments']:
+            # Get our Tournament Object
+            tournament = season.tournament(tournament_name)
+
+            # Check our rounds stored within the JSON data
+            if("rounds" in raw_json['tournaments'][tournament_name]):
+                print("'rounds' found in " + tournament_name)
+            else:
+                print("no prev data found for " + tournament_name)
+                
+            input("...continue?")
 
     # Generate our rounds from our player list from scratch
     def generate_rounds(self, seasonId, minRoundId, maxRoundId):
@@ -210,21 +211,14 @@ class Handler():
             # Generate our rounds
             for gender in players:
                 for r in range(0, season.settings()["round_count"]):
+                    # Define Round Variables
+                    r_id = r + 1
+                    r_name = "round_" + str(r_id)
+
                     # Make sure we're not generating over our requested generation amount
-                    if((r - 1) < minRoundId):
-                        # HIT BELOW MINIMUM (used for generating rounds on the fly)
-                        if(self.app.debug):
-                            input("hit below minimum, continuing [min:{0} - r:{1}]".format(minRoundId, r))
-                        continue
-                    elif((r - 1) >= maxRoundId):
-                        # HIT ABOVE MAXIMUM (don't want to generate above this round)
-                        if(self.app.debug):
-                            input("reached maximum, breaking out [max:{0} - r:{1}]".format(maxRoundId, r))
-                        break
-                    else:
-                        # ROUND IS OKAY TO GENERATE
-                        if(self.app.debug):
-                            input("[r: {0}, min: {1}, max: {2}]".format(r, minRoundId, maxRoundId))
+                    if    (r < minRoundId): continue
+                    elif  (r > maxRoundId): break
+                    else:                   pass
 
                     # Default Values
                     round_cap = 3
@@ -232,10 +226,6 @@ class Handler():
                     # Do we have a Round Cap overrider for this gender?
                     if(gender + "_cap" in season.settings()):
                         round_cap = season.settings()[gender + "_cap"]
-
-                    # Define Round Variables
-                    r_id = (r + 1)
-                    r_name = "round_" + str(r_id)
                     _r = Round.Round(self.app, gender, r_name)
 
                     # Data to Check
@@ -268,11 +258,13 @@ class Handler():
 
                     # Add our round to our season
                     tournament.add_round(gender, _r)
+                    #input("{} --- Round Added: [{}]".format([ w.name() for w in _r.winners() ], r_name))
         
         # Debug
         if(self.app.debug):
             print("[LOAD]: Generated {1} rounds for season: '{0}', minRound: {2}, maxRound: {3}".format(season.name(), season.settings()['round_count'], minRoundId, maxRoundId))
         
+        #input("...continue? ")
         # End of generate_rounds()
 
     # Used to load prize money
