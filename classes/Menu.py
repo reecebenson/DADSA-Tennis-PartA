@@ -12,6 +12,7 @@ class Builder():
     _tree = None
     _current = None
     _title = None
+    _force_close = None
 
     @staticmethod
     def init(app, title = False):
@@ -21,6 +22,11 @@ class Builder():
         Builder._tree = [ "main" ]
         Builder._current = "main"
         Builder._title = "Please select an option:" if not title else title
+        Builder._force_close = False
+
+    @staticmethod
+    def close_menu():
+        Builder._force_close = True
 
     @staticmethod
     def add_menu(menu, name, ref):
@@ -135,6 +141,10 @@ class Builder():
 
     @staticmethod
     def monitor_input():
+        # Check if we're force closing the menu
+        if(Builder._force_close):
+            return
+
         try:
             # Validate our input
             resp = input("\n>>> ")

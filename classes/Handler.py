@@ -63,6 +63,22 @@ class Handler():
                             # Let's go back to loading rounds
                             self.load_rounds(season, True, "The option you selected is unavailable.")
 
+    # Set our round mode via menu
+    def set_round_mode(self, **mode):
+        # Generate Data upto Round X
+        if(mode['type'] == "generate"):
+            self.round_mode[mode['season']] = partial(self.generate_rounds, mode['season'], 0, mode['rnd'])
+            Builder.close_menu()
+        elif(mode['type'] == "load"):
+            self.round_mode[mode['season']] = partial(self.load_previous_rounds, mode['season'])
+            Builder.close_menu()
+
+        # Debug
+        if(self.app.debug):
+            print("Data passed to set_round_mode:")
+            for key, value in mode.items():
+                print("%s = %s" % (key, value))
+
     # Load our rounds for each season
     def load_rounds(self, seasonId, error = False, errorMsg = None):
         # Get our Season Object
@@ -78,33 +94,24 @@ class Handler():
             else:
                 print("\nError:\nThere was an error performing your request.\n")
 
-        # Question our user on how they would like to load data
-        print("How would you like to load the data for '{0}'?".format(season.name()))
-        print("1. Generate New Data")
-        print("   -> This will override previous stored data!\n")
-        print("2. Load Previous Data" if self.prev_rounds_exist(seasonId) else Builder.notAvailable("2. Load Previous Data"))
-        print("   -> Import data from the `seasons.json` file\n")
+        # Build Our Menu
+        Builder.init(self.app, "How would you like to load the data for '{0}'?".format(season.name()))
 
-        try:
-            resp = input(">>> ")
-            if(resp.isdigit()):
-                req = int(resp)
-                if(req >= 1 and req <= 3):
-                    if(req == 1):
-                        # Generate Round Data
-                        self.round_mode[seasonId] = partial(self.generate_rounds, seasonId)
-                    elif(req == 2):
-                        if(self.prev_rounds_exist(seasonId)):
-                            # Load Data from previous terminal instance
-                            self.round_mode[seasonId] = partial(self.load_previous_rounds, seasonId)
-                        else:
-                            self.load_rounds(seasonId, True, "That option is unavailable.")
-                else:
-                    self.load_rounds(seasonId, True)
-            else:
-                self.load_rounds(seasonId, True)
-        except KeyboardInterrupt:
-            self.app.exit()
+        # Add Menus
+        Builder.add_menu("main", "Generate New Data", "gen_data")
+        Builder.add_menu("main", "Load Previous Data", "load_data")
+
+        # Add Functionality
+        ## ROUNDS
+        for r in range(1, (season.settings()["round_count"] + 1)):
+            Builder.add_menu("gen_data", "Generate to Round {0}".format(r), "gen_data_{0}".format(r))
+            Builder.add_func("gen_data", "gen_data_{0}".format(r), partial(self.set_round_mode, season=seasonId, type="generate", rnd=r))
+
+        ## PREV DATA
+        Builder.add_func("main", "load_data", partial(self.set_round_mode, season=seasonId, type="load"))
+
+        # Show Menu
+        Builder.show_current_menu()
 
     # Load our tournaments for each season
     def load_tournaments(self, seasonId):
@@ -121,7 +128,7 @@ class Handler():
 
             # Create our Tournament
             tournament = Tournament.Tournament(self.app, tournament_name)
-            tournament.set_prize_money([tournament_json[money] for money in tournament_json if(not "_difficulty" in money)])
+            tournament.set_prize_money([tournament_json['prize_money'][money] for money in tournament_json['prize_money']])
             tournament.set_difficulty(float(tournament_json['_difficulty']))
 
             # Add our Tournament to our Season
@@ -190,7 +197,7 @@ class Handler():
         input("data exists, yay")
 
     # Generate our rounds from our player list from scratch
-    def generate_rounds(self, seasonId):
+    def generate_rounds(self, seasonId, minRoundId, maxRoundId):
         # Write our new data to memory
         season = self.get_season(seasonId)
         players = season.players()
@@ -198,6 +205,22 @@ class Handler():
         # Generate our rounds
         for gender in players:
             for r in range(0, season.settings()["round_count"]):
+                # Make sure we're not generating over our requested generation amount
+                if((r - 1) < minRoundId):
+                    # HIT BELOW MINIMUM (used for generating rounds on the fly)
+                    if(self.app.debug):
+                        input("hit below minimum, continuing [min:{0} - r:{1}]".format(minRoundId, r))
+                    continue
+                elif((r - 1) >= maxRoundId):
+                    # HIT ABOVE MAXIMUM (don't want to generate above this round)
+                    if(self.app.debug):
+                        input("reached maximum, breaking out [max:{0} - r:{1}]".format(maxRoundId, r))
+                    break
+                else:
+                    # ROUND IS OKAY TO GENERATE
+                    if(self.app.debug):
+                        input("[r: {0}, min: {1}, max: {2}]".format(r, minRoundId, maxRoundId))
+
                 # Default Values
                 round_cap = 3
 
@@ -238,15 +261,12 @@ class Handler():
                     # Add the match
                     _r.add_match(Match.Match(_r, p_one, p_two, p_one_score, p_two_score))
 
-                print(rnd_players)
-                input("Generated data for round {0}".format(r))
-
                 # Add our round to our season
                 season.add_round(gender, _r)
         
         # Debug
         if(self.app.debug):
-            print("[LOAD]: Generated {1} rounds for season: '{0}'".format(season.name(), season.settings()['round_count']))
+            print("[LOAD]: Generated {1} rounds for season: '{0}', minRound: {2}, maxRound: {3}".format(season.name(), season.settings()['round_count'], minRoundId, maxRoundId))
 
         # Write to Rounds
         #File.update_season_rounds(seasonId)
