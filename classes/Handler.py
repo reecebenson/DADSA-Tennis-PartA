@@ -278,7 +278,7 @@ class Handler():
                             tournament._rounds_raw["round_{0}".format(r_id)].update({ g: [ ] })
 
                         # Insert our data
-                        tournament._rounds_raw["round_{0}".format(r_id)][g] = [ w.name() for w in tournament.round(g, r).winners() ]
+                        tournament._rounds_raw["round_{0}".format(r_id)][g] = [ { m.player_one()[0].name(): m.player_one()[1], m.player_two()[0].name(): m.player_two()[1] } for m in tournament.round(g, r).matches() ]
             
             # Save Tournament Rounds (if enabled)
             if(tournament.file_saving()):
