@@ -199,6 +199,8 @@ class Handler():
             # Check our rounds stored within the JSON data
             if("rounds" in raw_json['tournaments'][tournament_name]):
                 print("'rounds' found in " + tournament_name)
+
+                # Load data in
             else:
                 print("no prev data found for " + tournament_name)
                 
