@@ -72,7 +72,10 @@ class Handler():
                 print("%s = %s" % (key, value))
 
         # Generate Data upto Round X
-        if(mode['type'] == "generate"):
+        if(mode['type'] == "empty"):
+            self.round_mode[mode['season']] = partial(self.app.empty_func)
+            Builder.close_menu()
+        elif(mode['type'] == "generate"):
             self.round_mode[mode['season']] = partial(self.generate_rounds, mode['season'], 0, mode['rnd'])
             Builder.close_menu()
         elif(mode['type'] == "load"):
@@ -98,6 +101,7 @@ class Handler():
         Builder.init(self.app, "How would you like to load the data for '{0}'?".format(season.name()))
 
         # Add Menus
+        Builder.add_menu("main", "Empty Round Data", "empty_data")
         Builder.add_menu("main", "Generate New Data", "gen_data")
         Builder.add_menu("main", "Load Previous Data", "load_data")
 
@@ -108,6 +112,7 @@ class Handler():
             Builder.add_func("gen_data", "gen_data_{0}".format(r), partial(self.set_round_mode, season=seasonId, type="generate", rnd=r))
 
         ## PREV DATA
+        Builder.add_func("main", "empty_data", partial(self.set_round_mode, season=seasonId, type="empty"))
         Builder.add_func("main", "load_data", partial(self.set_round_mode, season=seasonId, type="load"))
 
         # Show Menu
@@ -128,8 +133,10 @@ class Handler():
 
             # Create our Tournament
             tournament = Tournament.Tournament(self.app, tournament_name)
+            tournament.set_season(season)
             tournament.set_prize_money([tournament_json['prize_money'][money] for money in tournament_json['prize_money']])
             tournament.set_difficulty(float(tournament_json['_difficulty']))
+            tournament.set_file_saving(bool(tournament_json['_file_saving']))
 
             # Add our Tournament to our Season
             season.add_tournament(tournament_name, tournament)
@@ -215,9 +222,9 @@ class Handler():
                     r_name = "round_" + str(r + 1)
 
                     # Make sure we're not generating over our requested generation amount
-                    if    (r < minRoundId): continue
-                    elif  (r > maxRoundId): break
-                    else:                   pass
+                    if    (r <  minRoundId): continue
+                    elif  (r >= maxRoundId): break
+                    else:                    pass
 
                     # Default Values
                     round_cap = 3
@@ -257,12 +264,30 @@ class Handler():
 
                     # Add our round to our season
                     tournament.add_round(gender, _r)
-                    #input("{} --- Round Added: [{}]".format([ w.name() for w in _r.winners() ], r_name))
+                    input("{} --- Round Added: [{}]".format([ w.name() for w in _r.winners() ], r_name))
+
+                # Import our data into JSON format for saving reference
+                for g in tournament.rounds():
+                    for r_id, r in enumerate(tournament.rounds()[g], 1):
+                        # Make sure our round exists within the raw data
+                        if(not "round_{0}".format(r_id) in tournament._rounds_raw):
+                            tournament._rounds_raw.update({ "round_{0}".format(r_id): { } })
+
+                        # Make sure our gender exists within the raw data
+                        if(not g in tournament._rounds_raw["round_{0}".format(r_id)]):
+                            tournament._rounds_raw["round_{0}".format(r_id)].update({ g: [ ] })
+
+                        # Insert our data
+                        tournament._rounds_raw["round_{0}".format(r_id)][g] = [ w.name() for w in tournament.round(g, r).winners() ]
+            
+            # Save Tournament Rounds (if enabled)
+            if(tournament.file_saving()):
+                tournament.save_rounds()
         
         # Debug
         if(self.app.debug):
             print("[LOAD]: Generated {1} rounds for season: '{0}', minRound: {2}, maxRound: {3}".format(season.name(), season.settings()['round_count'], minRoundId, maxRoundId))
-        
+
         #input("...continue? ")
         # End of generate_rounds()
 

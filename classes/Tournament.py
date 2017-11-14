@@ -1,12 +1,18 @@
 # DADSA - Assignment 1
 # Reece Benson
 
+from classes.File import File
+from classes.Menu import Builder
+
 class Tournament():
     _app = None
     _name = None
+    _season = None
     _rounds = None
+    _rounds_raw = None
     _prize_money = None
     _difficulty = None
+    _file_saving = None
 
     def __init__(self, app, name):
         # Set our Application
@@ -15,9 +21,44 @@ class Tournament():
         # Set our variables
         self._name = name
         self._rounds = { }
+        self._rounds_raw = { }
+        self._file_saving = False
 
     def name(self):
         return self._name
+
+    def file_saving(self):
+        return self._file_saving
+
+    def set_file_saving(self, value):
+        self._file_saving = value
+        return self.file_saving()
+
+    def save_rounds(self):
+        return File.update_tournament_rounds(self.season().name(), self.name(), self._rounds_raw)
+
+    def toggle_file_saving(self, menu_ref):
+        # Update State
+        self._file_saving = not self._file_saving
+
+        # Update File Settings
+        File.update_file_saving(self.season().name(), self.name(), self.file_saving())
+
+        # Update Round Data within 'seasons.json'
+        if(self.file_saving()):
+            self.save_rounds()
+        
+        # Update Menu item
+        Builder.add_menu(menu_ref, "{0} Saving".format("Disable" if self.file_saving() else "Enable"), "{0}_{1}".format(menu_ref, "fs"))
+
+        return self.file_saving()
+
+    def season(self):
+        return self._season
+
+    def set_season(self, season):
+        self._season = season
+        return self.season()
 
     def rounds(self):
         return self._rounds

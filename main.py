@@ -27,6 +27,10 @@ class App():
         # Hold the program
         self.exit()
 
+    # A placeholder function that does absolutely nothing
+    def empty_func(self):
+        pass
+
     # A method which exits the program after the user has pressed the Return key
     def exit(self):
         input("\n\n>>> Press <Return> to terminate the program")

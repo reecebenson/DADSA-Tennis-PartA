@@ -204,12 +204,12 @@ class Builder():
                         return Builder.go_back()
                     else:
                         return Builder.show_current_menu(True, True, "You have entered an invalid option")
-            except KeyboardInterrupt:
-                raise KeyboardInterrupt
-            except ValueError:
-                raise ValueError
-            except Exception as err:
-                raise Exception
+            # Exceptions (handled from outer-scope try/except)
+            except KeyboardInterrupt:   raise KeyboardInterrupt
+            except ValueError:          raise ValueError
+            except Exception:           raise Exception
+
+        # Exceptions
         except KeyboardInterrupt:
             # User has terminated the program (Ctrl+C)
             return Builder._app.exit()
@@ -217,7 +217,11 @@ class Builder():
             # User has entered an invalid value
             return Builder.show_current_menu(True, True, "You have entered an invalid option")
         except Exception as err:
-            # input(traceback.print_exc())
+            # Handle other exceptions, and if debugging - show the error and halt the application
+            if(Builder._app.debug):
+                print("\nERROR:\nError Handled:\n{0}\n".format(traceback.print_exc()))
+                input("...continue")
+            # Application has handled error for User
             return Builder.show_current_menu(True, True)
 
     @staticmethod
@@ -301,12 +305,14 @@ class Menu():
                 Builder.add_menu(tournament_option_name, "View Difficulty", "{0}_{1}".format(tournament_option_name, "vd"))
                 Builder.add_menu(tournament_option_name, "View Prize Money", "{0}_{1}".format(tournament_option_name, "vpm"))
                 Builder.add_menu(tournament_option_name, "View Leaderboard", "{0}_{1}".format(tournament_option_name, "vlb"))
+                Builder.add_menu(tournament_option_name, "{0} Saving".format("Disable" if tournament.file_saving() else "Enable"), "{0}_{1}".format(tournament_option_name, "fs"))
 
                 # Import Tournament Functions
-                Builder.add_func(tournament_option_name, "{0}_{1}".format(tournament_option_name, "et"), partial(tournament.emulate, season))
+                Builder.add_func(tournament_option_name, "{0}_{1}".format(tournament_option_name, "et"), partial(tournament.emulate))
                 Builder.add_func(tournament_option_name, "{0}_{1}".format(tournament_option_name, "vd"), partial(print, tournament.display("difficulty")))
                 Builder.add_func(tournament_option_name, "{0}_{1}".format(tournament_option_name, "vpm"), partial(print, tournament.display("prize_money")))
                 Builder.add_func(tournament_option_name, "{0}_{1}".format(tournament_option_name, "vlb"), partial(print, tournament.display("leaderboard")))
+                Builder.add_func(tournament_option_name, "{0}_{1}".format(tournament_option_name, "fs"), partial(tournament.toggle_file_saving, tournament_option_name))
 
                 ## LOAD ROUNDS
                 for gdr in season.players():
@@ -358,6 +364,9 @@ class Menu():
                 print("Tournament Names: {0}".format([ t for t in season.tournaments() ]))
                 for tn in season.tournaments():
                     t = season.tournament(tn)
+                    print("_____________________")
+                    print(t._rounds_raw)
+                    print("_____________________")
                     print("Gender Count: {0}".format(len(t.rounds())))
                     for g in t.rounds():
                         print("Round Count for {0}: {1}".format(g, len(t.rounds()[g])))
@@ -391,144 +400,4 @@ class Menu():
         print("")
         print("The GitHub repository can be found @ http://github.com/reecebenson/DADSA-Tennis (private repo)")
         print("Thanks!")
-
-    def go_back(self):
-        # Set our flag to true
-        self.just_called_back = True
-
-        # Pop off the last item of the list
-        self._current.pop()
-
-        # Set our current menu to the last element of the list
-        self._current_menu = self._current[-1]
-
-    def strike(self, text):
-        result = ''
-        for c in text:
-            result = result + c + '\u0336'
-        return result
-
-    def display(self, index = None, error = None):
-        # Clear our terminal window
-        call("cls")
-
-        # Define our variables
-        cur_count = 0
-        menu_item = self.get_menu(index or "main")
-
-        # Error Handling
-        if(error != None):
-            print("\n", "Error!", error, "\n")
-
-        # Menu Title, set tree
-        print("Please select an option: ({})".format("/".join(self._current)))
-
-        menu_counter = 0
-        for m in menu_item:
-            # Get our menu name
-            menu_name = menu_item[m]
-
-            # Increase our Counter
-            menu_counter += 1
-
-            # Check that the menu option is available
-            if(m in self._menu):
-                # Is the Menu Item a Function?
-                m_type = None
-                if(callable(self._menu[m])):
-                    m_type = ""
-                else:
-                    m_type = "->"
-
-                # Print our Menu Item
-                print("{0}. {1} {2}".format(menu_counter, menu_name, m_type))
-            else:
-                print(self.strike("{0}. {1} [?]".format(menu_counter, menu_name)))
-
-        # Get User Input
-        self.get_input()
-
-    def validate_menu(self, index):
-        try:
-            menu_name = [ (v) for k,v in enumerate(self._menu) if(k == index) ][0]
-            return menu_name
-        except IndexError:
-            return None
-
-    def get_menu(self, menu_name):
-        # Check our Menu exists
-        if(not menu_name in self._menu):
-            return None
-        else:
-            return self._menu[menu_name]
-
-    def menu_exists(self, index):
-        # Find our indexed menu
-        menu_item = self.get_menu(self._current_menu)
-
-        menu_found = None
-        menu_counter = 0
-        for m in menu_item:
-            # Get our menu name
-            menu_name = menu_item[m]
-
-            # Increase our Counter
-            menu_counter += 1
-
-            # Check that the menu option is available
-            if(m in self._menu):
-                # Has our menu been found?
-                if(menu_counter == index):
-                    # Check if it's a function or a submenu
-                    if(callable(self._menu[m])):
-                        # Call our function
-                        menu_found = self._menu[m]
-                    else:
-                        menu_found = m
-            else:
-                menu_found = None
-        return menu_found
-
-    def get_input(self):
-        # Wrap this in a try/except to validate any errors with input
-        try:
-            # Get users input
-            resp = int(input('\n>>> '))
-
-            # Validate some set input calls
-            if(resp == "exit"):
-                raise KeyboardInterrupt
-            elif(resp == ""):
-                return self.display(self._current_menu, "Please select a valid option!")
-            
-            # Validate input from current menu
-            menu_selected = self.menu_exists(resp)
-            if(menu_selected != None and callable(menu_selected) != True):
-                print(menu_selected)
-                self._current.append(menu_selected)
-                self._current_menu = menu_selected
-                self.display(menu_selected)
-            elif(callable(menu_selected)):
-                # Clear our screen
-                call("cls")
-
-                # Call our function
-                menu_selected()
-
-                # Hold the user so they can see the result (if back hasn't just been called)
-                if(self.just_called_back == False):
-                    input(">>> Press <Return> to continue...")
-                else:
-                    self.just_called_back = False
-        
-                # Display our menu again to stop from program termination
-                self.display(self._current_menu)
-            else:
-                self.display(self._current_menu, "Please select a valid option!")
-
-        except KeyboardInterrupt:
-            self._app.exit()
-
-        except ValueError:
-            self.display(self._current_menu, "Please select a valid option!")
 

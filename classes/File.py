@@ -2,64 +2,27 @@ import json
 
 class File():
     @staticmethod
-    def update_season_rounds(season, new_rounds):
+    def update_tournament_rounds(season, tournament, new_rounds):
         with open('data/seasons.json', 'r+') as f:
             data = json.load(f)
 
             # Check our Season exists
             if(season in data):
-                # Append our new_rounds to the current data
-                data[season]['rounds'] = new_rounds
+                # Check our Tournament exists
+                if(tournament in data[season]["tournaments"]):
+                    # Append our new_rounds to the current data
+                    data[season]["tournaments"][tournament]['rounds'] = new_rounds
 
-                # Seek back to SOF and write back our data
-                f.seek(0)
-                f.write(json.dumps(data, indent=4))
-                f.truncate()
-            else:
-                return False
-        return True
-    
-    def add_gender(season, gender, cap):
-        with open('data/players.json', 'r+') as f:
-            data = json.load(f)
-
-            # Check our Season exists
-            if(season in data):
-                # Add our gender to the season
-                data[season].update({ gender: [ ] })
-
-                # Update
-                f.seek(0)
-                f.write(json.dumps(data, indent=4))
-                f.truncate()
-
-                return True
-            else:
-                return False
-        return False
-
-    def add_player(season, gender, name):
-        with open('data/players.json', 'r+') as f:
-            data = json.load(f)
-
-            # Check our Season exists
-            if(season in data):
-                # Check our Gender exists
-                if(gender in data[season]):
-                    # Append our player to the list
-                    data[season][gender].append(name)
-
-                    # Update
+                    # Seek back to SOF and write back our data
                     f.seek(0)
                     f.write(json.dumps(data, indent=4))
                     f.truncate()
-                    return True
                 else:
                     return False
             else:
                 return False
-        return False
-
+        return True
+    
     def update_settings(season, name, value):
         with open('data/seasons.json', 'r+') as f:
             data = json.load(f)
@@ -74,10 +37,30 @@ class File():
                     # Create setting
                     data['settings'].update({ name: value })
 
-                # Update
+                # Seek back to SOF and write back our data
                 f.seek(0)
                 f.write(json.dumps(data, indent=4))
                 f.truncate()
             else:
                 return False
         return True
+
+    def update_file_saving(season, tournament, value):
+        with open('data/seasons.json', 'r+') as f:
+            data = json.load(f)
+
+            # Check our Season exists
+            if(season in data):
+                # Check our tournament exists
+                if(tournament in data[season]["tournaments"]):
+                    # Set our Setting
+                    data[season]["tournaments"][tournament]["_file_saving"] = value
+
+                    # Seek back to SOF and write back our data
+                    f.seek(0)
+                    f.write(json.dumps(data, indent=4))
+                    f.truncate()
+                else:
+                    return False
+            else:
+                return False

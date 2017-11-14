@@ -2,18 +2,14 @@
     "season_1": {
         "settings": {
             "editable": true,
-
             "round_count": 5,
-
             "male_cap": 3,
             "female_cap": 2
         },
-
-        "tournaments":
-        {
+        "tournaments": {
             "TAC1": {
                 "_difficulty": 2.7,
-
+                "_file_saving": true,
                 "prize_money": {
                     "1": 1000000,
                     "2": 500000,
@@ -23,12 +19,105 @@
                     "6": 75000,
                     "7": 75000,
                     "8": 75000
+                },
+                "rounds": {
+                    "round_1": {
+                        "male": [
+                            "MP18",
+                            "MP13",
+                            "MP27",
+                            "MP09",
+                            "MP22",
+                            "MP12",
+                            "MP28",
+                            "MP01",
+                            "MP31",
+                            "MP10",
+                            "MP06",
+                            "MP16",
+                            "MP25",
+                            "MP23",
+                            "MP26",
+                            "MP32"
+                        ],
+                        "female": [
+                            "FP22",
+                            "FP32",
+                            "FP08",
+                            "FP26",
+                            "FP25",
+                            "FP29",
+                            "FP20",
+                            "FP04",
+                            "FP15",
+                            "FP07",
+                            "FP12",
+                            "FP05",
+                            "FP02",
+                            "FP06",
+                            "FP24",
+                            "FP19"
+                        ]
+                    },
+                    "round_2": {
+                        "male": [
+                            "MP06",
+                            "MP31",
+                            "MP28",
+                            "MP01",
+                            "MP13",
+                            "MP12",
+                            "MP09",
+                            "MP22"
+                        ],
+                        "female": [
+                            "FP25",
+                            "FP24",
+                            "FP20",
+                            "FP26",
+                            "FP22",
+                            "FP12",
+                            "FP15",
+                            "FP07"
+                        ]
+                    },
+                    "round_3": {
+                        "male": [
+                            "MP09",
+                            "MP06",
+                            "MP22",
+                            "MP12"
+                        ],
+                        "female": [
+                            "FP15",
+                            "FP20",
+                            "FP24",
+                            "FP07"
+                        ]
+                    },
+                    "round_4": {
+                        "male": [
+                            "MP06",
+                            "MP22"
+                        ],
+                        "female": [
+                            "FP15",
+                            "FP20"
+                        ]
+                    },
+                    "round_5": {
+                        "male": [
+                            "MP06"
+                        ],
+                        "female": [
+                            "FP20"
+                        ]
+                    }
                 }
             },
-
             "TAE21": {
                 "_difficulty": 2.3,
-
+                "_file_saving": true,
                 "prize_money": {
                     "1": 1000000,
                     "2": 450000,
@@ -38,12 +127,105 @@
                     "6": 80000,
                     "7": 80000,
                     "8": 80000
+                },
+                "rounds": {
+                    "round_1": {
+                        "male": [
+                            "MP05",
+                            "MP13",
+                            "MP22",
+                            "MP32",
+                            "MP14",
+                            "MP23",
+                            "MP21",
+                            "MP27",
+                            "MP24",
+                            "MP26",
+                            "MP31",
+                            "MP25",
+                            "MP28",
+                            "MP19",
+                            "MP15",
+                            "MP12"
+                        ],
+                        "female": [
+                            "FP09",
+                            "FP02",
+                            "FP13",
+                            "FP18",
+                            "FP05",
+                            "FP06",
+                            "FP08",
+                            "FP30",
+                            "FP12",
+                            "FP14",
+                            "FP19",
+                            "FP16",
+                            "FP10",
+                            "FP24",
+                            "FP26",
+                            "FP22"
+                        ]
+                    },
+                    "round_2": {
+                        "male": [
+                            "MP25",
+                            "MP27",
+                            "MP05",
+                            "MP21",
+                            "MP26",
+                            "MP28",
+                            "MP24",
+                            "MP15"
+                        ],
+                        "female": [
+                            "FP30",
+                            "FP26",
+                            "FP09",
+                            "FP18",
+                            "FP05",
+                            "FP19",
+                            "FP06",
+                            "FP14"
+                        ]
+                    },
+                    "round_3": {
+                        "male": [
+                            "MP05",
+                            "MP28",
+                            "MP27",
+                            "MP24"
+                        ],
+                        "female": [
+                            "FP26",
+                            "FP19",
+                            "FP30",
+                            "FP09"
+                        ]
+                    },
+                    "round_4": {
+                        "male": [
+                            "MP24",
+                            "MP28"
+                        ],
+                        "female": [
+                            "FP26",
+                            "FP19"
+                        ]
+                    },
+                    "round_5": {
+                        "male": [
+                            "MP28"
+                        ],
+                        "female": [
+                            "FP26"
+                        ]
+                    }
                 }
             },
-
             "TAW11": {
                 "_difficulty": 3.1,
-
+                "_file_saving": true,
                 "prize_money": {
                     "1": 1250000,
                     "2": 600000,
@@ -53,12 +235,105 @@
                     "6": 100000,
                     "7": 100000,
                     "8": 100000
+                },
+                "rounds": {
+                    "round_1": {
+                        "male": [
+                            "MP22",
+                            "MP06",
+                            "MP01",
+                            "MP13",
+                            "MP23",
+                            "MP30",
+                            "MP24",
+                            "MP27",
+                            "MP21",
+                            "MP31",
+                            "MP15",
+                            "MP14",
+                            "MP17",
+                            "MP16",
+                            "MP19",
+                            "MP29"
+                        ],
+                        "female": [
+                            "FP30",
+                            "FP23",
+                            "FP24",
+                            "FP15",
+                            "FP19",
+                            "FP11",
+                            "FP31",
+                            "FP13",
+                            "FP02",
+                            "FP16",
+                            "FP12",
+                            "FP17",
+                            "FP28",
+                            "FP03",
+                            "FP22",
+                            "FP18"
+                        ]
+                    },
+                    "round_2": {
+                        "male": [
+                            "MP13",
+                            "MP22",
+                            "MP16",
+                            "MP06",
+                            "MP01",
+                            "MP19",
+                            "MP31",
+                            "MP21"
+                        ],
+                        "female": [
+                            "FP15",
+                            "FP17",
+                            "FP02",
+                            "FP19",
+                            "FP28",
+                            "FP13",
+                            "FP16",
+                            "FP23"
+                        ]
+                    },
+                    "round_3": {
+                        "male": [
+                            "MP22",
+                            "MP13",
+                            "MP21",
+                            "MP31"
+                        ],
+                        "female": [
+                            "FP23",
+                            "FP28",
+                            "FP19",
+                            "FP17"
+                        ]
+                    },
+                    "round_4": {
+                        "male": [
+                            "MP22",
+                            "MP13"
+                        ],
+                        "female": [
+                            "FP17",
+                            "FP19"
+                        ]
+                    },
+                    "round_5": {
+                        "male": [
+                            "MP22"
+                        ],
+                        "female": [
+                            "FP19"
+                        ]
+                    }
                 }
             },
-
             "TBS2": {
                 "_difficulty": 3.25,
-
+                "_file_saving": false,
                 "prize_money": {
                     "1": 1375000,
                     "2": 700000,
