@@ -308,17 +308,21 @@ class Menu():
 
                 # Import Tournament Options
                 tournament_option_name = "ls_[{0}]_[{1}]".format(season.name(), tournament_name)
-                Builder.add_menu(tournament_option_name, "Emulate Tournament", "{0}_{1}".format(tournament_option_name, "et"))
-                Builder.add_info("{0}_{1}".format(tournament_option_name, "et"), "Play through the available rounds")
+                Builder.add_menu(tournament_option_name, "Emulate Tournament - {0}".format(tournament_name), "{0}_{1}".format(tournament_option_name, "et"))
                 Builder.add_menu(tournament_option_name, "Select Round", "{0}_{1}".format(tournament_option_name, "rs"))
-                Builder.add_info("{0}_{1}".format(tournament_option_name, "rs"), "View information about a specific round")
+                Builder.add_menu(tournament_option_name, "Edit Rounds", "{0}_{1}".format(tournament_option_name, "re"))
                 Builder.add_menu(tournament_option_name, "View Difficulty", "{0}_{1}".format(tournament_option_name, "vd"))
-                Builder.add_info("{0}_{1}".format(tournament_option_name, "vd"), "View the Difficulty for this specific tournament")
                 Builder.add_menu(tournament_option_name, "View Prize Money", "{0}_{1}".format(tournament_option_name, "vpm"))
-                Builder.add_info("{0}_{1}".format(tournament_option_name, "vpm"), "View the Prize Money for this specific tournament")
                 Builder.add_menu(tournament_option_name, "View Leaderboard", "{0}_{1}".format(tournament_option_name, "vlb"))
-                Builder.add_info("{0}_{1}".format(tournament_option_name, "vlb"), "View the current ranking of players")
                 Builder.add_menu(tournament_option_name, "{0} Saving".format("Disable" if tournament.file_saving() else "Enable"), "{0}_{1}".format(tournament_option_name, "fs"))
+
+                # Import Menu Information
+                Builder.add_info("{0}_{1}".format(tournament_option_name, "et"), "Play through the available rounds")
+                Builder.add_info("{0}_{1}".format(tournament_option_name, "rs"), "View information about a specific round")
+                Builder.add_info("{0}_{1}".format(tournament_option_name, "re"), "Manage data for a specific round")
+                Builder.add_info("{0}_{1}".format(tournament_option_name, "vd"), "View the Difficulty for this specific tournament")
+                Builder.add_info("{0}_{1}".format(tournament_option_name, "vpm"), "View the Prize Money for this specific tournament")
+                Builder.add_info("{0}_{1}".format(tournament_option_name, "vlb"), "View the current ranking of players")
                 Builder.add_info("{0}_{1}".format(tournament_option_name, "fs"), "Toggle the save state of whether or not to write round data to 'seasons.json'")
 
                 # Import Tournament Functions
@@ -331,6 +335,7 @@ class Menu():
                 ## LOAD ROUNDS
                 for gdr in season.players():
                     Builder.add_menu("{0}_{1}".format(tournament_option_name, "rs"), "{0} Rounds".format(gdr).title(), "{0}_{1}_{2}".format(tournament_option_name, "rs", gdr))
+                    Builder.add_menu("{0}_{1}".format(tournament_option_name, "re"), "{0} Rounds".format(gdr).title(), "{0}_{1}_{2}".format(tournament_option_name, "re", gdr))
 
                     ## IMPORT ROUNDS
                     for r in range(1, (season.settings()['round_count'] + 1)):
@@ -346,6 +351,7 @@ class Menu():
 
                         # Build Menu
                         Builder.add_menu("{0}_{1}_{2}".format(tournament_option_name, "rs", gdr), "Round {0}".format(r), r_view_round)
+                        Builder.add_menu("{0}_{1}_{2}".format(tournament_option_name, "re", gdr), "Round {0}".format(r), r_view_round + "_edit")
 
                         # Add Functionality
                         if(rnd == None):
@@ -357,6 +363,12 @@ class Menu():
                             Builder.add_func(r_view_round, "{0}_{1}_{2}_input".format(tournament_option_name, "vr", gdr+"_"+r_name), partial(print, "input stuff"))
                         else:
                             Builder.add_func(r_view_round, r_view_round, partial(tournament.emulate_round, gdr, r_name))
+
+                        # Add Edit Functionality
+                        Builder.add_menu(r_view_round + "_edit", "Edit Scores", r_view_round + "_edit_es")
+                        Builder.add_menu(r_view_round + "_edit", "Clear Scores", r_view_round + "_edit_cs")
+                        Builder.add_func(r_view_round + "_edit", r_view_round + "_edit_es", partial(print, "Edit Scores"))
+                        Builder.add_func(r_view_round + "_edit", r_view_round + "_edit_cs", partial(print, "Clear Scores"))
 
         # Display Menu
         Builder.show_current_menu()
