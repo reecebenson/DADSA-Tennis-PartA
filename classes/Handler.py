@@ -185,6 +185,7 @@ class Handler():
     def load_previous_rounds(self, seasonId):
         # Get our Season Object
         season = self.get_season(seasonId)
+        players = season.players()
         raw_json = season._j_data
 
         # Check that we have tournament data
@@ -201,6 +202,29 @@ class Handler():
                 print("'rounds' found in " + tournament_name)
 
                 # Load data in
+                for rnd in raw_json['tournaments'][tournament_name]['rounds']:
+                    r_path = raw_json['tournaments'][tournament_name]['rounds'][rnd]
+
+                    for gdr in r_path:
+                        rg_path = r_path[gdr]
+
+                        # Create our Round
+                        _r = Round.Round(self.app, gdr, rnd)
+
+                        # Add our Matches
+                        for match in rg_path:
+                            plyr_one = None
+                            plyr_two = None
+                            #_r.add_match(Match.Match(_r, season.player(gdr, match[0], match[1], rg_path[match][0], rg_path[match][1]))
+                            for i, plyr in enumerate(match, 0):
+                                if(i == 0):
+                                    plyr_one = [plyr, match[plyr]]
+                                elif(i == 1):
+                                    plyr_two = [plyr, match[plyr]]
+                                else:
+                                    break
+                            _r.add_match(Match.Match(_r, season.player(gdr, plyr_one[0]), season.player(gdr, plyr_two[0]), plyr_one[1], plyr_two[1]))
+                        tournament.add_round(gdr, _r)
             else:
                 print("no prev data found for " + tournament_name)
                 

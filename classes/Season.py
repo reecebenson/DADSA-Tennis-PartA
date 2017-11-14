@@ -101,6 +101,13 @@ class Season():
         # Update Files
         File.add_gender(self.name(), name, cap)
 
+    def player(self, gender, name):
+        if(gender in self.players()):
+            for plyr in self.players()[gender]:
+                if(plyr.name() == name):
+                    return plyr
+        return None
+
     def players(self):
         return self._players
 
