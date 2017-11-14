@@ -38,6 +38,10 @@ class Builder():
         Builder._menu[menu].update({ ref: name })
 
     @staticmethod
+    def add_info(ref, info):
+        Builder._menu[ref+"_info"] = info
+
+    @staticmethod
     def add_func(name, ref, func):
         Builder._menu[ref] = func
 
@@ -255,9 +259,13 @@ class Builder():
                 else:
                     print(Builder.notAvailable("{0}. {1}{2}".format(i, v, (' -> ' if Builder.is_menu(k) else ''))))
 
+                # Does this key (ref) have info?
+                if(Builder.item_exists(k+"_info")):
+                    print("   - {0}{1}".format(Builder.get_item(k+"_info"), "" if (i == len(cur_menu_items.items()) and Builder.current_menu() is "main") else "\n"))
+
             # Print our back button
             if(Builder.current_menu() is not "main"):
-                print("{0}. Back".format(i + 1))
+                print("b. Back")
 
             # Get input from user
             Builder.monitor_input()
@@ -301,11 +309,17 @@ class Menu():
                 # Import Tournament Options
                 tournament_option_name = "ls_[{0}]_[{1}]".format(season.name(), tournament_name)
                 Builder.add_menu(tournament_option_name, "Emulate Tournament", "{0}_{1}".format(tournament_option_name, "et"))
+                Builder.add_info("{0}_{1}".format(tournament_option_name, "et"), "Play through the available rounds")
                 Builder.add_menu(tournament_option_name, "Select Round", "{0}_{1}".format(tournament_option_name, "rs"))
+                Builder.add_info("{0}_{1}".format(tournament_option_name, "rs"), "View information about a specific round")
                 Builder.add_menu(tournament_option_name, "View Difficulty", "{0}_{1}".format(tournament_option_name, "vd"))
+                Builder.add_info("{0}_{1}".format(tournament_option_name, "vd"), "View the Difficulty for this specific tournament")
                 Builder.add_menu(tournament_option_name, "View Prize Money", "{0}_{1}".format(tournament_option_name, "vpm"))
+                Builder.add_info("{0}_{1}".format(tournament_option_name, "vpm"), "View the Prize Money for this specific tournament")
                 Builder.add_menu(tournament_option_name, "View Leaderboard", "{0}_{1}".format(tournament_option_name, "vlb"))
+                Builder.add_info("{0}_{1}".format(tournament_option_name, "vlb"), "View the current ranking of players")
                 Builder.add_menu(tournament_option_name, "{0} Saving".format("Disable" if tournament.file_saving() else "Enable"), "{0}_{1}".format(tournament_option_name, "fs"))
+                Builder.add_info("{0}_{1}".format(tournament_option_name, "fs"), "Toggle the save state of whether or not to write round data to 'seasons.json'")
 
                 # Import Tournament Functions
                 Builder.add_func(tournament_option_name, "{0}_{1}".format(tournament_option_name, "et"), partial(tournament.emulate))

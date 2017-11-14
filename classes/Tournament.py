@@ -49,7 +49,8 @@ class Tournament():
             self.save_rounds()
         
         # Update Menu item
-        Builder.add_menu(menu_ref, "{0} Saving".format("Disable" if self.file_saving() else "Enable"), "{0}_{1}".format(menu_ref, "fs"))
+        if(menu_ref != None):
+            Builder.add_menu(menu_ref, "{0} Saving".format("Disable" if self.file_saving() else "Enable"), "{0}_{1}".format(menu_ref, "fs"))
 
         return self.file_saving()
 

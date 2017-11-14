@@ -73,7 +73,7 @@ class Handler():
 
         # Generate Data upto Round X
         if(mode['type'] == "empty"):
-            self.round_mode[mode['season']] = partial(self.app.empty_func)
+            self.round_mode[mode['season']] = partial(self.load_empty_rounds, mode['season'])
             Builder.close_menu()
         elif(mode['type'] == "generate"):
             self.round_mode[mode['season']] = partial(self.generate_rounds, mode['season'], 0, mode['rnd'])
@@ -102,8 +102,11 @@ class Handler():
 
         # Add Menus
         Builder.add_menu("main", "Empty Round Data", "empty_data")
+        Builder.add_info("empty_data", "This will clear round data in 'seasons.json'.")
         Builder.add_menu("main", "Generate New Data", "gen_data")
+        Builder.add_info("gen_data", "Generate new round data upto a specific round, this data is stored if the tournament saving flag is True")
         Builder.add_menu("main", "Load Previous Data", "load_data")
+        Builder.add_info("load_data", "Loads previously saved round data from 'seasons.json'")
 
         # Add Functionality
         ## ROUNDS
@@ -180,6 +183,21 @@ class Handler():
 
         # Display Menu
         Builder.show_current_menu()
+
+    # Load empty rounds
+    def load_empty_rounds(self, seasonId):
+        # Get our Season Object
+        season = self.get_season(seasonId)
+
+        # Clear our rounds data
+        for tn in season.tournaments():
+            t = season.tournament(tn)
+            t._rounds_raw = { }
+
+            # Set our write to file flag to 'True' as we're (expected to) input rounds
+            if(not t.file_saving()):
+                t.toggle_file_saving(None)
+            t.save_rounds()
 
     # Load round data from previous instance
     def load_previous_rounds(self, seasonId):
