@@ -357,6 +357,7 @@ class Handler():
     def generate_round(self, seasonId, tournamentName, roundId, genderName):
         # Get our Season Object
         season = self.get_season(seasonId)
+        players = season.players()
 
         # Ensure we have a valid Season object
         if(season == None):
@@ -371,23 +372,40 @@ class Handler():
 
         # Ensure we have valid round data
         previous_round = tournament.round(genderName, "round_{}".format(roundId - 1))
-        if(previous_round == None):
+        if(previous_round == None and not (roundId - 1) == 0):
             return print("You can only generate this round when the rounds before Round {0} for {1}, {2} have been generated or manually inputed.".format(roundId, genderName.title(), tournamentName))
 
-        # Get this round we're about to generate and see if we already have data
-        this_round = tournament.round(genderName, "round_{}".format(roundId))
-        if(this_round != None):
-            return print("Round {0} already exists.".format(roundId))
-
         # Start Generation of Round
-        _r = Round.Round(self.app, genderName, "round_{0}".format(roundId))
-        tournament.add_round(genderName, _r) # test
-        print("{} --- Round Added: [{}]".format([ w.name() for w in _r.winners() ], "round_{0}".format(roundId)))
-        input("added prev round")
+        if(previous_round == None):
+            rand_players = random.sample(players[genderName], len(players[genderName]))
+        else:
+            rand_players = random.sample(previous_round.winners(), len(previous_round.winners()))
 
+        # Generate our matches from the data we have
+        _r = Round.Round(self.app, genderName, "round_{0}".format(roundId))
+        round_cap = season.settings()[genderName + "_cap"] or 3
+        for w in range(len(rand_players) // 2):
+            # Define our players
+            p_one = rand_players[w * 2]
+            p_two = rand_players[(w * 2) + 1]
+
+            # Generate some scores
+            p_one_score = random.randint(0, round_cap - 1)
+            p_two_score = random.randint(0, round_cap - 1)
+
+            # Make a random player the winner
+            who = random.randint(0, 1)
+            if(who == 0):   p_one_score = round_cap
+            else:           p_two_score = round_cap
+
+            # Add the match
+            _r.add_match(Match.Match(_r, p_one, p_two, p_one_score, p_two_score))
+
+        # Add our round to the tournament
+        tournament.add_round(genderName, _r)
+        
         # Save Data
         self.handle_save_rounds(tournament)
-
         return True
 
     # Used to load prize money
