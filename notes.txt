@@ -17,6 +17,9 @@ TOURNAMENT -> SELECT ROUND ->
 -----------------------------------------------------------------------------------
 DONE:
 
+Empty Round Data
+-> Deletes all round data
+
 Generate New Rounds
 -> Randomise Players for each tournament, round data for each tournament
 -> Upto Round X (example 3)

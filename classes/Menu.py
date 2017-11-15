@@ -13,12 +13,15 @@ class Builder():
     _current = None
     _title = None
     _force_close = None
+    _force_reload = None
 
     @staticmethod
     def init(app, title = False, reloading = False):
         # Set our variables
         Builder._app = app
         Builder._menu = { }
+        Builder._force_close = False
+        Builder._force_reload = False
 
         # If we're reloading, don't reset our current pos or data related to current open menu
         if(not reloading):
@@ -26,11 +29,14 @@ class Builder():
             Builder._tree = [ "main" ]
             Builder._current = "main"
             Builder._title = "Please select an option:" if not title else title
-            Builder._force_close = False
 
     @staticmethod
     def close_menu():
         Builder._force_close = True
+
+    @staticmethod
+    def reload_menu():
+        Builder._force_reload = True
 
     @staticmethod
     def add_menu(menu, name, ref):
@@ -134,7 +140,7 @@ class Builder():
         return "/".join([ m for m in Builder._tree ])
 
     @staticmethod
-    def go_back():
+    def go_back(reloading = False):
         # Set our flag to true
         Builder.just_called_back = True
 
@@ -145,11 +151,14 @@ class Builder():
         Builder._current = Builder._tree[-1]
 
         # Display our menu
-        return Builder.show_current_menu()
+        if(not reloading):
+            return Builder.show_current_menu()
+
+        return None
 
     @staticmethod
     def monitor_input():
-        # Check if we're force closing the menu
+        # Check if we're force closing the menu or if we're reloading the menu
         if(Builder._force_close):
             return
 
@@ -197,7 +206,11 @@ class Builder():
                             # Hold user (to display output from function)
                             input("\n>>> Press <Return> to continue...")
 
-                            return Builder.show_current_menu()
+                            if(not Builder._force_reload):
+                                return Builder.show_current_menu()
+                            else:
+                                Builder._app.menu = Menu(Builder._app)
+                                return Builder._app.menu.load(True)
                         else:
                             if(not Builder.item_exists(req_menu['ref'])):
                                 return Builder.show_current_menu(True, True, "That option is unavailable")
@@ -288,13 +301,7 @@ class Menu():
 
     def load(self, reloading = False):
         # Create our Menu
-        Builder.init(self._app, False, reloading)
-
-        # Debug
-        if(reloading):
-            input("Menu reloading!")
-        else:
-            input("Not reloading!")
+        Builder.init(self._app, False if not reloading else "New Menu", reloading)
 
         ## MAIN
         Builder.add_menu("main", "Load Season", "load_season")
@@ -381,8 +388,7 @@ class Menu():
                         Builder.add_func(r_view_round + "_edit", r_view_round + "_edit_cs", partial(tournament.clear_round, gdr, r))
 
         # Display Menu
-        if(not reloading):
-            Builder.show_current_menu()
+        Builder.show_current_menu()
 
     def debug_info(self):
         try:
@@ -408,20 +414,9 @@ class Menu():
                     for g in t.rounds():
                         print("Round Count for {0}: {1}".format(g, len(t.rounds()[g])))
                 print("Settings: {0}".format(season._j_data['settings']))
-
-                #ACTIONS
-                print("Perform an action:")
-                action = input(">>> ")
-                if(action == "gen"):
-                    self._app.handler.generate_rounds()
-                elif(action == "del rounds"):
-                    season._rounds = { }
-                else:
-                    input("\nError:\nAction does not exist.\nPress <Return> to continue...")
+                input("Continue...")
             else:
                 input("\nError:\nSeason does not exist.\nPress <Return> to continue...")
-            
-            self.debug_info()
         except Exception as err:
             print(err)
             input("Continue...")

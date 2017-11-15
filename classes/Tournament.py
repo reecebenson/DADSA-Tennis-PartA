@@ -101,9 +101,8 @@ class Tournament():
 
         # Reload Menu
         if(ref != None and updated):
-            Builder.go_back()
-            self._app.menu.load(True)
-            Builder.go_back()
+            Builder.go_back(True)
+            Builder.reload_menu()
         return None
 
     def edit_round(self, gender, round_id, ref):

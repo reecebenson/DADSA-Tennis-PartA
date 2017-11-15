@@ -69,9 +69,6 @@ class Season():
                     ret += "{0}. '{1}'\n".format(i, player.name())
         else:
             ret += "An unknown error has been handled..."
-
-        # Returning as a string, so if there was a GUI I could
-        # append this to a Label instead of printing to console
         return ret
 
     def tournaments(self):
