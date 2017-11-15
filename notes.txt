@@ -1,5 +1,8 @@
 TODO:
 
+# double check match aggressive check to make sure it covers spec details
+Round aggressively checking (round match count, round missing, etc.)
+
 Manual Input Data
 -> Delete
 
