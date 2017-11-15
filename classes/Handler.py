@@ -335,6 +335,61 @@ class Handler():
         #input("...continue? ")
         # End of generate_rounds()
 
+    def handle_save_rounds(self, tournament):
+        # Import our data into JSON format for saving reference
+        for g in tournament.rounds():
+            for r_id, r in enumerate(tournament.rounds()[g], 1):
+                # Make sure our round exists within the raw data
+                if(not "round_{0}".format(r_id) in tournament._rounds_raw):
+                    tournament._rounds_raw.update({ "round_{0}".format(r_id): { } })
+
+                # Make sure our gender exists within the raw data
+                if(not g in tournament._rounds_raw["round_{0}".format(r_id)]):
+                    tournament._rounds_raw["round_{0}".format(r_id)].update({ g: [ ] })
+
+                # Insert our data
+                tournament._rounds_raw["round_{0}".format(r_id)][g] = [ { m.player_one()[0].name(): m.player_one()[1], m.player_two()[0].name(): m.player_two()[1] } for m in tournament.round(g, r).matches() ]
+    
+        # Save Tournament Rounds (if enabled)
+        if(tournament.file_saving()):
+            tournament.save_rounds()
+
+    def generate_round(self, seasonId, tournamentName, roundId, genderName):
+        # Get our Season Object
+        season = self.get_season(seasonId)
+
+        # Ensure we have a valid Season object
+        if(season == None):
+            return print("Invalid Season ID: {}".format(seasonId))
+
+        # Get our Tournament Object
+        tournament = season.tournament(tournamentName)
+
+        # Ensure we have a valid Tournament object
+        if(tournament == None):
+            return print("Invalid Tournament Name: {}".format(tournamentName))
+
+        # Ensure we have valid round data
+        previous_round = tournament.round(genderName, "round_{}".format(roundId - 1))
+        if(previous_round == None):
+            return print("You can only generate this round when the rounds before Round {0} for {1}, {2} have been generated or manually inputed.".format(roundId, genderName.title(), tournamentName))
+
+        # Get this round we're about to generate and see if we already have data
+        this_round = tournament.round(genderName, "round_{}".format(roundId))
+        if(this_round != None):
+            return print("Round {0} already exists.".format(roundId))
+
+        # Start Generation of Round
+        _r = Round.Round(self.app, genderName, "round_{0}".format(roundId))
+        tournament.add_round(genderName, _r) # test
+        print("{} --- Round Added: [{}]".format([ w.name() for w in _r.winners() ], "round_{0}".format(roundId)))
+        input("added prev round")
+
+        # Save Data
+        self.handle_save_rounds(tournament)
+
+        return True
+
     # Used to load prize money
     def load_ranking_points(self):
         with open('./data/rankingPoints.json') as tData:

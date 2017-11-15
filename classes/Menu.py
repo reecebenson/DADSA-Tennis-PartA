@@ -15,14 +15,18 @@ class Builder():
     _force_close = None
 
     @staticmethod
-    def init(app, title = False):
+    def init(app, title = False, reloading = False):
         # Set our variables
         Builder._app = app
         Builder._menu = { }
-        Builder._tree = [ "main" ]
-        Builder._current = "main"
-        Builder._title = "Please select an option:" if not title else title
-        Builder._force_close = False
+
+        # If we're reloading, don't reset our current pos or data related to current open menu
+        if(not reloading):
+            # Set our other variables
+            Builder._tree = [ "main" ]
+            Builder._current = "main"
+            Builder._title = "Please select an option:" if not title else title
+            Builder._force_close = False
 
     @staticmethod
     def close_menu():
@@ -282,9 +286,15 @@ class Menu():
         # Set our Application
         self._app = app
 
-    def load(self):
+    def load(self, reloading = False):
         # Create our Menu
-        Builder.init(self._app)
+        Builder.init(self._app, False, reloading)
+
+        # Debug
+        if(reloading):
+            input("Menu reloading!")
+        else:
+            input("Not reloading!")
 
         ## MAIN
         Builder.add_menu("main", "Load Season", "load_season")
@@ -359,19 +369,20 @@ class Menu():
                             Builder.add_menu(r_view_round, "Input Data", "{0}_{1}_{2}_input".format(tournament_option_name, "vr", gdr+"_"+r_name))
 
                             # Add Functionality
-                            Builder.add_func(r_view_round, "{0}_{1}_{2}_gen".format(tournament_option_name, "vr", gdr+"_"+r_name), partial(tournament.generate_round, gdr, r_name))
-                            Builder.add_func(r_view_round, "{0}_{1}_{2}_input".format(tournament_option_name, "vr", gdr+"_"+r_name), partial(tournament.edit_round, gdr, r_name))
+                            Builder.add_func(r_view_round, "{0}_{1}_{2}_gen".format(tournament_option_name, "vr", gdr+"_"+r_name), partial(tournament.generate_round, gdr, r, r_view_round))
+                            Builder.add_func(r_view_round, "{0}_{1}_{2}_input".format(tournament_option_name, "vr", gdr+"_"+r_name), partial(tournament.edit_round, gdr, r, r_view_round))
                         else:
                             Builder.add_func(r_view_round, r_view_round, partial(tournament.emulate_round, gdr, r_name))
 
                         # Add Edit Functionality
                         Builder.add_menu(r_view_round + "_edit", "Edit Scores", r_view_round + "_edit_es")
                         Builder.add_menu(r_view_round + "_edit", "Clear Scores", r_view_round + "_edit_cs")
-                        Builder.add_func(r_view_round + "_edit", r_view_round + "_edit_es", partial(tournament.edit_round, gdr, r_name))
-                        Builder.add_func(r_view_round + "_edit", r_view_round + "_edit_cs", partial(tournament.clear_round, gdr, r_name))
+                        Builder.add_func(r_view_round + "_edit", r_view_round + "_edit_es", partial(tournament.edit_round, gdr, r))
+                        Builder.add_func(r_view_round + "_edit", r_view_round + "_edit_cs", partial(tournament.clear_round, gdr, r))
 
         # Display Menu
-        Builder.show_current_menu()
+        if(not reloading):
+            Builder.show_current_menu()
 
     def debug_info(self):
         try:

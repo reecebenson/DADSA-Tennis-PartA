@@ -1,6 +1,7 @@
 # DADSA - Assignment 1
 # Reece Benson
 
+from functools import partial
 from classes.File import File
 from classes.Menu import Builder
 
@@ -94,11 +95,18 @@ class Tournament():
                 # Append our Round
                 self._rounds[gdr].append(_round)
 
-    def generate_round(self, gender, round_id):
-        print("generate stuff for {} - {}".format(gender, round_id))
+    def generate_round(self, gender, round_id, ref):
+        # Generate specific round
+        updated = self._app.handler.generate_round(self.season().name(), self.name(), round_id, gender)
+
+        # Reload Menu
+        if(ref != None and updated):
+            Builder.go_back()
+            self._app.menu.load(True)
+            Builder.go_back()
         return None
 
-    def edit_round(self, gender, round_id):
+    def edit_round(self, gender, round_id, ref):
         print("edit stuff for {} - {}".format(gender, round_id))
         return None
 

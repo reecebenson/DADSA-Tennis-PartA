@@ -1,4 +1,5 @@
 import json
+from classes.SmallJSON import SmallJSON
 
 class File():
     @staticmethod
@@ -15,7 +16,7 @@ class File():
 
                     # Seek back to SOF and write back our data
                     f.seek(0)
-                    f.write(json.dumps(data, indent=4))
+                    f.write(json.dumps(data, indent=4, cls=SmallJSON))
                     f.truncate()
                 else:
                     return False
@@ -39,7 +40,7 @@ class File():
 
                 # Seek back to SOF and write back our data
                 f.seek(0)
-                f.write(json.dumps(data, indent=4))
+                f.write(json.dumps(data, indent=4, cls=SmallJSON))
                 f.truncate()
             else:
                 return False
@@ -58,7 +59,7 @@ class File():
 
                     # Seek back to SOF and write back our data
                     f.seek(0)
-                    f.write(json.dumps(data, indent=4))
+                    f.write(json.dumps(data, indent=4, cls=SmallJSON))
                     f.truncate()
                 else:
                     return False
