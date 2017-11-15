@@ -359,16 +359,16 @@ class Menu():
                             Builder.add_menu(r_view_round, "Input Data", "{0}_{1}_{2}_input".format(tournament_option_name, "vr", gdr+"_"+r_name))
 
                             # Add Functionality
-                            Builder.add_func(r_view_round, "{0}_{1}_{2}_gen".format(tournament_option_name, "vr", gdr+"_"+r_name), partial(print, "gen stuff"))
-                            Builder.add_func(r_view_round, "{0}_{1}_{2}_input".format(tournament_option_name, "vr", gdr+"_"+r_name), partial(print, "input stuff"))
+                            Builder.add_func(r_view_round, "{0}_{1}_{2}_gen".format(tournament_option_name, "vr", gdr+"_"+r_name), partial(tournament.generate_round, gdr, r_name))
+                            Builder.add_func(r_view_round, "{0}_{1}_{2}_input".format(tournament_option_name, "vr", gdr+"_"+r_name), partial(tournament.edit_round, gdr, r_name))
                         else:
                             Builder.add_func(r_view_round, r_view_round, partial(tournament.emulate_round, gdr, r_name))
 
                         # Add Edit Functionality
                         Builder.add_menu(r_view_round + "_edit", "Edit Scores", r_view_round + "_edit_es")
                         Builder.add_menu(r_view_round + "_edit", "Clear Scores", r_view_round + "_edit_cs")
-                        Builder.add_func(r_view_round + "_edit", r_view_round + "_edit_es", partial(print, "Edit Scores"))
-                        Builder.add_func(r_view_round + "_edit", r_view_round + "_edit_cs", partial(print, "Clear Scores"))
+                        Builder.add_func(r_view_round + "_edit", r_view_round + "_edit_es", partial(tournament.edit_round, gdr, r_name))
+                        Builder.add_func(r_view_round + "_edit", r_view_round + "_edit_cs", partial(tournament.clear_round, gdr, r_name))
 
         # Display Menu
         Builder.show_current_menu()

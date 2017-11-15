@@ -94,6 +94,18 @@ class Tournament():
                 # Append our Round
                 self._rounds[gdr].append(_round)
 
+    def generate_round(self, gender, round_id):
+        print("generate stuff for {} - {}".format(gender, round_id))
+        return None
+
+    def edit_round(self, gender, round_id):
+        print("edit stuff for {} - {}".format(gender, round_id))
+        return None
+
+    def clear_round(self, gender, round_id):
+        print("clear round, from {} upto round_5 - {}".format(round_id, gender))
+        return None
+
     def prize_money(self):
         return self._prize_money
 
