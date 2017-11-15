@@ -1,6 +1,8 @@
 # DADSA - Assignment 1
 # Reece Benson
 
+from os import system as call
+
 class Match():
     _round = None
     _winner = None
@@ -15,7 +17,82 @@ class Match():
         self._player_two = p_two
         self._player_one_score = p_one_score
         self._player_two_score = p_two_score
+    
+    def validate(self, error_count = 0):
+        # Get our cap
+        error = False
+        cap = self.round().cap()
         
+        # Check if the rounds are above the cap
+        ## PLAYER ONE
+        if(self.player_one()[1] > cap):
+            # Error Occurred
+            error = True
+            error_count += 1
+
+            # Print out the match for the user to see and reference to
+            call("cls")
+            print("Checking:", self.versuses(True))
+
+            print("{0}'s score is above the cap of {1}, please enter this players new score:".format(self.player_one()[0].name(), cap))
+            new_score = input(">>> ")
+            if(new_score.isdigit()):
+                new_score = int(new_score)
+                if(new_score >= 0 and new_score <= cap):
+                    self._player_one_score = new_score
+                else:
+                    return self.validate(error_count)
+            else:
+                return self.validate(error_count)
+        
+        ## PLAYER TWO
+        if(self.player_two()[1] > cap):
+            # Error Occurred
+            error = True
+            error_count += 1
+            
+            # Print out the match for the user to see and reference to
+            call("cls")
+            print("Checking:", self.versuses(True))
+            
+            print("{0}'s score is above the cap of {1}, please enter this players new score:".format(self.player_two()[0].name(), cap))
+            new_score = input(">>> ")
+            if(new_score.isdigit()):
+                new_score = int(new_score)
+                if(new_score >= 0 and new_score <= cap):
+                    self._player_two_score = new_score
+                else:
+                    return self.validate(error_count)
+            else:
+                return self.validate(error_count)
+        
+        # Check if the scores of the players are the same
+        if(self.player_one()[1] == self.player_two()[1]):
+            # Error Occurred
+            error = True
+            error_count += 1
+            
+            # Print out the match for the user to see and reference to
+            call("cls")
+            print("Checking:", self.versuses(True))
+            
+            print("{0}'s and {1}'s score are the same. Please enter {0}'s new score:".format(self.player_one()[0].name(), self.player_two()[0].name()))
+            new_score = input(">>> ")
+            if(new_score.isdigit()):
+                new_score = int(new_score)
+                if(new_score >= 0 and new_score <= cap and new_score != self.player_two()[1]):
+                    self._player_two_score = new_score
+                else:
+                    return self.validate(error_count)
+            else:
+                return self.validate(error_count)
+
+        # Check if we're done (aggressive recursion)
+        if(error):
+            return self.validate(error_count)
+        else:
+            return error_count
+
     def round(self):
         return self._round
 

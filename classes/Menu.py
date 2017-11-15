@@ -20,6 +20,8 @@ class Builder():
         # Set our variables
         Builder._app = app
         Builder._menu = { }
+
+        # Flags will be reset when the menu is closed and reinitialised, or when the menu is closed and then reloaded (init called again)
         Builder._force_close = False
         Builder._force_reload = False
 
@@ -32,10 +34,15 @@ class Builder():
 
     @staticmethod
     def close_menu():
+        # Set our flag
         Builder._force_close = True
 
     @staticmethod
     def reload_menu():
+        # We will pop() [go back] to avoid hitting any errors (maybe menu is replaced with a function, etc)
+        Builder.go_back(True)
+
+        # Set our flag
         Builder._force_reload = True
 
     @staticmethod
@@ -49,14 +56,17 @@ class Builder():
 
     @staticmethod
     def add_info(ref, info):
+        # Add additional information to a menu item
         Builder._menu[ref+"_info"] = info
 
     @staticmethod
     def add_func(name, ref, func):
+        # Add a selectable function to the referred menu item
         Builder._menu[ref] = func
 
     @staticmethod
     def get_item(ref):
+        # Get an existing item, otherwise return None
         if(not ref in Builder._menu):
             return None
         else:
@@ -65,6 +75,7 @@ class Builder():
 
     @staticmethod
     def call_func(ref):
+        # Call the function reference of a menu item
         if(Builder.is_func(ref)):
             Builder.get_item(ref)()
         else:
@@ -72,14 +83,17 @@ class Builder():
 
     @staticmethod
     def is_func(ref):
+        # Check if the function reference is callable / is a function
         return callable(Builder.get_item(ref))
 
     @staticmethod
     def item_exists(ref):
+        # Check if a menu item or reference exists
         return (ref in Builder._menu)
 
     @staticmethod
     def is_menu(ref):
+        # Set flag
         is_a_menu = True
         
         # Check if the "menu" exists
@@ -94,6 +108,7 @@ class Builder():
 
     @staticmethod
     def notAvailable(text):
+        # Append a string as a suffix
         return text + " (Not Available)"
 
     @staticmethod
@@ -120,23 +135,28 @@ class Builder():
 
     @staticmethod
     def show():
+        # Print a tree of the current built menu
         print(Builder._menu)
 
     @staticmethod
     def current_menu():
+        # Return the current menu (top of the stack)
         return Builder._current
 
     @staticmethod
     def set_current_menu(new_menu):
+        # Set the current menu
         Builder._current = new_menu
         return Builder.current_menu()
 
     @staticmethod
     def add_menu_tree(ref):
+        # Add to our current menu tree
         Builder._tree.append(ref)
 
     @staticmethod
     def get_menu_tree():
+        # Get our current menu tree as a string, split by forward slash (/)
         return "/".join([ m for m in Builder._tree ])
 
     @staticmethod

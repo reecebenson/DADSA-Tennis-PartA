@@ -20,6 +20,10 @@ class Round():
     def name(self):
         return self._name
 
+    def validate(self, error_count = 0):
+        # Check if this round is statistically correct
+        return error_count
+
     def gender(self):
         return self._gender
 

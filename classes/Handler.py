@@ -214,11 +214,10 @@ class Handler():
         for tournament_name in raw_json['tournaments']:
             # Get our Tournament Object
             tournament = season.tournament(tournament_name)
+            error_found = False
 
             # Check our rounds stored within the JSON data
             if("rounds" in raw_json['tournaments'][tournament_name]):
-                print("'rounds' found in " + tournament_name)
-
                 # Load data in
                 for rnd in raw_json['tournaments'][tournament_name]['rounds']:
                     r_path = raw_json['tournaments'][tournament_name]['rounds'][rnd]
@@ -228,12 +227,13 @@ class Handler():
 
                         # Create our Round
                         _r = Round.Round(self.app, gdr, rnd)
+                        round_cap = season.settings()[gdr + "_cap"] or 3
 
                         # Add our Matches
                         for match in rg_path:
                             plyr_one = None
                             plyr_two = None
-                            #_r.add_match(Match.Match(_r, season.player(gdr, match[0], match[1], rg_path[match][0], rg_path[match][1]))
+
                             for i, plyr in enumerate(match, 0):
                                 if(i == 0):
                                     plyr_one = [plyr, match[plyr]]
@@ -241,12 +241,27 @@ class Handler():
                                     plyr_two = [plyr, match[plyr]]
                                 else:
                                     break
-                            _r.add_match(Match.Match(_r, season.player(gdr, plyr_one[0]), season.player(gdr, plyr_two[0]), plyr_one[1], plyr_two[1]))
+
+                            # Setup our Match
+                            _m = Match.Match(_r, season.player(gdr, plyr_one[0]), season.player(gdr, plyr_two[0]), plyr_one[1], plyr_two[1])
+
+                            # Check if errors occurred, if they have - we want to update our file to fix these issues
+                            m_error = True if _m.validate() > 0 else False
+                            if(m_error):
+                                error_found = True
+
+                            # Add our Match to our round
+                            _r.add_match(_m)
                         tournament.add_round(gdr, _r)
-            else:
-                print("no prev data found for " + tournament_name)
+
+                        # Check if errors occurred, if they have - we want to update our file to fix these issues
+                        r_error = True if _r.validate() > 0 else False
+                        if(r_error):
+                            r_error_found = True
                 
-            input("...continue?")
+                # If errors have occurred, update file with fixes
+                if(error_found):
+                    self.handle_save_rounds(tournament)
 
     # Generate our rounds from our player list from scratch
     def generate_rounds(self, seasonId, minRoundId, maxRoundId):
