@@ -230,7 +230,7 @@ class Handler():
                         match_cap = (len(players[gdr]) // 2) if (prev_round == None) else (len(prev_round.winners()) // 2)
 
                         # Create our Round
-                        _r = Round.Round(self.app, gdr, rnd, match_cap)
+                        _r = Round.Round(self.app, gdr, rnd, tournament, match_cap)
                         round_cap = season.settings()[gdr + "_cap"] or 3
 
                         # Add our Matches
@@ -295,13 +295,16 @@ class Handler():
                     # Default Values
                     round_cap = 3
 
+                    # Data to Check
+                    prev_r = tournament.round(gender, "round_" + str(r))
+
+                    # Check if we have a round to take data from
+                    match_cap = (len(players[gender]) // 2) if (prev_r == None) else (len(prev_r.winners()) // 2)
+
                     # Do we have a Round Cap overrider for this gender?
                     if(gender + "_cap" in season.settings()):
                         round_cap = season.settings()[gender + "_cap"]
-                    _r = Round.Round(self.app, gender, r_name)
-
-                    # Data to Check
-                    prev_r = tournament.round(gender, "round_" + str(r))
+                    _r = Round.Round(self.app, gender, r_name, tournament, match_cap)
 
                     # Check if we have a round to take data from
                     rnd_players = [ ]
@@ -402,9 +405,12 @@ class Handler():
             rand_players = random.sample(players[genderName], len(players[genderName]))
         else:
             rand_players = random.sample(previous_round.winners(), len(previous_round.winners()))
+            
+        # Check if we have a round to take data from
+        match_cap = (len(players[genderName]) // 2) if (previous_round == None) else (len(previous_round.winners()) // 2)
 
         # Generate our matches from the data we have
-        _r = Round.Round(self.app, genderName, "round_{0}".format(roundId))
+        _r = Round.Round(self.app, genderName, "round_{0}".format(roundId), tournament, match_cap)
         round_cap = season.settings()[genderName + "_cap"] or 3
         for w in range(len(rand_players) // 2):
             # Define our players
