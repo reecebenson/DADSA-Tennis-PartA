@@ -140,7 +140,7 @@ class Tournament():
         for m, match in enumerate(self.round(gdr, rnd).matches(), 1):
             print(match.versuses(True))
 
-    def display(self, detail, gender = None):
+    def display(self, detail, extra = None):
         # Set our header text
         ret = "Details about '{0}':".format(self.name()) + "\n"
         ret += "—————————————————————————————————————————————————————————" + "\n"
@@ -153,14 +153,14 @@ class Tournament():
             ret += "Prize Money:" + "\n"
             ret += "{0}".format("\n".join([ "  #{0}: £{1:,}".format(i, int(t)) for i, t in enumerate(self.prize_money(), 1) ])) + "\n"
         elif(detail == "leaderboard"):
-            if(gender == None):
+            if(extra == None):
                 ret += "A gender must be specified."
             else:
-                srt = sort(self.season().players()[gender])
+                srt = sort(self.season().players()[extra])
                 
                 place = 1
                 for i in reversed(range(len(srt))):
-                    ret += ("#{0}: {1} — Points: {2}pts — Prize Money: £{3:,}\n".format(place, srt[i].name(), srt[i].points() * self.difficulty(), 0))
+                    ret += ("#{0}: {1} — Points: {2}pts — {3}\n".format(place, srt[i].name(), srt[i].points() * self.difficulty(), "{0}: {1} score, {2} wins".format(self.name(), srt[i].score(self.name()), srt[i].wins(self.name()))))
                     place += 1
         else:
             ret = "An unknown error has been handled..."

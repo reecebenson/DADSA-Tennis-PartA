@@ -345,7 +345,6 @@ class Menu():
 
                 # Import Tournament Options
                 tournament_option_name = "ls_[{0}]_[{1}]".format(season.name(), tournament_name)
-                Builder.add_menu(tournament_option_name, "Emulate Tournament - {0}".format(tournament_name), "{0}_{1}".format(tournament_option_name, "et"))
                 Builder.add_menu(tournament_option_name, "Select Round", "{0}_{1}".format(tournament_option_name, "rs"))
                 Builder.add_menu(tournament_option_name, "Edit Rounds", "{0}_{1}".format(tournament_option_name, "re"))
                 Builder.add_menu(tournament_option_name, "View Difficulty", "{0}_{1}".format(tournament_option_name, "vd"))
@@ -354,7 +353,6 @@ class Menu():
                 Builder.add_menu(tournament_option_name, "{0} Saving".format("Disable" if tournament.file_saving() else "Enable"), "{0}_{1}".format(tournament_option_name, "fs"))
 
                 # Import Menu Information
-                Builder.add_info("{0}_{1}".format(tournament_option_name, "et"), "Play through the available rounds")
                 Builder.add_info("{0}_{1}".format(tournament_option_name, "rs"), "View information about a specific round")
                 Builder.add_info("{0}_{1}".format(tournament_option_name, "re"), "Manage data for a specific round")
                 Builder.add_info("{0}_{1}".format(tournament_option_name, "vd"), "View the Difficulty for this specific tournament")
@@ -363,7 +361,6 @@ class Menu():
                 Builder.add_info("{0}_{1}".format(tournament_option_name, "fs"), "Toggle the save state of whether or not to write round data to 'seasons.json'")
 
                 # Import Tournament Functions
-                Builder.add_func(tournament_option_name, "{0}_{1}".format(tournament_option_name, "et"), partial(tournament.emulate))
                 Builder.add_func(tournament_option_name, "{0}_{1}".format(tournament_option_name, "vd"), partial(print, tournament.display("difficulty")))
                 Builder.add_func(tournament_option_name, "{0}_{1}".format(tournament_option_name, "vpm"), partial(print, tournament.display("prize_money")))
                 Builder.add_func(tournament_option_name, "{0}_{1}".format(tournament_option_name, "fs"), partial(tournament.toggle_file_saving, tournament_option_name))
