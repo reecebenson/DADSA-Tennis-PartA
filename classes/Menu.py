@@ -423,18 +423,15 @@ class Menu():
                 
                 #PRINT DEBUG
                 print("Name: {0}".format(season.name()))
-                print("Tournament Count: {0}".format(len(season.tournaments())))
-                print("Tournament Names: {0}".format([ t for t in season.tournaments() ]))
                 for tn in season.tournaments():
                     t = season.tournament(tn)
-                    print("_____________________")
-                    print(t._rounds_raw)
-                    print("_____________________")
-                    print("Gender Count: {0}".format(len(t.rounds())))
+                    print("Name: {}".format(tn))
                     for g in t.rounds():
-                        print("Round Count for {0}: {1}".format(g, len(t.rounds()[g])))
-                print("Settings: {0}".format(season._j_data['settings']))
-                input("Continue...")
+                        for r in t.rounds()[g]:
+                            r = t.round(g, r)
+                            print("------------\n{} {}".format(g, r).title())
+                            print("Match Cap: {}".format(r.match_cap()))
+                            print("Match Count: {}".format(len(r.matches())))
             else:
                 input("\nError:\nSeason does not exist.\nPress <Return> to continue...")
         except Exception as err:

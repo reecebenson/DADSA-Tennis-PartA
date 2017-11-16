@@ -215,6 +215,7 @@ class Handler():
             # Get our Tournament Object
             tournament = season.tournament(tournament_name)
             error_found = False
+            prev_round = None
 
             # Check our rounds stored within the JSON data
             if("rounds" in raw_json['tournaments'][tournament_name]):
@@ -225,8 +226,11 @@ class Handler():
                     for gdr in r_path:
                         rg_path = r_path[gdr]
 
+                        # Check if we have a round to take data from
+                        match_cap = (len(players[gdr]) // 2) if (prev_round == None) else (len(prev_round.winners()) // 2)
+
                         # Create our Round
-                        _r = Round.Round(self.app, gdr, rnd)
+                        _r = Round.Round(self.app, gdr, rnd, match_cap)
                         round_cap = season.settings()[gdr + "_cap"] or 3
 
                         # Add our Matches
@@ -259,6 +263,9 @@ class Handler():
                         if(r_error):
                             r_error_found = True
                 
+                    # Set our previous round
+                    prev_round = _r
+
                 # If errors have occurred, update file with fixes
                 if(error_found):
                     self.handle_save_rounds(tournament)
