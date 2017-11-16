@@ -160,7 +160,7 @@ class Tournament():
                 
                 place = 1
                 for i in reversed(range(len(srt))):
-                    ret += ("#{0}: {1} — Points: {2}pts\n".format(place, srt[i].name(), srt[i].points() * self.difficulty()))
+                    ret += ("#{0}: {1} — Points: {2}pts — Prize Money: £{3:,}\n".format(place, srt[i].name(), srt[i].points() * self.difficulty(), 0))
                     place += 1
         else:
             ret = "An unknown error has been handled..."
