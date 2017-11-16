@@ -366,13 +366,16 @@ class Menu():
                 Builder.add_func(tournament_option_name, "{0}_{1}".format(tournament_option_name, "et"), partial(tournament.emulate))
                 Builder.add_func(tournament_option_name, "{0}_{1}".format(tournament_option_name, "vd"), partial(print, tournament.display("difficulty")))
                 Builder.add_func(tournament_option_name, "{0}_{1}".format(tournament_option_name, "vpm"), partial(print, tournament.display("prize_money")))
-                Builder.add_func(tournament_option_name, "{0}_{1}".format(tournament_option_name, "vlb"), partial(print, tournament.display("leaderboard")))
                 Builder.add_func(tournament_option_name, "{0}_{1}".format(tournament_option_name, "fs"), partial(tournament.toggle_file_saving, tournament_option_name))
 
                 ## LOAD ROUNDS
                 for gdr in season.players():
                     Builder.add_menu("{0}_{1}".format(tournament_option_name, "rs"), "{0} Rounds".format(gdr).title(), "{0}_{1}_{2}".format(tournament_option_name, "rs", gdr))
                     Builder.add_menu("{0}_{1}".format(tournament_option_name, "re"), "{0} Rounds".format(gdr).title(), "{0}_{1}_{2}".format(tournament_option_name, "re", gdr))
+                    Builder.add_menu("{0}_{1}".format(tournament_option_name, "vlb"), "{0} Leaderboard".format(gdr).title(), "{0}_{1}_{2}".format(tournament_option_name, "vlb", gdr))
+
+                    ## ADD FUNC FOR LEADERBOARD
+                    Builder.add_func("{0}_{1}".format(tournament_option_name, "vlb"), "{0}_{1}_{2}".format(tournament_option_name, "vlb", gdr), partial(print, tournament.display("leaderboard", gdr)))
 
                     ## IMPORT ROUNDS
                     for r in range(1, (season.settings()['round_count'] + 1)):

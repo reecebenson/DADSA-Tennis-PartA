@@ -110,13 +110,22 @@ class Round():
                         print("There was an error with processing round data. The data is corrupt and has players that do not exist.\nPlease regenerate the 'seasons.json' file.")
                         return self._app.exit()
                 else:
-                    # Find a player that doesn't exist within this rounds
-                    for p in self.parent().season().players()[m.player_one()[0].gender()]:
-                        if(p.name() not in self.players()):
-                            print("found a player not within this round: {}".format(p.name()))
-                            input("halt")
+                    # Find a player that doesn't exist within this round but exists within the previous round
+                    p_found = [ False, None ]
+                    for p in self.parent().season().players():
+                        if(p not in self.players() and (p in [ w.name() for w in self.parent().season().players()[m.player_one()[0].gender()] ])):
+                            p_found = [ True, m.player_one()[0].name() ]
+                            m._player_one = self.parent().season().player(m.player_one()[0].gender(), p)
+                            break
 
-                    input("hold")
+                    # Check if the error has been resolved
+                    if(p_found[0]):
+                        # Update 'seasons.json'
+                        input("[{2}:{3}] '{0}' has been replaced with '{1}' - ...continue\n".format(p_found[1], p, self.parent().name(), self.name()))
+                    else:
+                        call("cls")
+                        print("There was an error with processing round data. The data is corrupt and has players that do not exist.\nPlease regenerate the 'seasons.json' file.")
+                        return self._app.exit()
             else:
                 self._players.append(m.player_one()[0].name())
             
@@ -148,13 +157,22 @@ class Round():
                         print("There was an error with processing round data. The data is corrupt and has players that do not exist.\nPlease regenerate the 'seasons.json' file.")
                         return self._app.exit()
                 else:
-                    # Find a player that doesn't exist within this rounds
-                    for p in self.parent().season().players()[m.player_two()[0].gender()]:
-                        if(p.name() not in self.players()):
-                            print("found a player not within this round: {}".format(p.name()))
-                            input("halt")
+                    # Find a player that doesn't exist within this round but exists within the previous round
+                    p_found = [ False, None ]
+                    for p in self.parent().season().players():
+                        if(p not in self.players() and (p in [ w.name() for w in self.parent().season().players()[m.player_two()[0].gender()] ])):
+                            p_found = [ True, m.player_two()[0].name() ]
+                            m._player_two = self.parent().season().player(m.player_two()[0].gender(), p)
+                            break
 
-                    input("hold")
+                    # Check if the error has been resolved
+                    if(p_found[0]):
+                        # Update 'seasons.json'
+                        input("[{2}:{3}] '{0}' has been replaced with '{1}' - ...continue\n".format(p_found[1], p, self.parent().name(), self.name()))
+                    else:
+                        call("cls")
+                        print("There was an error with processing round data. The data is corrupt and has players that do not exist.\nPlease regenerate the 'seasons.json' file.")
+                        return self._app.exit()
             else:
                 self._players.append(m.player_two()[0].name())
 

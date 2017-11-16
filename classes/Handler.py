@@ -341,7 +341,10 @@ class Handler():
 
                     # Add our round to our season
                     tournament.add_round(gender, _r)
-                    input("{} --- Round Added: [{}]".format([ w.name() for w in _r.winners() ], r_name))
+
+                    # Debug
+                    if(self.app.debug):
+                        print("{} --- Round Added: [{}]".format([ w.name() for w in _r.winners() ], r_name))
 
                 # Import our data into JSON format for saving reference
                 for g in tournament.rounds():
@@ -365,7 +368,6 @@ class Handler():
         if(self.app.debug):
             print("[LOAD]: Generated {1} rounds for season: '{0}', minRound: {2}, maxRound: {3}".format(season.name(), season.settings()['round_count'], minRoundId, maxRoundId))
 
-        #input("...continue? ")
         # End of generate_rounds()
 
     def handle_save_rounds(self, tournament):

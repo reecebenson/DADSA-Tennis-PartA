@@ -4,6 +4,7 @@
 from functools import partial
 from classes.File import File
 from classes.Menu import Builder
+from classes.QuickSort import quick_sort as sort
 
 class Tournament():
     _app = None
@@ -139,7 +140,7 @@ class Tournament():
         for m, match in enumerate(self.round(gdr, rnd).matches(), 1):
             print(match.versuses(True))
 
-    def display(self, detail):
+    def display(self, detail, gender = None):
         # Set our header text
         ret = "Details about '{0}':".format(self.name()) + "\n"
         ret += "—————————————————————————————————————————————————————————" + "\n"
@@ -152,7 +153,15 @@ class Tournament():
             ret += "Prize Money:" + "\n"
             ret += "{0}".format("\n".join([ "  #{0}: £{1:,}".format(i, int(t)) for i, t in enumerate(self.prize_money(), 1) ])) + "\n"
         elif(detail == "leaderboard"):
-            ret += "leaderboard data"
+            if(gender == None):
+                ret += "A gender must be specified."
+            else:
+                srt = sort(self.season().players()[gender])
+                
+                place = 1
+                for i in reversed(range(len(srt))):
+                    ret += ("#{0}: {1} — Points: {2}pts\n".format(place, srt[i].name(), srt[i].points() * self.difficulty()))
+                    place += 1
         else:
             ret = "An unknown error has been handled..."
         return ret
