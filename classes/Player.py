@@ -24,8 +24,8 @@ class Player():
             return 0
 
     # Comparison Overrides
-    def __eq__(self, other):
-        return not self._points < other._points and not other._points < self._points
+    #def __eq__(self, other):
+    #    return not self._points < other._points and not other._points < self._points
 
     def __ne__(self, other):
         return self._points < other._points or other._points < self._points

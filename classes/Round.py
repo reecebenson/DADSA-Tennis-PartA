@@ -77,6 +77,11 @@ class Round():
             # Increase Match Identifier
             matchId += 1
 
+            if(m.player_one()[0] == None or m.player_two()[0] == None):
+                call("cls")
+                print("There was an error with processing round data. The data is corrupt and has players that do not exist.\nPlease regenerate the 'seasons.json' file.")
+                return self._app.exit()
+
             # Check Player One
             if(m.player_one()[0].name() in self.players()):
                 error = True
@@ -84,13 +89,34 @@ class Round():
 
                 # Print some details
                 call("cls")
-                print("[{0}:{1}] {2} is already in the player list for Match {3}. Repeat?".format(self.parent().name(), self.name(), m.player_one()[0].name(), matchId))
+                print("[{0}:{1}] {2} is already in the player list for Match {3}. Fixing...".format(self.parent().name(), self.name(), m.player_one()[0].name(), matchId))
 
                 # Get user not in this list
-                if(m.player_one()[0] in self.parent().season().players()[m.player_one()[0].gender()]):
-                    print("player one in players list")
+                if(self.previous_round() != None):
+                    # Find a player that doesn't exist within this round but exists within the previous round
+                    p_found = [ False, None ]
+                    for p in self.previous_round().players():
+                        if(p not in self.players() and (p in [ w.name() for w in self.previous_round().winners() ])):
+                            p_found = [ True, m.player_one()[0].name() ]
+                            m._player_one = self.parent().season().player(m.player_one()[0].gender(), p)
+                            break
 
-                input(">>> ")
+                    # Check if the error has been resolved
+                    if(p_found[0]):
+                        # Update 'seasons.json'
+                        input("[{2}:{3}] '{0}' has been replaced with '{1}' - ...continue\n".format(p_found[1], p, self.parent().name(), self.name()))
+                    else:
+                        call("cls")
+                        print("There was an error with processing round data. The data is corrupt and has players that do not exist.\nPlease regenerate the 'seasons.json' file.")
+                        return self._app.exit()
+                else:
+                    # Find a player that doesn't exist within this rounds
+                    for p in self.parent().season().players()[m.player_one()[0].gender()]:
+                        if(p.name() not in self.players()):
+                            print("found a player not within this round: {}".format(p.name()))
+                            input("halt")
+
+                    input("hold")
             else:
                 self._players.append(m.player_one()[0].name())
             
@@ -101,21 +127,89 @@ class Round():
 
                 # Print some details
                 call("cls")
-                print("[{0}:{1}] {2} is already in the player list for Match {3}. Repeat?".format(self.parent().name(), self.name(), m.player_two()[0].name(), matchId))
+                print("[{0}:{1}] {2} is already in the player list for Match {3}. Fixing...".format(self.parent().name(), self.name(), m.player_two()[0].name(), matchId))
 
                 # Get user not in this list
                 if(self.previous_round() != None):
-                    if(m.player_two()[0] in self.previous_round().players()[m.player_two()[0].gender()]):
-                        print("player two in previous round [{}] players list".format(self.previous_round().name()))
-                else:
-                    # Make sure player exists
-                    if(m.player_two()[0] in self.parent().season().players()[m.player_two()[0].gender()]):
-                        print("player exists")
+                    # Find a player that doesn't exist within this round but exists within the previous round
+                    p_found = [ False, None ]
+                    for p in self.previous_round().players():
+                        if(p not in self.players() and (p in [ w.name() for w in self.previous_round().winners() ])):
+                            p_found = [ True, m.player_two()[0].name() ]
+                            m._player_two = self.parent().season().player(m.player_two()[0].gender(), p)
+                            break
 
-                input(">>> ")
+                    # Check if the error has been resolved
+                    if(p_found[0]):
+                        # Update 'seasons.json'
+                        input("[{2}:{3}] '{0}' has been replaced with '{1}' - ...continue\n".format(p_found[1], p, self.parent().name(), self.name()))
+                    else:
+                        call("cls")
+                        print("There was an error with processing round data. The data is corrupt and has players that do not exist.\nPlease regenerate the 'seasons.json' file.")
+                        return self._app.exit()
+                else:
+                    # Find a player that doesn't exist within this rounds
+                    for p in self.parent().season().players()[m.player_two()[0].gender()]:
+                        if(p.name() not in self.players()):
+                            print("found a player not within this round: {}".format(p.name()))
+                            input("halt")
+
+                    input("hold")
             else:
                 self._players.append(m.player_two()[0].name())
-        
+
+            # Check that the players are within the winners of the previous round (if exists)
+            if(self.previous_round() != None):
+                existing_players = [ p for p in self.players() ]
+                winner_name_list = [ w.name() for w in self.previous_round().winners() ]
+                
+                # Check Player One exists within the previous winners
+                if(m.player_one()[0].name() not in winner_name_list):
+                    # Print some details
+                    call("cls")
+                    print(winner_name_list)
+                    print("[{0}:{1}] Player {2} was not a valid winner for the previous {3}. Fixing...".format(self.parent().name(), self.name(), m.player_one()[0].name(), self.previous_round().name()))
+
+                    # Find a player who is not defined within these matches
+                    p_found = [ False, None ]
+                    for p in self.previous_round().winners():
+                        if(p.name() in winner_name_list and p.name() not in existing_players):
+                            p_found = [ True, p.name() ]
+                            if(self.parent().season().player(m.player_one()[0].gender(), p.name()) == None):
+                                input("fucked it")
+                            print(self.parent().season().player(m.player_one()[0].gender(), p.name()))
+                            m._player_one = self.parent().season().player(m.player_one()[0].gender(), p.name())
+
+                    # If we have a player, lets fix our data
+                    if(p_found[0]):
+                        # Update 'seasons.json'
+                        input("[{2}:{3}] '{0}' has been replaced with '{1}' - ...continue\n".format(m.player_one()[0].name(), p_found[1], self.parent().name(), self.name()))
+                    else:
+                        input("Unable to fix this shit...")
+                        exit()
+
+                # Check Player Two exists within the previous winners
+                if(m.player_two()[0].name() not in winner_name_list):
+                    # Print some details
+                    call("cls")
+                    print(winner_name_list)
+                    print("[{0}:{1}] Player {2} was not a valid winner for the previous {3}. Fixing...".format(self.parent().name(), self.name(), m.player_two()[0].name(), self.previous_round().name()))
+
+                    # Find a player who is not defined within these matches
+                    p_found = [ False, None ]
+                    for p in self.previous_round().winners():
+                        if(p.name() in winner_name_list and p.name() not in existing_players):
+                            p_found = [ True, p.name() ]
+                            m._player_two = self.parent().season().player(m.player_two()[0].gender(), p.name())
+
+                    # If we have a player, lets fix our data
+                    if(p_found[0]):
+                        # Update 'seasons.json'
+                        input("[{2}:{3}] '{0}' has been replaced with '{1}' - ...continue\n".format(m.player_two()[0].name(), p_found[1], self.parent().name(), self.name()))
+                    else:
+                        input("Unable to fix this shit...")
+                        exit()
+
         # Check if we're done (aggressive recursion)
         if(error):
             return self.validate(error_count)

@@ -214,7 +214,9 @@ class Handler():
         for tournament_name in raw_json['tournaments']:
             # Get our Tournament Object
             tournament = season.tournament(tournament_name)
+            r_error_found = False
             error_found = False
+            prev_gdr = None
             prev_round = None
 
             # Check our rounds stored within the JSON data
@@ -231,6 +233,7 @@ class Handler():
 
                         # Create our Round
                         _r = Round.Round(self.app, gdr, rnd, tournament, match_cap)
+                        _r.set_previous_round(prev_round)
                         round_cap = season.settings()[gdr + "_cap"] or 3
 
                         # Add our Matches
@@ -264,10 +267,11 @@ class Handler():
                             r_error_found = True
                 
                     # Set our previous round
+                    prev_gdr = gdr
                     prev_round = _r
 
                 # If errors have occurred, update file with fixes
-                if(error_found):
+                if(error_found or r_error_found):
                     self.handle_save_rounds(tournament)
 
     # Generate our rounds from our player list from scratch
@@ -312,6 +316,7 @@ class Handler():
                         rnd_players = random.sample(players[gender], len(players[gender]))
                     else:
                         rnd_players = random.sample(prev_r.winners(), len(prev_r.winners()))
+                        _r.set_previous_round(prev_r)
 
                     # Generate our matches from the data we have
                     for w in range(len(rnd_players) // 2):
@@ -411,6 +416,7 @@ class Handler():
 
         # Generate our matches from the data we have
         _r = Round.Round(self.app, genderName, "round_{0}".format(roundId), tournament, match_cap)
+        _r.set_previous_round(previous_round)
         round_cap = season.settings()[genderName + "_cap"] or 3
         for w in range(len(rand_players) // 2):
             # Define our players
