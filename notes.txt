@@ -13,12 +13,14 @@ TOURNAMENT -> SELECT ROUND ->
 
 1. Round 1
 2. Round 2
-3. Round 3 - Data Unavailable (Generate / Manual)
-4. Round 4 - Data Unavailable (Generate / Manual)
-5. Round 5 - Data Unavailable (Generate / Manual)
+3. Round 3 - Data Unavailable (/ Manual)
+4. Round 4 - Data Unavailable (/ Manual)
+5. Round 5 - Data Unavailable (/ Manual)
 
 -----------------------------------------------------------------------------------
 DONE:
+
+Round Generation Selection - Done
 
 Empty Round Data
 -> Deletes all round data

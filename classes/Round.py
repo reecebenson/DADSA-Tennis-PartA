@@ -55,18 +55,8 @@ class Round():
 
             # Print out the match for the user to see and reference to
             call("cls")
-            print("Match Cap: {}, current match count: {}".format(self.match_cap(), len(self.matches())))
-
-            print("CHECK MATCHES, NON-WINNERS IN PREV ROUND ETC.")
-            new_score = input(">>> ")
-            if(new_score.isdigit()):
-                new_score = int(new_score)
-                if(new_score >= 0 and new_score <= cap):
-                    self._player_one_score = new_score
-                else:
-                    return self.validate(error_count)
-            else:
-                return self.validate(error_count)
+            print("The matches within {0}:{1} exceed the match cap count. Matches found: {2}, match cap count: {3}".format(self.name(), self.parent().name(), self.match_cap(), len(self.matches())))
+            return self._app.exit()
 
         # Clear our variables
         self._players.clear()
