@@ -65,9 +65,34 @@ class Match():
                     return self.validate(error_count)
             else:
                 return self.validate(error_count)
-        
+
         # Check if the scores of the players are the same
         if(self.player_one()[1] == self.player_two()[1]):
+            # Error Occurred
+            error = True
+            error_count += 1
+            
+            # Print out the match for the user to see and reference to
+            call("cls")
+            print("Checking:", self.versuses(True))
+            
+            print("{0}'s and {1}'s score are the same. Please enter {0}'s new score:".format(self.player_one()[0].name(), self.player_two()[0].name()))
+            new_score = input(">>> ")
+            if(new_score.isdigit()):
+                new_score = int(new_score)
+                if(new_score >= 0 and new_score <= cap and new_score != self.player_two()[1]):
+                    self._player_two_score = new_score
+                else:
+                    return self.validate(error_count)
+            else:
+                return self.validate(error_count)
+
+        # Check that there is atleast one winner
+        if(self.player_one()[1] == cap or self.player_two()[1] == cap):
+            winnerExists = True
+        
+        # There is not a winner available
+        if(not winnerExists):
             # Error Occurred
             error = True
             error_count += 1
