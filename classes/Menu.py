@@ -404,8 +404,8 @@ class Menu():
                         # Add Edit Functionality
                         Builder.add_menu(r_view_round + "_edit", "Edit Scores", r_view_round + "_edit_es")
                         Builder.add_menu(r_view_round + "_edit", "Clear Scores", r_view_round + "_edit_cs")
-                        Builder.add_func(r_view_round + "_edit", r_view_round + "_edit_es", partial(tournament.edit_round, gdr, r))
-                        Builder.add_func(r_view_round + "_edit", r_view_round + "_edit_cs", partial(tournament.clear_round, gdr, r))
+                        Builder.add_func(r_view_round + "_edit", r_view_round + "_edit_es", partial(tournament.edit_round, gdr, r, r_view_round + "_edit"))
+                        Builder.add_func(r_view_round + "_edit", r_view_round + "_edit_cs", partial(tournament.clear_round, gdr, r, r_view_round + "_edit"))
 
         # Display Menu
         Builder.show_current_menu()

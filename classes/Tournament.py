@@ -110,8 +110,9 @@ class Tournament():
         print("edit stuff for {} - {}".format(gender, round_id))
         return None
 
-    def clear_round(self, gender, round_id):
+    def clear_round(self, gender, round_id, ref):
         print("clear round, from {} upto round_5 - {}".format(round_id, gender))
+        print("rounds available in this tournament: {}".format(len(self.rounds()[gender])))
         return None
 
     def prize_money(self):
