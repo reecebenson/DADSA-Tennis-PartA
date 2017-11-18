@@ -76,7 +76,7 @@ class Match():
             call("cls")
             print("Checking:", self.versuses(True))
             
-            print("{0}'s and {1}'s score are the same. Please enter {0}'s new score:".format(self.player_one()[0].name(), self.player_two()[0].name()))
+            print("{0}'s and {1}'s score are the same. Please enter {1}'s new score:".format(self.player_one()[0].name(), self.player_two()[0].name()))
             new_score = input(">>> ")
             if(new_score.isdigit()):
                 new_score = int(new_score)
@@ -88,6 +88,7 @@ class Match():
                 return self.validate(error_count)
 
         # Check that there is atleast one winner
+        winnerExists = False
         if(self.player_one()[1] == cap or self.player_two()[1] == cap):
             winnerExists = True
         
@@ -101,14 +102,12 @@ class Match():
             call("cls")
             print("Checking:", self.versuses(True))
             
-            print("{0}'s and {1}'s score are the same. Please enter {0}'s new score:".format(self.player_one()[0].name(), self.player_two()[0].name()))
-            new_score = input(">>> ")
-            if(new_score.isdigit()):
-                new_score = int(new_score)
-                if(new_score >= 0 and new_score <= cap and new_score != self.player_two()[1]):
-                    self._player_two_score = new_score
-                else:
-                    return self.validate(error_count)
+            print("{0} vs. {1} does not have a winner. Please enter the new winner (by name):".format(self.player_one()[0].name(), self.player_two()[0].name()))
+            new_winner = input(">>> ")
+            if(new_winner.lower() == self.player_one()[0].name().lower()):
+                self._player_one_score = cap
+            elif(new_winner.lower() == self.player_two()[0].name().lower()):
+                self._player_two_score = cap
             else:
                 return self.validate(error_count)
 
