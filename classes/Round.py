@@ -6,6 +6,7 @@ from os import system as call
 class Round():
     _app = None
     _name = None
+    _id = None
     _gender = None
     _parent = None
     _previous_round = None
@@ -20,6 +21,7 @@ class Round():
 
         # Set our variables
         self._name = name
+        self._id = int(name[-1:])
         self._parent = parent
         self._gender = gender
         self._previous_round = None
@@ -29,6 +31,9 @@ class Round():
 
     def name(self):
         return self._name
+
+    def id(self):
+        return self._id
 
     def parent(self):
         return self._parent

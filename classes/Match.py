@@ -5,6 +5,7 @@ from os import system as call
 
 class Match():
     _round = None
+    _id = None
     _winner = None
     _player_one = None
     _player_two = None
@@ -13,11 +14,15 @@ class Match():
     
     def __init__(self, rnd, p_one, p_two, p_one_score, p_two_score):
         self._round = rnd
+        self._id = len(rnd.matches())
         self._player_one = p_one
         self._player_two = p_two
         self._player_one_score = p_one_score
         self._player_two_score = p_two_score
     
+    def id(self):
+        return self._id
+
     def validate(self, error_count = 0):
         # Get our cap
         error = False

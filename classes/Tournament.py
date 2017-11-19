@@ -107,13 +107,109 @@ class Tournament():
         return None
 
     def edit_round(self, gender, round_id, ref):
-        print("edit stuff for {} - {}".format(gender, round_id))
+        # Check Round exists
+        if(not self.round(gender, "round_{}".format(round_id))):
+            return None
+
+        # Header
+        print("Editing {3} - {0} Round {1} - {2} matches exist\n".format(
+                                                            gender.title(),
+                                                            round_id,
+                                                            len(self.round(gender, "round_{}".format(round_id)).matches()),
+                                                            self.name()
+                                                            ))
+
+        # Count the changes made
+        changes_made = 0
+
+        for m in self.round(gender, "round_{}".format(round_id)).matches():
+            shouldEdit = input("Would you like to edit [{1}] '{0}'? (default: n): ".format(m.versuses(True), m.id())) or "n"
+
+            if(shouldEdit.lower() == "y"):
+                # Flag for changes in this match
+                match_winner = m.winner()[0].name()
+                match_changes = False
+
+                # Player One Score
+                plyr_one_score = input("Enter the Score for {0} (default: {1}): ".format(m.player_one()[0].name(), m.player_one()[1])) or str(m.player_one()[1])
+
+                # Check if our score is different
+                if(plyr_one_score.isdigit() and int(plyr_one_score) != m.player_one()[1]):
+                    match_changes = True
+                    changes_made += 1
+                    m._player_one_score = int(plyr_one_score)
+
+                # Player Two Score
+                plyr_two_score = input("Enter the Score for {0} (default: {1}): ".format(m.player_two()[0].name(), m.player_two()[1])) or str(m.player_two()[1])
+                if(plyr_two_score.isdigit() and int(plyr_two_score) != m.player_two()[1]):
+                    match_changes = True
+                    changes_made += 1
+                    m._player_two_score = int(plyr_two_score)
+
+                # Check if changes have been made
+                if(match_changes):
+                    # Check for winner change
+                    if(match_winner != m.winner()[0].name()):
+                        print("New winner for this match. Deleting rounds: {0}".format([ r for r in self.rounds()[gender] if(self.round(gender, r).id() > round_id) ]))
+
+                        # Delete rounds
+                        for r in self.rounds()[gender].copy():
+                            if(self.round(gender, r).id() > round_id):
+                                # Update rounds_raw
+                                print("deleting: {},{}".format(gender, r))
+                                self.delete_round(gender, r)
+                    
+                    # Update raw match data
+                    self._rounds_raw["round_{}".format(round_id)][gender][m.id()].update({ m.player_one()[0].name(): m.player_one()[1], m.player_two()[0].name(): m.player_two()[1] })
+                    # Save file
+                    self.save_rounds()
+
+                    # Debug
+                    input("Update complete for {0}\n".format(m.versuses()))
+                else:
+                    input("Nothing has been changed for {0}.\n".format(m.versuses()))
+
         return None
 
     def clear_round(self, gender, round_id, ref):
         print("clear round, from {} upto round_5 - {}".format(round_id, gender))
         print("rounds available in this tournament: {}".format(len(self.rounds()[gender])))
         return None
+
+    def delete_round(self, g, r_id):
+        # Check if our round exists
+        if(not r_id in self._rounds_raw):
+            return None
+
+        # Check if our round gender exists
+        if(not g in self._rounds_raw[r_id]):
+            return None
+
+        # Delete our round raw data
+        print(self._rounds_raw[r_id].pop(g))
+
+        # Update self variables
+        print(self._rounds[g].pop(r_id))
+
+        # Done!
+        return True
+
+    def update_rounds_raw(self):
+        # Import our data into JSON format for saving reference
+        for g in self.rounds():
+            for r_id, r in enumerate(self.rounds()[g], 1):
+                # Make sure our round exists within the raw data
+                if(not "round_{0}".format(r_id) in self._rounds_raw):
+                    self._rounds_raw.update({ "round_{0}".format(r_id): { } })
+
+                # Make sure our gender exists within the raw data
+                if(not g in self._rounds_raw["round_{0}".format(r_id)]):
+                    self._rounds_raw["round_{0}".format(r_id)].update({ g: [ ] })
+
+                # Insert our data
+                self._rounds_raw["round_{0}".format(r_id)][g] = [ { m.player_one()[0].name(): m.player_one()[1], m.player_two()[0].name(): m.player_two()[1] } for m in self.round(g, r).matches() ]
+    
+        return True
 
     def prize_money(self):
         return self._prize_money

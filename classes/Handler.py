@@ -278,6 +278,9 @@ class Handler():
                 if(error_found or r_error_found):
                     self.handle_save_rounds(tournament)
 
+            # Update Raw Rounds
+            tournament.update_rounds_raw()
+
     # Generate our rounds from our player list from scratch
     def generate_rounds(self, seasonId, minRoundId, maxRoundId):
         # Write our new data to memory
