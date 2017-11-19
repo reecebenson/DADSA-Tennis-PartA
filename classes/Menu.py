@@ -396,18 +396,23 @@ class Menu():
                             Builder.add_menu(r_view_round, "Input Data", "{0}_{1}_{2}_input".format(tournament_option_name, "vr", gdr+"_"+r_name))
 
                             # Add Functionality
-                            Builder.add_func(r_view_round, "{0}_{1}_{2}_gen".format(tournament_option_name, "vr", gdr+"_"+r_name), partial(tournament.generate_round, gdr, r, r_view_round))
-                            Builder.add_func(r_view_round, "{0}_{1}_{2}_input".format(tournament_option_name, "vr", gdr+"_"+r_name), partial(tournament.edit_round, gdr, r, r_view_round))
+                            Builder.add_info("{0}_{1}_{2}_gen".format(tournament_option_name, "vr", gdr+"_"+r_name), "Generate the data for this round in accordance to previous rounds (if available)")
+                            Builder.add_func(r_view_round, "{0}_{1}_{2}_gen".format(tournament_option_name, "vr", gdr+"_"+r_name), partial(tournament.generate_round, gdr, r))
+
+                            Builder.add_info("{0}_{1}_{2}_input".format(tournament_option_name, "vr", gdr+"_"+r_name), "Manually input the players and scores for this round")
+                            Builder.add_func(r_view_round, "{0}_{1}_{2}_input".format(tournament_option_name, "vr", gdr+"_"+r_name), partial(tournament.edit_round, gdr, r))
                         else:
+                            # Emulate Round
                             Builder.add_func(r_view_round, r_view_round, partial(tournament.emulate_round, gdr, r_name))
 
-                        # Add Edit Functionality
-                        Builder.add_menu(r_view_round + "_edit", "Edit Scores", r_view_round + "_edit_es")
-                        Builder.add_info(r_view_round + "_edit_es", "Edit Scores on a specific round. Updating a lower round will delete the data for the rounds above it.\n     i.e. Editing Round 3 will delete Round 4 and Round 5 data.")
-                        Builder.add_menu(r_view_round + "_edit", "Clear Scores", r_view_round + "_edit_cs")
-                        Builder.add_info(r_view_round + "_edit_cs", "Clear Scores on a specific round. Updating a lower round will delete the data for the rounds above it.\n     i.e. Clearing Round 3 will also delete Round 4 and Round 5 data.")
-                        Builder.add_func(r_view_round + "_edit", r_view_round + "_edit_es", partial(tournament.edit_round, gdr, r, r_view_round + "_edit"))
-                        Builder.add_func(r_view_round + "_edit", r_view_round + "_edit_cs", partial(tournament.clear_round, gdr, r, r_view_round + "_edit"))
+                            # Add Edit Functionality
+                            Builder.add_menu(r_view_round + "_edit", "Edit Scores", r_view_round + "_edit_es")
+                            Builder.add_info(r_view_round + "_edit_es", "Edit Scores on a specific round. Updating a lower round will delete the data for the rounds above it.\n     i.e. Editing Round 3 will delete Round 4 and Round 5 data.")
+                            Builder.add_menu(r_view_round + "_edit", "Clear Scores", r_view_round + "_edit_cs")
+                            Builder.add_info(r_view_round + "_edit_cs", "Clear Scores on a specific round. Updating a lower round will delete the data for the rounds above it.\n     i.e. Clearing Round 3 will also delete Round 4 and Round 5 data.")
+                            Builder.add_func(r_view_round + "_edit", r_view_round + "_edit_es", partial(tournament.edit_round, gdr, r))
+                            Builder.add_func(r_view_round + "_edit", r_view_round + "_edit_cs", partial(tournament.clear_round, gdr, r))
+
 
         # Display Menu
         Builder.show_current_menu()

@@ -96,17 +96,17 @@ class Tournament():
                 # Append our Round
                 self._rounds[gdr].append(_round)
 
-    def generate_round(self, gender, round_id, ref):
+    def generate_round(self, gender, round_id):
         # Generate specific round
         updated = self._app.handler.generate_round(self.season().name(), self.name(), round_id, gender)
 
         # Reload Menu
-        if(ref != None and updated):
+        if(updated):
             Builder.reload_menu()
             print("Successfully updated Round {0} for the {1} Gender on Tournament {2}.".format(round_id, gender.title(), self.name()))
         return None
 
-    def edit_round(self, gender, round_id, ref):
+    def edit_round(self, gender, round_id):
         # Check Round exists
         if(not self.round(gender, "round_{}".format(round_id))):
             return None
@@ -123,12 +123,13 @@ class Tournament():
         changes_made = 0
 
         for m in self.round(gender, "round_{}".format(round_id)).matches():
-            shouldEdit = input("Would you like to edit [{1}] '{0}'? (default: n): ".format(m.versuses(True), m.id())) or "n"
+            shouldEdit = input("Would you like to edit [{1}] '{0}'? [y/N]: ".format(m.versuses(True), m.id())) or "n"
 
             if(shouldEdit.lower() == "y"):
                 # Flag for changes in this match
                 match_winner = m.winner()[0].name()
                 match_changes = False
+                match_cap = m.round().cap()
 
                 # Player One Score
                 plyr_one_score = input("Enter the Score for {0} (default: {1}): ".format(m.player_one()[0].name(), m.player_one()[1])) or str(m.player_one()[1])
@@ -146,34 +147,59 @@ class Tournament():
                     changes_made += 1
                     m._player_two_score = int(plyr_two_score)
 
+                # Validate the match data
+                m.validate()
+
                 # Check if changes have been made
                 if(match_changes):
                     # Check for winner change
                     if(match_winner != m.winner()[0].name()):
-                        print("New winner for this match. Deleting rounds: {0}".format([ r for r in self.rounds()[gender] if(self.round(gender, r).id() > round_id) ]))
+                        deleted_rounds = ", ".join([ r for r in self.rounds()[gender] if(self.round(gender, r).id() > round_id) ])
+                        print("A new winner has been selected for this match, causing the deletion of the following rounds: {0}".format(deleted_rounds if deleted_rounds != "" else "< none >"))
 
                         # Delete rounds
                         for r in self.rounds()[gender].copy():
                             if(self.round(gender, r).id() > round_id):
                                 # Update rounds_raw
-                                print("deleting: {},{}".format(gender, r))
                                 self.delete_round(gender, r)
                     
                     # Update raw match data
                     self._rounds_raw["round_{}".format(round_id)][gender][m.id()].update({ m.player_one()[0].name(): m.player_one()[1], m.player_two()[0].name(): m.player_two()[1] })
+
                     # Save file
                     self.save_rounds()
 
                     # Debug
-                    input("Update complete for {0}\n".format(m.versuses()))
+                    print("Match [{0}] has been updated successfully -> [{1}]\n".format(m.id(), m.versuses(True)))
                 else:
-                    input("Nothing has been changed for {0}.\n".format(m.versuses()))
+                    print("No changes were made to Match [{0}] -> {0}\n".format(m.id(), m.versuses(True)))
+
+        # Force a Menu Rebuild
+        Builder.reload_menu()
 
         return None
 
-    def clear_round(self, gender, round_id, ref):
-        print("clear round, from {} upto round_5 - {}".format(round_id, gender))
-        print("rounds available in this tournament: {}".format(len(self.rounds()[gender])))
+    def clear_round(self, gender, round_id):
+        # Verification
+        verif = input("Are you sure you want to clear the following rounds [y/N]?\n{0}\n>>> ".format(", ".join([ r for r in self.rounds()[gender] if(self.round(gender, r).id() >= round_id) ]))) or "n"
+
+        if(verif.lower() == "y"):
+            # Delete rounds
+            for r in self.rounds()[gender].copy():
+                if(self.round(gender, r).id() >= round_id):
+                    # Update rounds_raw
+                    self.delete_round(gender, r)
+
+                    # Output
+                    print("Deleted Round: {0} -> {1} -> {2}".format(self.name(), gender, "Round "+str(r[-1:])))
+
+            # Save file
+            self.save_rounds()
+        else:
+            print("Cancelled ")
+
+        # Force a Menu Rebuild
+        Builder.reload_menu()
         return None
 
     def delete_round(self, g, r_id):
@@ -186,10 +212,14 @@ class Tournament():
             return None
 
         # Delete our round raw data
-        print(self._rounds_raw[r_id].pop(g))
+        self._rounds_raw[r_id].pop(g)
 
         # Update self variables
-        print(self._rounds[g].pop(r_id))
+        self._rounds[g].pop(r_id)
+
+        # Clean up
+        if(len(self._rounds_raw[r_id]) == 0):
+            self._rounds_raw.pop(r_id)
 
         # Done!
         return True
