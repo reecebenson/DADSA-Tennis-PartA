@@ -1,9 +1,4 @@
 {
-    "settings": {
-        "menu_stack": [ 
-            "main"
-        ]
-    },
     "season_1": {
         "settings": {
             "editable": true,
