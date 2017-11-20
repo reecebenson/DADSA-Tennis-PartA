@@ -422,10 +422,19 @@ class Handler():
             players = previous_round.winners()
 
         # Lets loop until all of our players have been used up
-        available_players = [ p.name() for p in players ]
+        available_players = players.copy()
         try:
             tryAgain = False
             tryAgainError = ""
+            
+            # Get our caps
+            match_cap = (len(players[genderName]) // 2) if (previous_round == None) else (len(previous_round.winners()) // 2)
+            round_cap = season.settings()[genderName + "_cap"] or 3
+
+            # Create our Round
+            _r = Round.Round(self.app, genderName, "round_{0}".format(roundId), tournament, match_cap)
+            _r.set_previous_round(previous_round)
+            _r.set_cap(round_cap)
 
             while(len(available_players) != 0):
                 # Clear the Terminal
@@ -439,26 +448,58 @@ class Handler():
                     print("\nError:\n{0}\n".format(tryAgainError))
                     tryAgain = False
 
-                plyr_one = input("Please enter Player A: ")
-                if(plyr_one in available_players):
-                    print("valid player one: {}".format(plyr_one))
+                # Match Specific Variables
+                winnerCount = 0
 
+                plyr_one = input("Please enter Player A: ")
+                if(plyr_one in [ p.name() for p in available_players ]):
                     plyr_one_score = input("Please enter the score for Player A: ")
-                    if(plyr_one_score.isdigit()):
-                        print("valid player one score: {}".format(plyr_one_score))
+                    if(plyr_one_score.isdigit() and int(plyr_one_score) <= _r.cap()):
+                        # Type Conversion
+                        plyr_one_score = int(plyr_one_score)
+
+                        # Increment our Winner Count
+                        if(plyr_one_score == _r.cap()):
+                            winnerCount += 1
 
                         # Player B
                         plyr_two = input("Please enter Player B: ")
-                        if(plyr_two in available_players and plyr_two != plyr_one):
-                            print("valid player two: {}".format(plyr_two))
-
+                        if(plyr_two in [ p.name() for p in available_players ] and plyr_two != plyr_one):
                             plyr_two_score = input("Please enter the score for Player B: ")
-                            if(plyr_two_score.isdigit()):
-                                print("valid player two score: {}".format(plyr_two_score))
+                            if(plyr_two_score.isdigit() and int(plyr_two_score) <= _r.cap()):
+                                # Type Conversion
+                                plyr_two_score = int(plyr_two_score)
 
-                                # Data
-                                print(plyr_one, plyr_one_score)
-                                print(plyr_two, plyr_two_score)
+                                # Increment our Winner Count
+                                if(plyr_two_score == _r.cap()):
+                                    winnerCount += 1
+                                
+                                # Ensure we have one winner
+                                if(winnerCount == 1):
+                                    # Get Player Objects
+                                    p_one = next(( p for p in available_players if(p.name() == plyr_one)), None)
+                                    p_two = next(( p for p in available_players if(p.name() == plyr_two)), None)
+
+                                    # Ensure our Player's exist
+                                    if(p_one and p_two):
+                                        # Add this Match to the Round
+                                        _m = Match.Match(_r, p_one, p_two, plyr_one_score, plyr_two_score)
+                                        _r.add_match(_m)
+
+                                        # Pop our players from the array
+                                        del available_players[available_players.index(p_one)]
+                                        del available_players[available_players.index(p_two)]
+
+                                        # Hold User
+                                        input("Match ({0}) successfully added. Press <Return> to continue...\n".format(_m.versuses(True)))
+                                    else:
+                                        # Try Again
+                                        tryAgainError = "The Players seize to exist within the available player list."
+                                        tryAgain = True
+                                else:
+                                    # Try Again
+                                    tryAgainError = "A winner was not elected for this Match." if (winnerCount == 0) else "Matches cannot be left as a draw - only one player can win."
+                                    tryAgain = True
                             else:
                                 # Try Again
                                 tryAgainError = "The score entered for Player B ({0}) is invalid.".format(plyr_two_score)
@@ -478,6 +519,12 @@ class Handler():
                     tryAgainError = "The player you entered ({0}) does not exist.".format(plyr_one)
                     tryAgain = True
                     continue
+
+            # Add our round to the tournament
+            tournament.add_round(genderName, _r)
+
+            # Save our tournament rounds
+            self.handle_save_rounds(tournament)
         except KeyboardInterrupt:
             input("write to file here")
             
