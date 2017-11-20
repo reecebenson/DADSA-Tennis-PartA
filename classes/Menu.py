@@ -77,7 +77,7 @@ class Builder():
     def call_func(ref):
         # Call the function reference of a menu item
         if(Builder.is_func(ref)):
-            Builder.get_item(ref)()
+            return Builder.get_item(ref)()
         else:
             return None
 
@@ -221,10 +221,11 @@ class Builder():
                             print("——————————————————————————————————————————————————————————————")
 
                             # Execute
-                            Builder.call_func(req_menu['ref'])
+                            retStr = Builder.call_func(req_menu['ref'])
 
                             # Hold user (to display output from function)
-                            input("\n>>> Press <Return> to continue...")
+                            if(retStr != "SKIP"):
+                                input("\n>>> Press <Return> to continue...")
 
                             if(not Builder._force_reload):
                                 return Builder.show_current_menu()

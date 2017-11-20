@@ -82,6 +82,9 @@ class Handler():
             self.round_mode[mode['season']] = partial(self.load_previous_rounds, mode['season'])
             Builder.close_menu()
 
+        # Return SKIP to skip over the monitor_input halt
+        return "SKIP"
+
     # Load our rounds for each season
     def load_rounds(self, seasonId, error = False, errorMsg = None):
         # Get our Season Object
@@ -418,15 +421,65 @@ class Handler():
         else:
             players = previous_round.winners()
 
-        # Print out our available players
-        print("Available Players for input on Round {0}:\n{1}".format(roundId, ", ".join([ p.name() for p in players ])))
-
         # Lets loop until all of our players have been used up
-        available_players = players.copy()
-        while(len(available_players) != 0):
-            print("Please enter some match stuffs")
+        available_players = [ p.name() for p in players ]
+        try:
+            tryAgain = False
+            tryAgainError = ""
 
-            input(">>> ")
+            while(len(available_players) != 0):
+                # Clear the Terminal
+                call("cls")
+
+                # Print out our available players
+                print("Available Players for input on Round {0}:\n{1}".format(roundId, ", ".join([ p.name() for p in players ])))
+
+                # Handle Error
+                if(tryAgain):
+                    print("\nError:\n{0}\n".format(tryAgainError))
+                    tryAgain = False
+
+                plyr_one = input("Please enter Player A: ")
+                if(plyr_one in available_players):
+                    print("valid player one: {}".format(plyr_one))
+
+                    plyr_one_score = input("Please enter the score for Player A: ")
+                    if(plyr_one_score.isdigit()):
+                        print("valid player one score: {}".format(plyr_one_score))
+
+                        # Player B
+                        plyr_two = input("Please enter Player B: ")
+                        if(plyr_two in available_players and plyr_two != plyr_one):
+                            print("valid player two: {}".format(plyr_two))
+
+                            plyr_two_score = input("Please enter the score for Player B: ")
+                            if(plyr_two_score.isdigit()):
+                                print("valid player two score: {}".format(plyr_two_score))
+
+                                # Data
+                                print(plyr_one, plyr_one_score)
+                                print(plyr_two, plyr_two_score)
+                            else:
+                                # Try Again
+                                tryAgainError = "The score entered for Player B ({0}) is invalid.".format(plyr_two_score)
+                                tryAgain = True
+                        else:
+                            # Try Again
+                            tryAgainError = "The player you entered ({0}) does not exist.".format(plyr_two) if plyr_two != plyr_one else "Player B cannot be the same as Player A."
+                            tryAgain = True
+                            continue
+                    else:
+                        # Try Again
+                        tryAgainError = "The score entered for Player A ({0}) is invalid.".format(plyr_one_score)
+                        tryAgain = True
+                        continue
+                else:
+                    # Try Again
+                    tryAgainError = "The player you entered ({0}) does not exist.".format(plyr_one)
+                    tryAgain = True
+                    continue
+        except KeyboardInterrupt:
+            input("write to file here")
             
         return True
 

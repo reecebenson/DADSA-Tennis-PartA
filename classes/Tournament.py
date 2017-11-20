@@ -54,7 +54,8 @@ class Tournament():
         if(menu_ref != None):
             Builder.add_menu(menu_ref, "{0} Saving".format("Disable" if self.file_saving() else "Enable"), "{0}_{1}".format(menu_ref, "fs"))
 
-        return self.file_saving()
+        # Skip over monitor_input halt
+        return "SKIP"
 
     def season(self):
         return self._season

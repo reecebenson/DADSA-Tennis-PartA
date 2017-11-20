@@ -32,4 +32,4 @@ class App():
         input("\n\n>>> Press <Return> to terminate the program")
         exit()
 
-App()
+app = App()
