@@ -400,7 +400,7 @@ class Menu():
                             Builder.add_func(r_view_round, "{0}_{1}_{2}_gen".format(tournament_option_name, "vr", gdr+"_"+r_name), partial(tournament.generate_round, gdr, r))
 
                             Builder.add_info("{0}_{1}_{2}_input".format(tournament_option_name, "vr", gdr+"_"+r_name), "Manually input the players and scores for this round")
-                            Builder.add_func(r_view_round, "{0}_{1}_{2}_input".format(tournament_option_name, "vr", gdr+"_"+r_name), partial(tournament.edit_round, gdr, r))
+                            Builder.add_func(r_view_round, "{0}_{1}_{2}_input".format(tournament_option_name, "vr", gdr+"_"+r_name), partial(tournament.input_round, gdr, r))
                         else:
                             # Emulate Round
                             Builder.add_func(r_view_round, r_view_round, partial(tournament.emulate_round, gdr, r_name))

@@ -393,6 +393,44 @@ class Handler():
         if(tournament.file_saving()):
             tournament.save_rounds()
 
+
+    # Input Rounds
+    def input_round(self, seasonId, tournamentName, roundId, genderName):
+        # Get our Season Object
+        season = self.get_season(seasonId)
+        players = None
+
+        # Get our Tournament Object
+        tournament = season.tournament(tournamentName)
+
+        # Ensure we have a valid Tournament object
+        if(tournament == None):
+            return print("Invalid Tournament Name: {}".format(tournamentName))
+
+        # Ensure we have valid round data
+        previous_round = tournament.round(genderName, "round_{}".format(roundId - 1))
+        if(previous_round == None and not (roundId - 1) == 0):
+            return print("You can only generate this round when the rounds before Round {0} for {1}, {2} have been generated or manually inputed.".format(roundId, genderName.title(), tournamentName))
+
+        # Get the available players for this particular Round
+        if(previous_round == None):
+            players = season.players()[genderName]
+        else:
+            players = previous_round.winners()
+
+        # Print out our available players
+        print("Available Players for input on Round {0}:\n{1}".format(roundId, ", ".join([ p.name() for p in players ])))
+
+        # Lets loop until all of our players have been used up
+        available_players = players.copy()
+        while(len(available_players) != 0):
+            print("Please enter some match stuffs")
+
+            input(">>> ")
+            
+        return True
+
+    # Generate Specific Round
     def generate_round(self, seasonId, tournamentName, roundId, genderName):
         # Get our Season Object
         season = self.get_season(seasonId)

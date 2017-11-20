@@ -17,6 +17,23 @@ TOURNAMENT -> SELECT ROUND ->
 5. Round 5 - Data Unavailable (/ Manual)
 
 -----------------------------------------------------------------------------------
+
+TASKS
+1. Identify and justify what type of data structures you will use for storing the data
+2. Design a solution for ranking players according to the points they have earned (pseudocode)
+3. Implement the solution for ranking players according to points earned (Python Code)
+4. Explain the algorithm implemented and justify its choice
+5. Design a further solution that ranks the payers based on prize money earned (pseudocode)
+6. Implement the additional solution in task 5 using Python.
+7. Discuss and justify your choice of entering match results
+
+To achieve a mark in the range 70-100 you have to complete all tasks. The two designs and the two
+implementations must be flawless. The justification for the selection of data structures and
+algorithms must be detailed and based on scientific fact. Both ways of scores entering must
+implemented. All error checks must also beimplemented.
+
+-----------------------------------------------------------------------------------
+
 DONE:
 
 # double check match aggressive check to make sure it covers spec details

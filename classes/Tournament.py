@@ -106,6 +106,16 @@ class Tournament():
             print("Successfully updated Round {0} for the {1} Gender on Tournament {2}.".format(round_id, gender.title(), self.name()))
         return None
 
+    def input_round(self, gender, round_id):
+        # Generate specific round
+        updated = self._app.handler.input_round(self.season().name(), self.name(), round_id, gender)
+
+        # Reload Menu
+        if(updated):
+            Builder.reload_menu()
+            print("Successfully inputted Round {0} for the {1} Gender on Tournament {2}.".format(round_id, gender.title(), self.name()))
+        return None
+
     def edit_round(self, gender, round_id):
         # Check Round exists
         if(not self.round(gender, "round_{}".format(round_id))):
