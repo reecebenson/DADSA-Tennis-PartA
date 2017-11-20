@@ -391,8 +391,13 @@ class Menu():
                         Builder.add_menu("{0}_{1}_{2}".format(tournament_option_name, "rs", gdr), "Round {0}".format(r), r_view_round)
                         Builder.add_menu("{0}_{1}_{2}".format(tournament_option_name, "re", gdr), "Round {0}".format(r), r_view_round + "_edit")
 
+                        # Functionality Override
+                        funcOverride = False
+                        if(rnd != None and len(rnd.matches()) != rnd.match_cap()):
+                            funcOverride = True
+
                         # Add Functionality
-                        if(rnd == None):
+                        if(rnd == None or funcOverride):
                             Builder.add_menu(r_view_round, "Generate Data", "{0}_{1}_{2}_gen".format(tournament_option_name, "vr", gdr+"_"+r_name))
                             Builder.add_menu(r_view_round, "Input Data", "{0}_{1}_{2}_input".format(tournament_option_name, "vr", gdr+"_"+r_name))
 

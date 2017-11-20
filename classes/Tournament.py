@@ -97,22 +97,22 @@ class Tournament():
                 # Append our Round
                 self._rounds[gdr].append(_round)
 
-    def generate_round(self, gender, round_id):
+    def generate_round(self, gender, round_id, flag = None):
         # Generate specific round
         updated = self._app.handler.generate_round(self.season().name(), self.name(), round_id, gender)
 
         # Reload Menu
-        if(updated):
+        if(updated and flag != "LOAD"):
             Builder.reload_menu()
             print("Successfully updated Round {0} for the {1} Gender on Tournament {2}.".format(round_id, gender.title(), self.name()))
         return None
 
-    def input_round(self, gender, round_id):
+    def input_round(self, gender, round_id, flag = None):
         # Generate specific round
         updated = self._app.handler.input_round(self.season().name(), self.name(), round_id, gender)
 
         # Reload Menu
-        if(updated):
+        if(updated and flag != "LOAD"):
             Builder.reload_menu()
             print("Successfully inputted Round {0} for the {1} Gender on Tournament {2}.".format(round_id, gender.title(), self.name()))
         return None

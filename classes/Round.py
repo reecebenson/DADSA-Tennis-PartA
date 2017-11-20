@@ -38,6 +38,11 @@ class Round():
     def parent(self):
         return self._parent
 
+    def add_players(self, *plyrs):
+        for p in plyrs:
+            self._players.append(p)
+        return self.players()
+
     def players(self):
         return self._players
 
@@ -53,15 +58,34 @@ class Round():
         error = False
         
         # Check if the rounds are above the cap
-        if(len(self.matches()) > self.match_cap()):
+        if(len(self.matches()) != self.match_cap()):
             # Error Occurred
             error = True
             error_count += 1
 
             # Print out the match for the user to see and reference to
             call("cls")
-            print("The matches within {0}:{1} exceed the match cap count. Matches found: {2}, match cap count: {3}".format(self.name(), self.parent().name(), self.match_cap(), len(self.matches())))
-            return self._app.exit()
+            print("The match count within {0}:{1}:{4} does not match the cap count. Matches found: {2}, match cap count: {3}".format(self.name(), self.parent().name(), self.match_cap(), len(self.matches()), self.gender()))
+
+            # Check if the user wants to enter / finish the input
+            if(len(self.matches()) > self.match_cap()):
+                print("Please regenerate or create an empty project.")
+                return self._app.exit()
+            else:
+                ## BELOW MATCH CAP (manual / generate)
+                print("\nPlease select an option:", "\n1.", "Generate the rest of the matches for Round {0}".format(self.id()), "\n2.", "Manually input the rest of the matches for Round {0}".format(self.id()))
+                option = input(">>> ")
+
+                # Handle User Input
+                if(option.isdigit()):
+                    if(option == "1"):
+                        self.parent().generate_round(self.gender(), self.id(), "LOAD")
+                    elif(option == "2"):
+                        self.parent().input_round(self.gender(), self.id(), "LOAD")
+                    else:
+                        self.validate(error_count)
+                else:
+                    self.validate(error_count)
 
         # Clear our variables
         self._players.clear()

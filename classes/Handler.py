@@ -242,6 +242,7 @@ class Handler():
                         _r = Round.Round(self.app, gdr, rnd, tournament, match_cap)
                         _r.set_previous_round(prev_round[gdr])
                         _r.set_cap(round_cap)
+                        tournament.add_round(gdr, _r)
 
                         # Add our Matches
                         for match in rg_path:
@@ -264,18 +265,18 @@ class Handler():
                             if(m_error):
                                 error_found = True
 
-                            # Add our Match to our round
+                            # Add our Match and Players to our round
                             _r.add_match(_m)
-                        tournament.add_round(gdr, _r)
+                            _r.add_players(season.player(gdr, plyr_one[0]), season.player(gdr, plyr_two[0]))
 
                         # Check if errors occurred, if they have - we want to update our file to fix these issues
                         r_error = True if _r.validate() > 0 else False
                         if(r_error):
                             r_error_found = True
                 
-                    # Set our previous round
-                    if(gdr in prev_round):
-                        prev_round[gdr] = _r
+                        # Set our previous round
+                        if(gdr in prev_round):
+                            prev_round[gdr] = _r
 
                 # If errors have occurred, update file with fixes
                 if(error_found or r_error_found):
@@ -423,6 +424,16 @@ class Handler():
 
         # Lets loop until all of our players have been used up
         available_players = players.copy()
+
+        # Check if this round has some data
+        this_round = tournament.round(genderName, "round_{}".format(roundId))
+        if(this_round != None):
+            # Clean up our available_players array with matches that may exist
+            for p in this_round.players():
+                if(p in available_players):
+                    del available_players[available_players.index(p)]
+
+        # Get our input
         try:
             tryAgain = False
             tryAgainError = ""
@@ -431,17 +442,26 @@ class Handler():
             match_cap = (len(players[genderName]) // 2) if (previous_round == None) else (len(previous_round.winners()) // 2)
             round_cap = season.settings()[genderName + "_cap"] or 3
 
-            # Create our Round
-            _r = Round.Round(self.app, genderName, "round_{0}".format(roundId), tournament, match_cap)
+            # Check if our round already exists
+            _r = None
+            if(this_round == None):
+                _r = Round.Round(self.app, genderName, "round_{0}".format(roundId), tournament, match_cap)
+            else:
+                _r = this_round
+
+            # Update Round details
             _r.set_previous_round(previous_round)
             _r.set_cap(round_cap)
+            
+            # Add our round to the tournament
+            tournament.add_round(genderName, _r)
 
             while(len(available_players) != 0):
                 # Clear the Terminal
                 call("cls")
 
                 # Print out our available players
-                print("Available Players for input on Round {0}:\n{1}".format(roundId, ", ".join([ p.name() for p in players ])))
+                print("Available Players for input on Round {0}:\n{1}".format(roundId, ", ".join([ p.name() for p in available_players ])))
 
                 # Handle Error
                 if(tryAgain):
@@ -490,6 +510,9 @@ class Handler():
                                         del available_players[available_players.index(p_one)]
                                         del available_players[available_players.index(p_two)]
 
+                                        # Save this match straight away
+                                        self.handle_save_rounds(tournament)
+
                                         # Hold User
                                         input("Match ({0}) successfully added. Press <Return> to continue...\n".format(_m.versuses(True)))
                                     else:
@@ -520,10 +543,7 @@ class Handler():
                     tryAgain = True
                     continue
 
-            # Add our round to the tournament
-            tournament.add_round(genderName, _r)
-
-            # Save our tournament rounds
+            # Finalise the save to our tournament
             self.handle_save_rounds(tournament)
         except KeyboardInterrupt:
             input("write to file here")
@@ -557,15 +577,32 @@ class Handler():
             rand_players = random.sample(players[genderName], len(players[genderName]))
         else:
             rand_players = random.sample(previous_round.winners(), len(previous_round.winners()))
-            
+
+        # Check if this round has some data
+        this_round = tournament.round(genderName, "round_{}".format(roundId))
+        if(this_round != None):
+            # Clean up our rand_players array with matches that may exist
+            for p in this_round.players():
+                if(p in rand_players):
+                    del rand_players[rand_players.index(p)]
+
         # Check if we have a round to take data from
         match_cap = (len(players[genderName]) // 2) if (previous_round == None) else (len(previous_round.winners()) // 2)
 
         # Generate our matches from the data we have
         round_cap = season.settings()[genderName + "_cap"] or 3
-        _r = Round.Round(self.app, genderName, "round_{0}".format(roundId), tournament, match_cap)
+        
+        # Check if our round already exists
+        _r = None
+        if(this_round == None):
+            _r = Round.Round(self.app, genderName, "round_{0}".format(roundId), tournament, match_cap)
+        else:
+            _r = this_round
+
+        # Set our round attributes
         _r.set_previous_round(previous_round)
         _r.set_cap(round_cap)
+        
         for w in range(len(rand_players) // 2):
             # Define our players
             p_one = rand_players[w * 2]
