@@ -2,6 +2,7 @@
 # Reece Benson
 
 from functools import partial
+from os import system as call
 from classes.File import File
 from classes.Menu import Builder
 from classes.QuickSort import quick_sort as sort
@@ -264,19 +265,118 @@ class Tournament():
     def set_difficulty(self, difficulty):
         self._difficulty = difficulty
 
-    def emulate(self):
+    def emulate(self, gdr):
         # Start the emulation of our tournament (? from where we left off)
-        # Get our Round Genders
-        for i, gdr in enumerate(self.rounds(), 1):
-            # Get our Rounds
-            for r, rnd in enumerate(self.rounds()[gdr], 1):
-                self.emulate_round(gdr, rnd)
-                print(">>>>>>>>>>>>>>>> END OF ROUND")
+        r = 0
+        invalid_option = False
+        while (r < self.season().settings()["round_count"]):
+            # Increment r
+            r += 1
 
-    def emulate_round(self, gdr = None, rnd = None):
+            # Get our round
+            rnd = "round_{0}".format(r)
+
+            # Clear Terminal
+            call("cls")
+
+            # Print our round
+            print("Round {0} Results:".format(r))
+            emulation = self.emulate_round(gdr, rnd, True)
+
+            # Setup our options
+            options = emulation[0]
+            options_funcs = emulation[1]
+
+            # Can we continue to another round?
+            if(r != self.season().settings()["round_count"]):
+                options = [ "Continue to the next round" ] + options
+                options_funcs = [ partial(print, "Next Round - Continue") ] + options_funcs
+
+            # Can we go back a round?
+            if(r != 1):
+                options.append("Go back a round")
+                options_funcs.append("back")
+
+            # Add our other options
+            options.append("Edit this round")
+            options_funcs.append(partial(print, "Edit round"))
+            options.append("Stop Tournament Emulation")
+            options_funcs.append(partial(print, "Stop tournament emu"))
+
+            # Check if we had an error
+            if(invalid_option):
+                print("\nError:\nYou entered an invalid option.")
+                invalid_option = False
+
+            # Menu
+            cur_index = 1
+            print("\nPlease select an option:")
+
+            # Print the options available to this round
+            for opt in options:
+                print("{}.".format(cur_index), opt)
+                cur_index += 1
+
+            option = input(">>> ")
+            if(option.isdigit()):
+                option = int(option)
+
+                if(option > 0 and option < cur_index):
+                    # Run function
+                    func_to_run = options_funcs[option - 1]
+
+                    if(callable(func_to_run)):
+                        func_to_run()
+                        r -= 1
+                        invalid_option = False
+                    else:
+                        if(func_to_run == "back"):
+                            r -= 2
+                            invalid_option = False
+                        else:
+                            pass
+                    input("hold")
+                else:
+                    r -= 1
+                    invalid_option = True
+            else:
+                r -= 1
+                invalid_option = True
+
+        # Have we reached the end of our rounds?
+        if(r == self.season().settings()["round_count"]):
+            print("End of Tournament {0}. 1st Place Winner: {1}".format(self.name(), self.rounds()[gdr]["round_{0}".format(r)].winners()[0].name()))
+        else:
+            print("Please select an option:", "\n1.", "Generate this round", "\n2.", "Stop Tournament emulation")
+            option = input(">>> ") or "2"
+
+    def emulate_round(self, gdr = None, rnd = None, all = False):
         # Get our Matches
         for m, match in enumerate(self.round(gdr, rnd).matches(), 1):
             print(match.versuses(True))
+
+        # Options
+        if(all):
+            return ([ "View current leaderboard", "View current prize money" ], [ partial(self.view_leaderboard, gdr, rnd), partial(self.view_prize_money, gdr, rnd) ])
+        else:
+            # Build Menu
+            print("\nPlease select an option:", "\n1.", "View current leaderboard", "\n2.", "View current prize money")
+            option = input(">>> ") or None
+
+            if(option == None):
+                pass
+            elif(option == "1"):
+                print("option 1")
+            elif(option == "2"):
+                print("option ")
+            else:
+                pass
+
+    def view_leaderboard(self, gdr = None, rnd = None):
+        print("view leaderboard")
+
+    def view_prize_money(self, gdr = None, rnd = None):
+        print("view prize money")
 
     def display(self, detail, extra = None):
         # Set our header text

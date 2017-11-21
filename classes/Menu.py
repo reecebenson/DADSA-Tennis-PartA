@@ -353,19 +353,21 @@ class Menu():
 
                 # Import Tournament Options
                 tournament_option_name = "ls_[{0}]_[{1}]".format(season.name(), tournament_name)
+                Builder.add_menu(tournament_option_name, "Emulate Tournament", "{0}_{1}".format(tournament_option_name, "et"))
                 Builder.add_menu(tournament_option_name, "Select Round", "{0}_{1}".format(tournament_option_name, "rs"))
                 Builder.add_menu(tournament_option_name, "Edit Rounds", "{0}_{1}".format(tournament_option_name, "re"))
                 Builder.add_menu(tournament_option_name, "View Difficulty", "{0}_{1}".format(tournament_option_name, "vd"))
                 Builder.add_menu(tournament_option_name, "View Prize Money", "{0}_{1}".format(tournament_option_name, "vpm"))
-                Builder.add_menu(tournament_option_name, "View Leaderboard", "{0}_{1}".format(tournament_option_name, "vlb"))
+                #Builder.add_menu(tournament_option_name, "View Leaderboard", "{0}_{1}".format(tournament_option_name, "vlb"))
                 Builder.add_menu(tournament_option_name, "{0} Saving".format("Disable" if tournament.file_saving() else "Enable"), "{0}_{1}".format(tournament_option_name, "fs"))
 
                 # Import Menu Information
+                Builder.add_info("{0}_{1}".format(tournament_option_name, "et"), "Run through every available round on the gender specified")
                 Builder.add_info("{0}_{1}".format(tournament_option_name, "rs"), "View information about a specific round")
                 Builder.add_info("{0}_{1}".format(tournament_option_name, "re"), "Manage data for a specific round")
                 Builder.add_info("{0}_{1}".format(tournament_option_name, "vd"), "View the Difficulty for this specific tournament")
                 Builder.add_info("{0}_{1}".format(tournament_option_name, "vpm"), "View the Prize Money for this specific tournament")
-                Builder.add_info("{0}_{1}".format(tournament_option_name, "vlb"), "View the current ranking of players")
+                #Builder.add_info("{0}_{1}".format(tournament_option_name, "vlb"), "View the current ranking of players")
                 Builder.add_info("{0}_{1}".format(tournament_option_name, "fs"), "Toggle the save state of whether or not to write round data to 'seasons.json'")
 
                 # Import Tournament Functions
@@ -375,11 +377,13 @@ class Menu():
 
                 ## LOAD ROUNDS
                 for gdr in season.players():
+                    Builder.add_menu("{0}_{1}".format(tournament_option_name, "et"), "{0} Rounds".format(gdr).title(), "{0}_{1}_{2}".format(tournament_option_name, "et", gdr))
                     Builder.add_menu("{0}_{1}".format(tournament_option_name, "rs"), "{0} Rounds".format(gdr).title(), "{0}_{1}_{2}".format(tournament_option_name, "rs", gdr))
                     Builder.add_menu("{0}_{1}".format(tournament_option_name, "re"), "{0} Rounds".format(gdr).title(), "{0}_{1}_{2}".format(tournament_option_name, "re", gdr))
                     Builder.add_menu("{0}_{1}".format(tournament_option_name, "vlb"), "{0} Leaderboard".format(gdr).title(), "{0}_{1}_{2}".format(tournament_option_name, "vlb", gdr))
 
                     ## ADD FUNC FOR LEADERBOARD
+                    Builder.add_func("{0}_{1}".format(tournament_option_name, "et"), "{0}_{1}_{2}".format(tournament_option_name, "et", gdr), partial(tournament.emulate, gdr))
                     Builder.add_func("{0}_{1}".format(tournament_option_name, "vlb"), "{0}_{1}_{2}".format(tournament_option_name, "vlb", gdr), partial(print, tournament.display("leaderboard", gdr)))
 
                     ## IMPORT ROUNDS
