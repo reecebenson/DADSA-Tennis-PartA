@@ -279,69 +279,78 @@ class Tournament():
             # Clear Terminal
             call("cls")
 
-            # Print our round
-            print("——————————————————————————————————————————————————————————————")
-            print("Round {0} Results:".format(r))
-            emulation = self.emulate_round(gdr, rnd, True)
+            # Check if our round exists
+            if(self.round(gdr, rnd)):
+                # Print our round
+                print("——————————————————————————————————————————————————————————————")
+                print("Round {0} Results:".format(r))
+                emulation = self.emulate_round(gdr, rnd, True)
 
-            # Setup our options
-            options = emulation[0]
-            options_funcs = emulation[1]
+                # Setup our options
+                options = emulation[0]
+                options_funcs = emulation[1]
 
-            # Can we continue to another round?
-            if(r != self.season().settings()["{}_round_count".format(gdr)]):
-                options = [ "Continue to the next round" ] + options
-                options_funcs = [ "continue" ] + options_funcs
+                # Can we continue to another round?
+                if(r != self.season().settings()["{}_round_count".format(gdr)]):
+                    options = [ "Continue to the next round" ] + options
+                    options_funcs = [ "continue" ] + options_funcs
 
-            # Can we go back a round?
-            if(r != 1):
-                options.append("Go back a round")
-                options_funcs.append("back")
+                # Can we go back a round?
+                if(r != 1):
+                    options.append("Go back a round")
+                    options_funcs.append("back")
 
-            # Add our other options
-            options.append("Edit this round")
-            options_funcs.append(partial(print, "Edit round"))
-            options.append("Stop Tournament Emulation")
-            options_funcs.append(partial(print, "Stop tournament emu"))
+                # Add our other options
+                options.append("Edit this round")
+                options_funcs.append(partial(print, "Edit round"))
+                options.append("Stop Tournament Emulation")
+                options_funcs.append(partial(print, "Stop tournament emu"))
 
-            # Check if we had an error
-            if(invalid_option):
-                print("\nError:\nYou entered an invalid option.")
-                invalid_option = False
+                # Check if we had an error
+                if(invalid_option):
+                    print("\nError:\nYou entered an invalid option.")
+                    invalid_option = False
 
-            # Menu
-            cur_index = 1
-            print("\nPlease select an option:")
+                # Menu
+                cur_index = 1
+                print("\nPlease select an option:")
 
-            # Print the options available to this round
-            for opt in options:
-                print("{}.".format(cur_index), opt)
-                cur_index += 1
+                # Print the options available to this round
+                for opt in options:
+                    print("{}.".format(cur_index), opt)
+                    cur_index += 1
 
-            option = input(">>> ")
-            if(option.isdigit()):
-                option = int(option)
+                option = input(">>> ")
+                if(option.isdigit()):
+                    option = int(option)
 
-                if(option > 0 and option < cur_index):
-                    # Run function
-                    func_to_run = options_funcs[option - 1]
+                    if(option > 0 and option < cur_index):
+                        # Run function
+                        func_to_run = options_funcs[option - 1]
 
-                    if(callable(func_to_run)):
-                        func_to_run()
-                        r -= 1
-                        invalid_option = False
-                    else:
-                        if(func_to_run == "back"):
-                            r -= 2
+                        if(callable(func_to_run)):
+                            func_to_run()
+                            r -= 1
                             invalid_option = False
                         else:
-                            pass
+                            if(func_to_run == "back"):
+                                r -= 2
+                                invalid_option = False
+                            else:
+                                pass
+                    else:
+                        r -= 1
+                        invalid_option = True
                 else:
                     r -= 1
                     invalid_option = True
             else:
-                r -= 1
-                invalid_option = True
+                # Round does not exist
+                print("Round {0} does not exist. Emulation of Tournament {1} has been forced to stop.".format(r, self.name()))
+                input(">>> Press <Return> to continue...")
+                exit_while = True
+                #TODO
+                break
 
         # Have we reached the end of our rounds?
         if(r == self.season().settings()["{}_round_count".format(gdr)]):

@@ -722,8 +722,6 @@ class Handler():
 
                     # Calculate how many rounds are for this gender
                     self.get_season(season).settings().update({ gender + "_round_count": self.calculate_round_count(len(data[season][gender])) })
-                    print("{}_round_count: {}".format(gender, self.get_season(season).settings()["{}_round_count".format(gender)]))
-                    input("hold plyr load")
 
                     # Append our player in the season, within the gender
                     for player in data[season][gender]:
