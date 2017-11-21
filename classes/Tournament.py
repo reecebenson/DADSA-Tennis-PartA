@@ -269,7 +269,7 @@ class Tournament():
         # Start the emulation of our tournament (? from where we left off)
         r = 0
         invalid_option = False
-        while (r < self.season().settings()["round_count"]):
+        while (r < self.season().settings()["{}_round_count".format(gdr)]):
             # Increment r
             r += 1
 
@@ -280,6 +280,7 @@ class Tournament():
             call("cls")
 
             # Print our round
+            print("——————————————————————————————————————————————————————————————")
             print("Round {0} Results:".format(r))
             emulation = self.emulate_round(gdr, rnd, True)
 
@@ -288,9 +289,9 @@ class Tournament():
             options_funcs = emulation[1]
 
             # Can we continue to another round?
-            if(r != self.season().settings()["round_count"]):
+            if(r != self.season().settings()["{}_round_count".format(gdr)]):
                 options = [ "Continue to the next round" ] + options
-                options_funcs = [ partial(print, "Next Round - Continue") ] + options_funcs
+                options_funcs = [ "continue" ] + options_funcs
 
             # Can we go back a round?
             if(r != 1):
@@ -335,7 +336,6 @@ class Tournament():
                             invalid_option = False
                         else:
                             pass
-                    input("hold")
                 else:
                     r -= 1
                     invalid_option = True
@@ -344,7 +344,7 @@ class Tournament():
                 invalid_option = True
 
         # Have we reached the end of our rounds?
-        if(r == self.season().settings()["round_count"]):
+        if(r == self.season().settings()["{}_round_count".format(gdr)]):
             print("End of Tournament {0}. 1st Place Winner: {1}".format(self.name(), self.rounds()[gdr]["round_{0}".format(r)].winners()[0].name()))
         else:
             print("Please select an option:", "\n1.", "Generate this round", "\n2.", "Stop Tournament emulation")

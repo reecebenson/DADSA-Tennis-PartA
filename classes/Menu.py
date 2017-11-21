@@ -387,7 +387,7 @@ class Menu():
                     Builder.add_func("{0}_{1}".format(tournament_option_name, "vlb"), "{0}_{1}_{2}".format(tournament_option_name, "vlb", gdr), partial(print, tournament.display("leaderboard", gdr)))
 
                     ## IMPORT ROUNDS
-                    for r in range(1, (season.settings()['round_count'] + 1)):
+                    for r in range(1, (season.settings()["{}_round_count".format(gdr)] + 1)):
                         # Find our Round
                         r_str = str(r)
                         r_name = "round_{0}".format(r)

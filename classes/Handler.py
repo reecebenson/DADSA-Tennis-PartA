@@ -3,6 +3,7 @@
 
 import json
 import random
+import traceback
 from os import system as call
 from functools import partial
 from math import ceil, floor
@@ -50,9 +51,9 @@ class Handler():
 
                     # Check how the user would like to load data
                     _season = self.get_season(season)
+                    self.load_players(season)
                     self.load_rounds(season)
                     self.load_tournaments(season)
-                    self.load_players(season)
 
                     # Execute the round mode (gen/load/overwrite)
                     if(season in self.round_mode):
@@ -113,8 +114,33 @@ class Handler():
 
         # Add Functionality
         ## ROUNDS
-        for r in range(1, (season.settings()["round_count"] + 1)):
-            Builder.add_menu("gen_data", "Generate to Round {0}".format(r), "gen_data_{0}".format(r))
+        exit_while = False
+        r = 0
+        while(not exit_while):
+            # Increment our Round Number
+            r += 1
+            round_still_exists = False
+
+            # Check round exists
+            built_arr = []
+            built_str = ""
+            for gdr in season.players():
+                if(r <= season.settings()["{}_round_count".format(gdr)]):
+                    built_arr.append("{0} Round {1}".format(gdr.title(), r))
+                    round_still_exists = True
+                else:
+                    built_arr.append("{0} Round {1}".format(gdr.title(), season.settings()["{}_round_count".format(gdr)]))
+            
+            # Style our built string
+            built_str = ", ".join(built_arr)
+
+            # Do we have any more rounds?
+            if(not round_still_exists):
+                exit_while = True
+                break
+                
+            # Build to our menu
+            Builder.add_menu("gen_data", "Generate to {0}".format(built_str), "gen_data_{0}".format(r))
             Builder.add_func("gen_data", "gen_data_{0}".format(r), partial(self.set_round_mode, season=seasonId, type="generate", rnd=r))
 
         ## PREV DATA
@@ -173,7 +199,7 @@ class Handler():
             Builder.add_menu("score_input", "{0} Rounds".format(gdr.title()), "score_input_{0}".format(gdr))
 
             # Add Gender Specific Menu Items
-            for r in range(1, (season.settings()["round_count"] + 1)):
+            for r in range(1, (season.settings()["{}_round_count".format(gdr)] + 1)):
                 # Display Round
                 rnd = season.round(seasonId, r)
                 Builder.add_menu("score_input_{0}".format(gdr), "Round {0} {1}".format(r, ("(No Previous Data)" if rnd == None else "")), "score_input_{0}_{1}".format(r, gdr))
@@ -298,7 +324,7 @@ class Handler():
 
             # Generate our rounds
             for gender in players:
-                for r in range(0, season.settings()["round_count"]):
+                for r in range(0, season.settings()["{}_round_count".format(gender)]):
                     # Define Round Variables
                     r_name = "round_" + str(r + 1)
 
@@ -439,7 +465,9 @@ class Handler():
             tryAgainError = ""
             
             # Get our caps
-            match_cap = (len(players[genderName]) // 2) if (previous_round == None) else (len(previous_round.winners()) // 2)
+            print(players)
+            input("hold players")
+            match_cap = (len(available_players) // 2) if (previous_round == None) else (len(previous_round.winners()) // 2)
             round_cap = season.settings()[genderName + "_cap"] or 3
 
             # Check if our round already exists
@@ -562,6 +590,7 @@ class Handler():
 
             # Show user error
             print("An unknown error has occured:\n{0}".format(err))
+            traceback.print_exc()
 
             # Exit Program
             Builder._app.exit()
@@ -664,6 +693,14 @@ class Handler():
             # We want to set the prize money for all indexes possible via the player
             self.ranking_points += [ 0 ] * ( self.player_count - len(self.ranking_points))
 
+    # Calculate the amount of rounds from the amount of players
+    def calculate_round_count(self, player_count):
+        rounds = 0
+        while(player_count // 2 != 0):
+            rounds += 1
+            player_count = player_count // 2
+        return rounds
+
     # Used to load players from all seasons into memory
     def load_players(self, seasonId):
         # Set our player (in gender) count
@@ -683,9 +720,14 @@ class Handler():
                     if(not gender in self.get_season(season).players()):
                         self.get_season(season).players()[gender] = [ ]
 
+                    # Calculate how many rounds are for this gender
+                    self.get_season(season).settings().update({ gender + "_round_count": self.calculate_round_count(len(data[season][gender])) })
+                    print("{}_round_count: {}".format(gender, self.get_season(season).settings()["{}_round_count".format(gender)]))
+                    input("hold plyr load")
+
                     # Append our player in the season, within the gender
                     for player in data[season][gender]:
-                        #TODO: Change to using Player class
+                        # Add Player
                         self.get_season(season).add_player(player, gender)
 
                         # Update our player count
