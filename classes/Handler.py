@@ -19,6 +19,7 @@ class Handler():
     # Define the variables we will be using
     app = None
     ranking_points = None
+    ranking_points_unique = None
     player_count = None
     round_mode = None
     seasons = { }
@@ -37,7 +38,6 @@ class Handler():
 
         # This function will create our seasons
         self.load_seasons()
-        self.load_ranking_points()
 
     # Used to load seasons into memory
     def load_seasons(self):
@@ -52,6 +52,7 @@ class Handler():
                     # Check how the user would like to load data
                     _season = self.get_season(season)
                     self.load_players(season)
+                    self.load_ranking_points()
                     self.load_rounds(season)
                     self.load_tournaments(season)
 
@@ -296,7 +297,6 @@ class Handler():
 
                             # Add our Match and Players to our round
                             _r.add_match(_m)
-                            _r.add_players(season.player(gdr, plyr_one[0]), season.player(gdr, plyr_two[0]))
 
                         # Check if errors occurred, if they have - we want to update our file to fix these issues
                         r_error = True if _r.validate() > 0 else False
@@ -377,7 +377,6 @@ class Handler():
 
                         # Add the match
                         _r.add_match(Match.Match(_r, p_one, p_two, p_one_score, p_two_score))
-                        _r.add_players(p_one, p_two)
 
                     # Add our round to our season
                     tournament.add_round(gender, _r)
@@ -543,7 +542,6 @@ class Handler():
                                         # Add this Match to the Round
                                         _m = Match.Match(_r, p_one, p_two, plyr_one_score, plyr_two_score)
                                         _r.add_match(_m)
-                                        _r.add_players(p_one, p_two)
 
                                         # Pop our players from the array
                                         del available_players[available_players.index(p_one)]
@@ -679,7 +677,6 @@ class Handler():
 
             # Add the match
             _r.add_match(Match.Match(_r, p_one, p_two, p_one_score, p_two_score))
-            _r.add_players(p_one, p_two)
 
         # Add our round to the tournament
         tournament.add_round(genderName, _r)
@@ -702,10 +699,28 @@ class Handler():
                 self.ranking_points = { }
 
             # Set the prize money to the actual rank and points received
-            self.ranking_points  = [ pts for pts in data for rank in data[pts] ]
+            self.ranking_points  = [ int(pts) for pts in data for rank in data[pts] ]
 
             # We want to set the prize money for all indexes possible via the player
             self.ranking_points += [ 0 ] * ( self.player_count - len(self.ranking_points))
+
+    # Used to define the players new ranking points and can be used to organise the top 16 players
+    def unique_ranking_points(self):
+        # Organise a unique list if it hasn't already been sorted
+        if(self.ranking_points_unique == None):
+            # Remove duplicates
+            self.ranking_points_unique = []
+            [ self.ranking_points_unique.append(i) for i in self.ranking_points if not self.ranking_points_unique.count(i) ]
+
+            # Pop 0 from the list as it is redundant
+            # 0 is always the last element
+            self.ranking_points_unique.pop()
+
+            # Reverse our list
+            self.ranking_points_unique.reverse()
+
+        # Return a reversed list
+        return self.ranking_points_unique
 
     # Calculate the amount of rounds from the amount of players
     def calculate_round_count(self, player_count):
@@ -753,6 +768,10 @@ class Handler():
     def write_round(self):
 
         pass
+
+    def debug(self, dbg):
+        print("[DEBUG]: ", dbg)
+        input("[DEBUG] Holding...")
 
     def get_seasons(self):
         return self.seasons

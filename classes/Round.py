@@ -11,6 +11,7 @@ class Round():
     _parent = None
     _previous_round = None
     _players = None
+    _winners = None
     _matches = None
     _match_count = None
     _cap = 3
@@ -26,6 +27,7 @@ class Round():
         self._gender = gender
         self._previous_round = None
         self._players = [ ]
+        self._winners = [ ]
         self._matches = [ ]
         self._match_cap = match_cap
 
@@ -38,25 +40,25 @@ class Round():
     def parent(self):
         return self._parent
 
-    def add_players(self, *plyrs):
-        # Go through all of the rounds
+    def add_winners(self, *plyrs):
+        # Go through all players within the plyrs var
         for p in plyrs:
             # Append this player to our list
-            self._players.append(p)
+            self._winners.append(p)
 
+    def add_players(self, *plyrs):
+        # Go through all players within the plyrs var
+        for p in plyrs:
             # Score our player
-            print(p)
-            """p._score[self.name()].update({ _round.name(): 0 })
+            p.score_set(self.parent().name(), self.name(), 0)
 
-            # TODO: Score this player
             # Did this player a winner of a match within this round?
-            if(p in _round.winners()):
-                p._score[self.name()][_round.name()] = 5"""
+            if(p in self.winners()):
+                urp = self._app.handler.unique_ranking_points()
+                p.score_set(self.parent().name(), self.name(), self._app.handler.unique_ranking_points()[self.id() - 1])
 
-            print(self.players())
-            print("done tour _rnd.plyrs()")
-            input("hold")
-
+            # Append this player to our list
+            self._players.append(p)
         return self.players()
 
     def players(self):
@@ -287,6 +289,13 @@ class Round():
         return self.cap()
 
     def add_match(self, match):
+        # Analyse our Match and extract the winner
+        self.add_winners(match.winner()[0])
+
+        # Analyse our Match and extract the players
+        self.add_players(match._player_one, match._player_two)
+
+        # Append a match to our Round
         self._matches.append(match)
 
     def matches(self):
@@ -299,5 +308,5 @@ class Round():
         return "n/a"
 
     def winners(self):
-        _winners = [ w.winner()[0] for w in self.matches() ]
-        return _winners
+        #_winners = [ w.winner()[0] for w in self.matches() ]
+        return self._winners

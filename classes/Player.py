@@ -70,24 +70,41 @@ class Player():
         # Return our updated wins count
         return self._wins[_tournament]
     
-    def score(self, _tournament):
+    def score(self, _tournament, _round = None):
         # Add Tournament Name to score
         if(_tournament not in self._score):
-            self._score.update({ _tournament: 0 })
+            self._score.update({ _tournament: { } })
 
-        # Return our score count
-        return self._score[_tournament]
+        # Are we viewing the score of a particular round
+        if(_round != None):
+            # Add Round to Tournament Name in Score
+            if(_round not in self._score[_tournament]):
+                self._score[_tournament].update({ _round: 0 })
 
-    def score_set(self, _tournament, _score):
+            # Return our score count
+            return self._score[_tournament][_round]
+        else:
+            # Return tournament scores
+            return self._score[_tournament]
+
+    def highest_score(self, _tournament):
+        highest = max(self._score[_tournament], key=self._score[_tournament].get) 
+        return { highest: self._score[_tournament][highest] }
+
+    def score_set(self, _tournament, _round, _score_set):
         # Add Tournament Name to Score
         if(_tournament not in self._score):
-            self._score.update({ _tournament: 0 })
+            self._score.update({ _tournament: { } })
+
+        # Add Round to Tournament in Score
+        if(_round not in self._score[_tournament]):
+            self._score[_tournament].update({ _round: 0 })
 
         # Update Tournament Score
-        self._score[_tournament] = _score
+        self._score[_tournament][_round] = _score_set
 
         # Return our updated score count
-        return self._score[_tournament]
+        return self._score[_tournament][_round]
     
     def points(self):
         return self._points

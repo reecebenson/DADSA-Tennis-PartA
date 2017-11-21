@@ -408,11 +408,21 @@ class Tournament():
 
     def view_leaderboard(self, gdr = None, rnd_name = None):
         rnd = self.round(gdr, rnd_name)
-        print("view leaderboard")
+        print("view leaderboard:", self.name(), gdr, rnd_name)
 
-        for pn in rnd.players():
-            p = self.season().player(gdr, pn)
-            print(p.name(), p._score)
+        for p in rnd.players():
+            print(p.name(), p.highest_score(self.name()))
+
+        # Print out ranking points
+        print("\n\n", self._app.handler.ranking_points)
+
+        """
+        srt = sort(self.season().players()[extra])
+        place = 1
+        for i in reversed(range(len(srt))):
+            ret += ("#{0}: {1} — Points: {2}pts — {3}\n".format(place, srt[i].name(), srt[i].points() * self.difficulty(), "{0}: {1} score, {2} wins".format(self.name(), srt[i].score(self.name()), srt[i].wins(self.name()))))
+            place += 1
+        """
 
         # Hold User
         input(">>> Press <Return> to continue...")
@@ -439,12 +449,7 @@ class Tournament():
             if(extra == None):
                 ret += "A gender must be specified."
             else:
-                srt = sort(self.season().players()[extra])
-                
-                place = 1
-                for i in reversed(range(len(srt))):
-                    ret += ("#{0}: {1} — Points: {2}pts — {3}\n".format(place, srt[i].name(), srt[i].points() * self.difficulty(), "{0}: {1} score, {2} wins".format(self.name(), srt[i].score(self.name()), srt[i].wins(self.name()))))
-                    place += 1
+                ret += "Removed."
         else:
             ret = "An unknown error has been handled..."
         return ret
