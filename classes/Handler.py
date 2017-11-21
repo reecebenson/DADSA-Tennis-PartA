@@ -546,7 +546,25 @@ class Handler():
             # Finalise the save to our tournament
             self.handle_save_rounds(tournament)
         except KeyboardInterrupt:
-            input("write to file here")
+            # Clear Terminal
+            call("cls")
+
+            # Show user what happens when they restart
+            print("You have tried to exit the program using Ctrl + C whilst inputting matches.", "\n")
+            print("If you load previous rounds in your next session, you will be able to continue")
+            print("from where you left off from this session.")
+
+            # Exit Program
+            Builder._app.exit()
+        except Exception as err:
+            # Clear Terminal
+            call("cls")
+
+            # Show user error
+            print("An unknown error has occured:\n{0}".format(err))
+
+            # Exit Program
+            Builder._app.exit()
             
         return True
 
@@ -602,7 +620,7 @@ class Handler():
         # Set our round attributes
         _r.set_previous_round(previous_round)
         _r.set_cap(round_cap)
-        
+
         for w in range(len(rand_players) // 2):
             # Define our players
             p_one = rand_players[w * 2]
