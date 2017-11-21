@@ -39,8 +39,24 @@ class Round():
         return self._parent
 
     def add_players(self, *plyrs):
+        # Go through all of the rounds
         for p in plyrs:
+            # Append this player to our list
             self._players.append(p)
+
+            # Score our player
+            print(p)
+            """p._score[self.name()].update({ _round.name(): 0 })
+
+            # TODO: Score this player
+            # Did this player a winner of a match within this round?
+            if(p in _round.winners()):
+                p._score[self.name()][_round.name()] = 5"""
+
+            print(self.players())
+            print("done tour _rnd.plyrs()")
+            input("hold")
+
         return self.players()
 
     def players(self):
@@ -88,7 +104,7 @@ class Round():
                     self.validate(error_count)
 
         # Clear our variables
-        self._players.clear()
+        #self._players.clear()
         matchId = 0
         
         # Check that a player hasn't played twice
@@ -146,7 +162,7 @@ class Round():
                         print("There was an error with processing round data. The data is corrupt and has players that do not exist.\nPlease regenerate the 'seasons.json' file.")
                         return self._app.exit()
             else:
-                self._players.append(m.player_one()[0].name())
+                pass # self._players.append(m.player_one()[0].name())
             
             # Check Player Two
             if(m.player_two()[0].name() in self.players()):
@@ -193,7 +209,7 @@ class Round():
                         print("There was an error with processing round data. The data is corrupt and has players that do not exist.\nPlease regenerate the 'seasons.json' file.")
                         return self._app.exit()
             else:
-                self._players.append(m.player_two()[0].name())
+                pass # self._players.append(m.player_two()[0].name())
 
             # Check that the players are within the winners of the previous round (if exists)
             if(self.previous_round() != None):

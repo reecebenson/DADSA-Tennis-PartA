@@ -264,7 +264,10 @@ class Handler():
                         match_cap = (len(players[gdr]) // 2) if (prev_round[gdr] == None) else (len(prev_round[gdr].winners()) // 2)
 
                         # Create our Round
-                        round_cap = season.settings()[gdr.lower() + "_cap"] or 3
+                        round_cap = 3
+                        if(gdr + "_cap" in season.settings()):
+                            round_cap = season.settings()[gdr + "_cap"]
+
                         _r = Round.Round(self.app, gdr, rnd, tournament, match_cap)
                         _r.set_previous_round(prev_round[gdr])
                         _r.set_cap(round_cap)
@@ -343,7 +346,9 @@ class Handler():
                     match_cap = (len(players[gender]) // 2) if (prev_r == None) else (len(prev_r.winners()) // 2)
 
                     # Do we have a Round Cap overrider for this gender?
-                    round_cap = season.settings()[gender + "_cap"] or 3
+                    round_cap = 3
+                    if(gender + "_cap" in season.settings()):
+                        round_cap = season.settings()[gender + "_cap"]
                     _r = Round.Round(self.app, gender, r_name, tournament, match_cap)
                     _r.set_cap(round_cap)
 
@@ -372,6 +377,7 @@ class Handler():
 
                         # Add the match
                         _r.add_match(Match.Match(_r, p_one, p_two, p_one_score, p_two_score))
+                        _r.add_players(p_one, p_two)
 
                     # Add our round to our season
                     tournament.add_round(gender, _r)
@@ -468,7 +474,11 @@ class Handler():
             print(players)
             input("hold players")
             match_cap = (len(available_players) // 2) if (previous_round == None) else (len(previous_round.winners()) // 2)
-            round_cap = season.settings()[genderName + "_cap"] or 3
+
+            # Round Cap
+            round_cap = 3
+            if(genderName + "_cap" in season.settings()):
+                round_cap = season.settings()[genderName + "_cap"]
 
             # Check if our round already exists
             _r = None
@@ -533,6 +543,7 @@ class Handler():
                                         # Add this Match to the Round
                                         _m = Match.Match(_r, p_one, p_two, plyr_one_score, plyr_two_score)
                                         _r.add_match(_m)
+                                        _r.add_players(p_one, p_two)
 
                                         # Pop our players from the array
                                         del available_players[available_players.index(p_one)]
@@ -634,11 +645,13 @@ class Handler():
                     del rand_players[rand_players.index(p)]
 
         # Check if we have a round to take data from
-        match_cap = (len(players[genderName]) // 2) if (previous_round == None) else (len(previous_round.winners()) // 2)
+        match_cap = (len(rand_players[genderName]) // 2) if (previous_round == None) else (len(previous_round.winners()) // 2)
 
         # Generate our matches from the data we have
-        round_cap = season.settings()[genderName + "_cap"] or 3
-        
+        round_cap = 3
+        if(genderName + "_cap" in season.settings()):
+            round_cap = season.settings()[genderName + "_cap"]
+
         # Check if our round already exists
         _r = None
         if(this_round == None):
@@ -666,6 +679,7 @@ class Handler():
 
             # Add the match
             _r.add_match(Match.Match(_r, p_one, p_two, p_one_score, p_two_score))
+            _r.add_players(p_one, p_two)
 
         # Add our round to the tournament
         tournament.add_round(genderName, _r)

@@ -346,20 +346,37 @@ class Tournament():
                     invalid_option = True
             else:
                 # Round does not exist
-                print("Round {0} does not exist. Emulation of Tournament {1} has been forced to stop.".format(r, self.name()))
-                input(">>> Press <Return> to continue...")
                 exit_while = True
-                #TODO
                 break
 
         # Have we reached the end of our rounds?
         if(r == self.season().settings()["{}_round_count".format(gdr)]):
             print("End of Tournament {0}. 1st Place Winner: {1}".format(self.name(), self.rounds()[gdr]["round_{0}".format(r)].winners()[0].name()))
         else:
-            print("Please select an option:", "\n1.", "Generate this round", "\n2.", "Stop Tournament emulation")
+            # Did not reach the end of the tournament
+            print("\nError:\nUnable to emulate {0} {1} Round {2} as it does not exist.\n".format(self.name(), gdr.title(), r))
+            print("Please select an option:", "\n1.", "Modify this round", "\n2.", "Stop Tournament emulation")
             option = input(">>> ") or "2"
+            if(option == "1"):
+                # Define our Menu Tree
+                _menu_tree = [  "main",
+                                "load_season",
+                                "ls_[{0}]".format(self.season().name()),
+                                "ls_[{0}]_[{1}]".format(self.season().name(), self.name()),
+                                "ls_[{0}]_[{1}]_rs".format(self.season().name(), self.name()),
+                                "ls_[{0}]_[{1}]_rs_{2}".format(self.season().name(), self.name(), gdr),
+                                "ls_[{0}]_[{1}]_vr_{2}_round_{3}".format(self.season().name(), self.name(), gdr, r) ]
+                _menu_current = _menu_tree[-1]
 
-    def emulate_round(self, gdr = None, rnd = None, all = False):
+                # Set our Current Menu
+                Builder._current = _menu_current
+                Builder._tree = _menu_tree
+            elif(option == "2"):
+                return None
+            else:
+                return None
+
+    def emulate_round(self, gdr = None, rnd = None, all = False, error = False):
         # Get our Matches
         for m, match in enumerate(self.round(gdr, rnd).matches(), 1):
             print(match.versuses(True))
@@ -368,24 +385,43 @@ class Tournament():
         if(all):
             return ([ "View current leaderboard", "View current prize money" ], [ partial(self.view_leaderboard, gdr, rnd), partial(self.view_prize_money, gdr, rnd) ])
         else:
+            # Have we errored?
+            if(error):
+                print("\nError:\nYou entered an invalid option.")
+                error = False
+
             # Build Menu
-            print("\nPlease select an option:", "\n1.", "View current leaderboard", "\n2.", "View current prize money")
+            print("\nPlease select an option:", "\n1.", "View current leaderboard", "\n2.", "View current prize money", "\n3.", "Back to menu")
             option = input(">>> ") or None
 
-            if(option == None):
-                pass
-            elif(option == "1"):
-                print("option 1")
+            if(option == "1"):
+                self.view_leaderboard(gdr, rnd)
             elif(option == "2"):
-                print("option ")
+                self.view_prize_money(gdr, rnd)
+            elif(option == "3"):
+                return "SKIP"
             else:
-                pass
+                return self.emulate_round(gdr, rnd, all, True)
+            
+            # Repeat our Round
+            return self.emulate_round(gdr, rnd, all)
 
-    def view_leaderboard(self, gdr = None, rnd = None):
+    def view_leaderboard(self, gdr = None, rnd_name = None):
+        rnd = self.round(gdr, rnd_name)
         print("view leaderboard")
+
+        for pn in rnd.players():
+            p = self.season().player(gdr, pn)
+            print(p.name(), p._score)
+
+        # Hold User
+        input(">>> Press <Return> to continue...")
 
     def view_prize_money(self, gdr = None, rnd = None):
         print("view prize money")
+
+        # Hold User
+        input(">>> Press <Return> to continue...")
 
     def display(self, detail, extra = None):
         # Set our header text

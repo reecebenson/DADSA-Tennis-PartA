@@ -81,7 +81,13 @@ class Season():
             return None
 
     def add_tournament(self, name, tournament):
+        # Add our tournament to our list
         self._tournaments.update({ name: tournament })
+        
+        # Add this tournament to all of our players scores
+        for gdr in self.players():
+            for p in self.players()[gdr]:
+                p._score.update({ name: { } })
 
         # Debug
         if(self._app.debug):
