@@ -265,11 +265,36 @@ class Tournament():
     def set_difficulty(self, difficulty):
         self._difficulty = difficulty
 
+    def go_to_edit_round(self, gdr, r):
+        # Define our Menu Tree
+        _menu_tree = [  "main",
+                        "load_season",
+                        "ls_[{0}]".format(self.season().name()),
+                        "ls_[{0}]_[{1}]".format(self.season().name(), self.name()),
+                        "ls_[{0}]_[{1}]_rs".format(self.season().name(), self.name()),
+                        "ls_[{0}]_[{1}]_rs_{2}".format(self.season().name(), self.name(), gdr),
+                        "ls_[{0}]_[{1}]_vr_{2}_round_{3}_edit".format(self.season().name(), self.name(), gdr, r) ]
+        _menu_current = _menu_tree[-1]
+
+        # Set our Current Menu
+        Builder._current = _menu_current
+        Builder._tree = _menu_tree
+
+        # Force close the emulation
+        return "SKIP"
+
     def emulate(self, gdr):
-        # Start the emulation of our tournament (? from where we left off)
+        # Set some variables
         r = 0
+        force_exit = False
         invalid_option = False
-        while (r < self.season().settings()["{}_round_count".format(gdr)]):
+
+        # Start the emulation of our tournament
+        while (r < self.season().settings()["{}_round_count".format(gdr)] and force_exit == False):
+            # Forcing to exit the while?
+            if(force_exit):
+                break
+
             # Increment r
             r += 1
 
@@ -302,9 +327,9 @@ class Tournament():
 
                 # Add our other options
                 options.append("Edit this round")
-                options_funcs.append(partial(print, "Edit round"))
+                options_funcs.append(partial(self.go_to_edit_round, gdr, r))
                 options.append("Stop Tournament Emulation")
-                options_funcs.append(partial(print, "Stop tournament emu"))
+                options_funcs.append("end")
 
                 # Check if we had an error
                 if(invalid_option):
@@ -329,13 +354,20 @@ class Tournament():
                         func_to_run = options_funcs[option - 1]
 
                         if(callable(func_to_run)):
-                            func_to_run()
-                            r -= 1
-                            invalid_option = False
+                            callback = func_to_run()
+
+                            if(callback == "SKIP"):
+                                force_exit = True
+                            else:
+                                r -= 1
+                                invalid_option = False
                         else:
                             if(func_to_run == "back"):
                                 r -= 2
                                 invalid_option = False
+                            elif(func_to_run == "end"):
+                                r = self.season().settings()["{}_round_count".format(gdr)] + 1
+                                force_exit = True
                             else:
                                 pass
                     else:
@@ -346,35 +378,37 @@ class Tournament():
                     invalid_option = True
             else:
                 # Round does not exist
-                exit_while = True
                 break
 
-        # Have we reached the end of our rounds?
-        if(r == self.season().settings()["{}_round_count".format(gdr)]):
-            print("End of Tournament {0}. 1st Place Winner: {1}".format(self.name(), self.rounds()[gdr]["round_{0}".format(r)].winners()[0].name()))
-        else:
-            # Did not reach the end of the tournament
-            print("\nError:\nUnable to emulate {0} {1} Round {2} as it does not exist.\n".format(self.name(), gdr.title(), r))
-            print("Please select an option:", "\n1.", "Modify this round", "\n2.", "Stop Tournament emulation")
-            option = input(">>> ") or "2"
-            if(option == "1"):
-                # Define our Menu Tree
-                _menu_tree = [  "main",
-                                "load_season",
-                                "ls_[{0}]".format(self.season().name()),
-                                "ls_[{0}]_[{1}]".format(self.season().name(), self.name()),
-                                "ls_[{0}]_[{1}]_rs".format(self.season().name(), self.name()),
-                                "ls_[{0}]_[{1}]_rs_{2}".format(self.season().name(), self.name(), gdr),
-                                "ls_[{0}]_[{1}]_vr_{2}_round_{3}".format(self.season().name(), self.name(), gdr, r) ]
-                _menu_current = _menu_tree[-1]
-
-                # Set our Current Menu
-                Builder._current = _menu_current
-                Builder._tree = _menu_tree
-            elif(option == "2"):
-                return None
+        if(not force_exit):
+            # Have we reached the end of our rounds?
+            if(r == self.season().settings()["{}_round_count".format(gdr)]):
+                print("End of Tournament {0}. 1st Place Winner: {1}".format(self.name(), self.rounds()[gdr]["round_{0}".format(r)].winners()[0].name()))
             else:
-                return None
+                # Did not reach the end of the tournament
+                print("\nError:\nUnable to emulate {0} {1} Round {2} as it does not exist.\n".format(self.name(), gdr.title(), r))
+                print("Please select an option:", "\n1.", "Modify this round", "\n2.", "Stop Tournament emulation")
+                option = input(">>> ") or "2"
+                if(option == "1"):
+                    # Define our Menu Tree
+                    _menu_tree = [  "main",
+                                    "load_season",
+                                    "ls_[{0}]".format(self.season().name()),
+                                    "ls_[{0}]_[{1}]".format(self.season().name(), self.name()),
+                                    "ls_[{0}]_[{1}]_rs".format(self.season().name(), self.name()),
+                                    "ls_[{0}]_[{1}]_rs_{2}".format(self.season().name(), self.name(), gdr),
+                                    "ls_[{0}]_[{1}]_vr_{2}_round_{3}".format(self.season().name(), self.name(), gdr, r) ]
+                    _menu_current = _menu_tree[-1]
+
+                    # Set our Current Menu
+                    Builder._current = _menu_current
+                    Builder._tree = _menu_tree
+                elif(option == "2"):
+                    return None
+                else:
+                    return None
+        else:
+            return "SKIP"
 
     def emulate_round(self, gdr = None, rnd = None, all = False, error = False):
         # Get our Matches

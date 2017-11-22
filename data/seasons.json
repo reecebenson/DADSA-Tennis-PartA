@@ -4,8 +4,7 @@
             "editable": true,
             "round_count": 5,
             "male_cap": 3,
-            "female_cap": 2,
-            "helicopter_cap": 5
+            "female_cap": 2
         },
         "tournaments": {
             "TAC1": {

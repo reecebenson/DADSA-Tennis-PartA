@@ -329,14 +329,17 @@ class Menu():
 
     def load(self, reloading = False):
         # Create our Menu
-        Builder.init(self._app, False if not reloading else "New Menu", reloading)
+        Builder.init(self._app, False, reloading)
 
         ## MAIN
         Builder.add_menu("main", "Load Season", "load_season")
         Builder.add_menu("main", "See Developer Information", "info")
-        Builder.add_menu("main", "See Debug Information", "d_info")
         Builder.add_func("main", "info", lambda: self.dev_info())
-        Builder.add_func("main", "d_info", lambda: self.debug_info())
+        
+        ## DEBUG INFORMATION
+        if(self._app.debug):
+            Builder.add_menu("main", "See Debug Information", "d_info")
+            Builder.add_func("main", "d_info", lambda: self.debug_info())
 
         ## LOAD SEASON
         for season_id in self._app.handler.get_seasons():

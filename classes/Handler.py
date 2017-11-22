@@ -761,14 +761,6 @@ class Handler():
                         if(len(self.get_season(season).players()[gender]) > self.player_count):
                             self.player_count = len(self.get_season(season).players()[gender])
 
-    def get_round_status(self):
-
-        pass
-
-    def write_round(self):
-
-        pass
-
     def debug(self, dbg):
         print("[DEBUG]: ", dbg)
         input("[DEBUG] Holding...")
