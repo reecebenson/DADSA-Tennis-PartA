@@ -7,7 +7,6 @@ class Player():
     _gender = None
     _wins = None
     _score = None
-    _money = None
 
     def __init__(self, _name, _gender, _id):
         self._id = _id
@@ -15,7 +14,6 @@ class Player():
         self._gender = _gender
         self._wins = { }
         self._score = { }
-        self._money = { }
 
     def name(self):
         return self._name
@@ -81,23 +79,3 @@ class Player():
 
         # Return our updated score count
         return self._score[_tournament][_round]
-    
-    # Find out how much money the player has
-    def money(self, _tournament, _round = None):
-        if(not _tournament in self._money):
-            self._money.update({ _tournament: { } })
-
-        if(not _round in self._money[_tournament]):
-            self._money[_tournament].update({ _round: 0 })
-
-        return self._money[_tournament] if(_round == None) else self._money[_tournament][_round]
-
-    def money_set(self, _tournament, _round, _money):
-        if(not _tournament in self._money):
-            self._money.update({ _tournament: { } })
-
-        if(not _round in self._money[_tournament]):
-            self._money[_tournament].update({ _round: 0 })
-
-        self._money[_tournament][_round] = _money
-        return self._money[_tournament][_round]

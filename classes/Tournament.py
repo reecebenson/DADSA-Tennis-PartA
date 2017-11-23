@@ -424,25 +424,38 @@ class Tournament():
 
         # Options
         if(all):
-            return ([ "View current leaderboard", "View current prize money" ], [ partial(self.view_leaderboard, gdr, rnd), partial(self.view_prize_money, gdr, rnd) ])
+            return ([ "View current leaderboard", "View current prize money" ], [ partial(self.view_leaderboard, gdr, rnd), partial(self.view_prize_money, gdr) ]) if(rnd == "round_{}".format(self.season().settings()["round_count"])) else ([ "View current leaderboard" ], [ partial(self.view_leaderboard, gdr, rnd) ])
         else:
             # Have we errored?
             if(error):
                 print("\nError:\nYou entered an invalid option.")
                 error = False
 
-            # Build Menu
-            print("\nPlease select an option:", "\n1.", "View current leaderboard", "\n2.", "View current prize money", "\n3.", "Back to menu")
-            option = input(">>> ") or None
+            # Are we on our last round?
+            if(rnd == "round_{}".format(self.season().settings()["round_count"])):
+                # Build Menu
+                print("\nPlease select an option:", "\n1.", "View current leaderboard", "\n2.", "View current prize money", "\n3.", "Back to menu")
+                option = input(">>> ") or None
 
-            if(option == "1"):
-                self.view_leaderboard(gdr, rnd)
-            elif(option == "2"):
-                self.view_prize_money(gdr, rnd)
-            elif(option == "3"):
-                return "SKIP"
+                if(option == "1"):
+                    self.view_leaderboard(gdr, rnd)
+                elif(option == "2" and rnd == "round_{}".format(self.season().settings()["round_count"])):
+                    self.view_prize_money(gdr)
+                elif(option == "3"):
+                    return "SKIP"
+                else:
+                    return self.emulate_round(gdr, rnd, all, True)
             else:
-                return self.emulate_round(gdr, rnd, all, True)
+                # Build Menu
+                print("\nPlease select an option:", "\n1.", "View current leaderboard", "\n2.", "Back to menu")
+                option = input(">>> ") or None
+
+                if(option == "1"):
+                    self.view_leaderboard(gdr, rnd)
+                elif(option == "2"):
+                    return "SKIP"
+                else:
+                    return self.emulate_round(gdr, rnd, all, True)
             
             # Repeat our Round
             return self.emulate_round(gdr, rnd, all)
@@ -486,10 +499,7 @@ class Tournament():
         # Return a reversed list
         return self._prize_money_unique
 
-    def view_prize_money(self, gdr = None, rnd_name = None):
-        # Get our Round Object
-        rnd = self.round(gdr, rnd_name)
-
+    def view_prize_money(self, gdr = None):
         # Clear our Terminal
         call("cls")
 
@@ -497,27 +507,17 @@ class Tournament():
         self.unique_prize_money()
 
         # Set our header text
-        print("View Prize Money for '{0}', Round {1}:".format(self.name(), rnd.id()))
+        print("View Prize Money for '{0}':".format(self.name()))
         print("—————————————————————————————————————————————————————————")
-
-        print(self._prize_money_unique)
 
         srt = sort(self.season().players()[gdr], self.name())
         place = 1
         for i in reversed(range(len(srt))):
             # Get the players Prize Money
-            p_prizemoney = 0
-
-            # Get the amount of winners in this round
-            if(len(rnd.winners()) > len(self.prize_money())):
-                pass # Don't bother setting any prize money
-            else:
-                if(srt[i] in rnd.winners()):
-                    # Allocate this player some money
-                    srt[i].money_set(self.name(), rnd.name(), self._prize_money_unique[srt[i].wins(self.name())])
+            p_prizemoney = self._prize_money_unique[srt[i].wins(self.name())]
                 
             # Print Data
-            print("#{0}: {1} — £{2:,}".format(place, srt[i].name(), srt[i].money(self.name(), rnd.name())))
+            print("#{0}: {1} — £{2:,}".format(f"{place:02}", srt[i].name(), p_prizemoney))
             place += 1
         
         # Hold User
