@@ -7,7 +7,7 @@ from classes import Handler
 
 class App():
     # Define the variables we will be using
-    debug = True
+    debug = False
     menu = None
     handler = None
 

@@ -56,7 +56,7 @@ class Round():
             # Did this player a winner of a match within this round?
             if(p in self.winners()):
                 urp = self._app.handler.unique_ranking_points()
-                p.score_set(self.parent().name(), self.name(), self._app.handler.unique_ranking_points()[self.id() - 1])
+                p.score_set(self.parent().name(), self.name(), (urp[(self.id() - 1) if (len(urp)) > self.id() else (len(urp) - 1)]))
 
             # Append this player to our list
             self._players.append(p)
