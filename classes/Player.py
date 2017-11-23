@@ -87,9 +87,9 @@ class Player():
             # Return tournament scores
             return self._score[_tournament]
 
-    def highest_score(self, _tournament):
+    def highest_score(self, _tournament, _with_round = True):
         highest = max(self._score[_tournament], key=self._score[_tournament].get) 
-        return { highest: self._score[_tournament][highest] }
+        return { highest: self._score[_tournament][highest] } if _with_round else self._score[_tournament][highest]
 
     def score_set(self, _tournament, _round, _score_set):
         # Add Tournament Name to Score

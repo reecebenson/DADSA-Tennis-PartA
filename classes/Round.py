@@ -44,6 +44,7 @@ class Round():
         # Go through all players within the plyrs var
         for p in plyrs:
             # Append this player to our list
+            p.wins_increase(self.parent().name())
             self._winners.append(p)
 
     def add_players(self, *plyrs):

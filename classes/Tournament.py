@@ -403,6 +403,9 @@ class Tournament():
                     # Set our Current Menu
                     Builder._current = _menu_current
                     Builder._tree = _menu_tree
+
+                    # Skip over the input handling from Menu Builder
+                    return "SKIP"
                 elif(option == "2"):
                     return None
                 else:
@@ -441,22 +444,19 @@ class Tournament():
             return self.emulate_round(gdr, rnd, all)
 
     def view_leaderboard(self, gdr = None, rnd_name = None):
+        # Get our Round Object
         rnd = self.round(gdr, rnd_name)
-        print("view leaderboard:", self.name(), gdr, rnd_name)
+        
+        # Set our header text
+        print("View Leaderboard for '{0}', Round {1}:".format(self.name(), rnd.id()) + "\n")
+        print("—————————————————————————————————————————————————————————\n")
 
-        for p in rnd.players():
-            print(p.name(), p.highest_score(self.name()))
-
-        # Print out ranking points
-        print("\n\n", self._app.handler.ranking_points)
-
-        """
-        srt = sort(self.season().players()[extra])
+        srt = sort(self.season().players()[gdr], self.name())
         place = 1
         for i in reversed(range(len(srt))):
-            ret += ("#{0}: {1} — Points: {2}pts — {3}\n".format(place, srt[i].name(), srt[i].points() * self.difficulty(), "{0}: {1} score, {2} wins".format(self.name(), srt[i].score(self.name()), srt[i].wins(self.name()))))
+            print("#{0}: {1} — Points: {2}pts — {3}".format(place, srt[i].name(), srt[i].points() * self.difficulty(), "{0}: {1} score, {2} wins".format(self.name(), srt[i].highest_score(self.name(), True), srt[i].wins(self.name()))))
             place += 1
-        """
+        
 
         # Hold User
         input(">>> Press <Return> to continue...")
