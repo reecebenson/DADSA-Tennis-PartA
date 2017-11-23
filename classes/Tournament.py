@@ -454,10 +454,9 @@ class Tournament():
         srt = sort(self.season().players()[gdr], self.name())
         place = 1
         for i in reversed(range(len(srt))):
-            print("#{0}: {1} — Points: {2}pts — {3}".format(place, srt[i].name(), srt[i].points() * self.difficulty(), "{0}: {1} score, {2} wins".format(self.name(), srt[i].highest_score(self.name(), True), srt[i].wins(self.name()))))
+            print("#{0}: {1} — {2}".format(f"{place:02}", srt[i].name(), "{0}: {1:03d} score, {2} wins".format(self.name(), srt[i].highest_score(self.name(), False), srt[i].wins(self.name()))))
             place += 1
         
-
         # Hold User
         input(">>> Press <Return> to continue...")
 
