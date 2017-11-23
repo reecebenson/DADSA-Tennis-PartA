@@ -165,7 +165,7 @@ class Round():
                         print("There was an error with processing round data. The data is corrupt and has players that do not exist.\nPlease regenerate the 'seasons.json' file.")
                         return self._app.exit()
             else:
-                pass # self._players.append(m.player_one()[0].name())
+                pass
             
             # Check Player Two
             if(m.player_two()[0].name() in self.players()):
@@ -212,7 +212,7 @@ class Round():
                         print("There was an error with processing round data. The data is corrupt and has players that do not exist.\nPlease regenerate the 'seasons.json' file.")
                         return self._app.exit()
             else:
-                pass # self._players.append(m.player_two()[0].name())
+                pass
 
             # Check that the players are within the winners of the previous round (if exists)
             if(self.previous_round() != None):
@@ -240,9 +240,6 @@ class Round():
                     if(p_found[0]):
                         # Update 'seasons.json'
                         input("[{2}:{3}] '{0}' has been replaced with '{1}' - ...continue\n".format(m.player_one()[0].name(), p_found[1], self.parent().name(), self.name()))
-                    else:
-                        input("Unable to fix this shit...")
-                        exit()
 
                 # Check Player Two exists within the previous winners
                 if(m.player_two()[0].name() not in winner_name_list):
@@ -262,9 +259,6 @@ class Round():
                     if(p_found[0]):
                         # Update 'seasons.json'
                         input("[{2}:{3}] '{0}' has been replaced with '{1}' - ...continue\n".format(m.player_two()[0].name(), p_found[1], self.parent().name(), self.name()))
-                    else:
-                        input("Unable to fix this shit...")
-                        exit()
 
         # Check if we're done (aggressive recursion)
         if(error):
@@ -309,5 +303,4 @@ class Round():
         return "n/a"
 
     def winners(self):
-        #_winners = [ w.winner()[0] for w in self.matches() ]
         return self._winners

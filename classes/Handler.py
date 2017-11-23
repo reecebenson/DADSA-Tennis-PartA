@@ -643,7 +643,7 @@ class Handler():
                     del rand_players[rand_players.index(p)]
 
         # Check if we have a round to take data from
-        match_cap = (len(rand_players[genderName]) // 2) if (previous_round == None) else (len(previous_round.winners()) // 2)
+        match_cap = (len(rand_players) // 2) if (previous_round == None) else (len(previous_round.winners()) // 2)
 
         # Generate our matches from the data we have
         round_cap = 3

@@ -18,4 +18,5 @@ def quick_sort(arr, attr = None):
             gt  = [ e for e in arr[1:] if e.highest_score(attr, False) > piv.highest_score(attr, False) ]
             lt  = [ e for e in arr[1:] if e.highest_score(attr, False) <= piv.highest_score(attr, False) ]
 
+
         return quick_sort(lt, attr) + [piv] + quick_sort(gt, attr)

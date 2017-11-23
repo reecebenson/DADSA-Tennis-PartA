@@ -17,9 +17,6 @@ class App():
         self.handler = Handler.Handler(self)
         self.handler.load()
 
-        # Generate rounds
-        # self.handler.generate_rounds()
-
         # Show Menu
         self.menu = Menu.Menu(self)
         self.menu.load()
@@ -32,4 +29,4 @@ class App():
         input("\n\n>>> Press <Return> to terminate the program")
         exit()
 
-app = App()
+App()

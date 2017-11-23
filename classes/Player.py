@@ -7,7 +7,7 @@ class Player():
     _gender = None
     _wins = None
     _score = None
-    _points = None
+    _money = None
 
     def __init__(self, _name, _gender, _id):
         self._id = _id
@@ -15,31 +15,7 @@ class Player():
         self._gender = _gender
         self._wins = { }
         self._score = { }
-        self._points = 0
-
-    def __cmp__(self, other):
-        if(self._points < other._points):
-            return -1
-        elif(self._points > other._points):
-            return 1
-        else:
-            return 0
-
-    # Comparison Overrides
-    #def __eq__(self, other):
-    #    return not self._points < other._points and not other._points < self._points
-
-    def __ne__(self, other):
-        return self._points < other._points or other._points < self._points
-
-    def __gt__(self, other):
-        return other._points < self._points
-
-    def __ge__(self, other):
-        return not self._points < other._points
-
-    def __le__(self, other):
-        return not other._points < self._points
+        self._money = { }
 
     def name(self):
         return self._name
@@ -106,12 +82,22 @@ class Player():
         # Return our updated score count
         return self._score[_tournament][_round]
     
-    def points(self):
-        return self._points
+    # Find out how much money the player has
+    def money(self, _tournament, _round = None):
+        if(not _tournament in self._money):
+            self._money.update({ _tournament: { } })
 
-    def points_set(self, _points, append = False):
-        if(append):
-            self._points += _points
-        else:
-            self._points = _points
-        return self._points
+        if(not _round in self._money[_tournament]):
+            self._money[_tournament].update({ _round: 0 })
+
+        return self._money[_tournament] if(_round == None) else self._money[_tournament][_round]
+
+    def money_set(self, _tournament, _round, _money):
+        if(not _tournament in self._money):
+            self._money.update({ _tournament: { } })
+
+        if(not _round in self._money[_tournament]):
+            self._money[_tournament].update({ _round: 0 })
+
+        self._money[_tournament][_round] = _money
+        return self._money[_tournament][_round]

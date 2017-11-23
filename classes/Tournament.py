@@ -14,6 +14,7 @@ class Tournament():
     _rounds = None
     _rounds_raw = None
     _prize_money = None
+    _prize_money_unique = None
     _difficulty = None
     _file_saving = None
 
@@ -414,6 +415,9 @@ class Tournament():
             return "SKIP"
 
     def emulate_round(self, gdr = None, rnd = None, all = False, error = False):
+        # Clear Terminal
+        call("cls")
+
         # Get our Matches
         for m, match in enumerate(self.round(gdr, rnd).matches(), 1):
             print(match.versuses(True))
@@ -446,23 +450,76 @@ class Tournament():
     def view_leaderboard(self, gdr = None, rnd_name = None):
         # Get our Round Object
         rnd = self.round(gdr, rnd_name)
+
+        # Clear our Terminal
+        call("cls")
         
         # Set our header text
-        print("View Leaderboard for '{0}', Round {1}:".format(self.name(), rnd.id()) + "\n")
-        print("—————————————————————————————————————————————————————————\n")
+        print("View Leaderboard for '{0}', Round {1}:".format(self.name(), rnd.id()))
+        print("—————————————————————————————————————————————————————————")
 
         srt = sort(self.season().players()[gdr], self.name())
         place = 1
         for i in reversed(range(len(srt))):
-            print("#{0}: {1} — {2}".format(f"{place:02}", srt[i].name(), "{0}: {1:03d} score, {2} wins".format(self.name(), srt[i].highest_score(self.name(), False), srt[i].wins(self.name()))))
+            print(srt[i].score(self.name()))
+            print("#{0}: {1} — {2}".format(f"{place:02}", srt[i].name(), "{0}: {1:03d} score".format(self.name(), srt[i].score(self.name(), rnd_name) if (srt[i].score(self.name(), rnd_name) != 0) else srt[i].highest_score(self.name(), False))))
             place += 1
         
         # Hold User
         input(">>> Press <Return> to continue...")
 
-    def view_prize_money(self, gdr = None, rnd = None):
-        print("view prize money")
+    # Used to define the players new ranking points and can be used to organise the top 16 players
+    def unique_prize_money(self):
+        # Organise a unique list if it hasn't already been sorted
+        if(self._prize_money_unique == None):
+            # Remove duplicates
+            self._prize_money_unique = []
+            [ self._prize_money_unique.append(i) for i in self._prize_money if not self._prize_money_unique.count(i) ]
 
+            # Fix some shit
+            while(len(self._prize_money_unique) <= self.season().settings()["round_count"]):
+                self._prize_money_unique.append(0)
+
+            # Reverse our list
+            self._prize_money_unique.reverse()
+
+        # Return a reversed list
+        return self._prize_money_unique
+
+    def view_prize_money(self, gdr = None, rnd_name = None):
+        # Get our Round Object
+        rnd = self.round(gdr, rnd_name)
+
+        # Clear our Terminal
+        call("cls")
+
+        # Get our unique prize money thingies
+        self.unique_prize_money()
+
+        # Set our header text
+        print("View Prize Money for '{0}', Round {1}:".format(self.name(), rnd.id()))
+        print("—————————————————————————————————————————————————————————")
+
+        print(self._prize_money_unique)
+
+        srt = sort(self.season().players()[gdr], self.name())
+        place = 1
+        for i in reversed(range(len(srt))):
+            # Get the players Prize Money
+            p_prizemoney = 0
+
+            # Get the amount of winners in this round
+            if(len(rnd.winners()) > len(self.prize_money())):
+                pass # Don't bother setting any prize money
+            else:
+                if(srt[i] in rnd.winners()):
+                    # Allocate this player some money
+                    srt[i].money_set(self.name(), rnd.name(), self._prize_money_unique[srt[i].wins(self.name())])
+                
+            # Print Data
+            print("#{0}: {1} — £{2:,}".format(place, srt[i].name(), srt[i].money(self.name(), rnd.name())))
+            place += 1
+        
         # Hold User
         input(">>> Press <Return> to continue...")
 
@@ -478,11 +535,6 @@ class Tournament():
         elif(detail == "prize_money"):
             ret += "Prize Money:" + "\n"
             ret += "{0}".format("\n".join([ "  #{0}: £{1:,}".format(i, int(t)) for i, t in enumerate(self.prize_money(), 1) ])) + "\n"
-        elif(detail == "leaderboard"):
-            if(extra == None):
-                ret += "A gender must be specified."
-            else:
-                ret += "Removed."
         else:
             ret = "An unknown error has been handled..."
         return ret
