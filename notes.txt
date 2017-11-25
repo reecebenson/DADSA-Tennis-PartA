@@ -1,20 +1,6 @@
 TODO:
 
-Manual Input Data
--> Create
--> Edit
--> Delete
-
-LOAD INTO SEASON
-
-(EXAMPLE USED)
-TOURNAMENT -> SELECT ROUND ->
-
-1. Round 1
-2. Round 2
-3. Round 3 - Data Unavailable (/ Manual)
-4. Round 4 - Data Unavailable (/ Manual)
-5. Round 5 - Data Unavailable (/ Manual)
+Overall Rankings
 
 -----------------------------------------------------------------------------------
 
