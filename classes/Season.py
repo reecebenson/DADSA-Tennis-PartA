@@ -4,6 +4,7 @@
 from classes import Player
 from classes import Round
 from classes.File import File
+from os import system as call
 
 class Season():
     _app = None
@@ -121,3 +122,57 @@ class Season():
 
         # Append our Players to their specific gender category
         self._players[gender].append(Player.Player(name, gender, len(self.players()[gender])))
+
+    def overall_view(self):
+        ## Menu Selection
+        available_tournaments = [ tn for tn in self.tournaments() ]
+        selected_tournaments = [ ]
+        all_selected = False
+
+        # Handling
+        error = False
+        error_msg = ""
+
+        ## Show Options
+        while(not all_selected):
+            ## Clear Terminal
+            call("cls")
+
+            # Show Error
+            if(error):
+                print("\nError:\n{}\n".format(error_msg))
+                error = False
+
+            print("Select tournaments you would like to migrate together:")
+            for i, tn in enumerate(self.tournaments(), 1):
+                print("{0}. {1} ({2})".format(i, tn, ("Selected" if tn in selected_tournaments else "Not Selected")))
+
+            # Print Final
+            if(len(selected_tournaments) > 0):
+                print("\n{0}. View Overall Leaderboard for {1}".format(i + 1, (", ".join(selected_tournaments) if len(selected_tournaments) != 0 else "[None Selected]")))
+
+            # Debug
+            resp = input(">>> ")
+            if(resp.isdigit()):
+                got = int(resp)
+                if(got >= 1 and got <= len(self.tournaments()) + (1 if(len(selected_tournaments) > 0) else 0)):
+                    # Check if we're trying to view overall
+                    if(got == len(available_tournaments) + 1):
+                        all_selected = True
+                        break
+                    else:
+                        # Toggle state of selected tournament
+                        if(available_tournaments[got-1] in selected_tournaments):
+                            del selected_tournaments[selected_tournaments.index(available_tournaments[got-1])]
+                        else:
+                            selected_tournaments.append(available_tournaments[got-1])
+                else:
+                    error = True
+                    error_msg = "Please input a valid option"
+            else:
+                error = True
+                error_msg = "Please input a valid option"
+
+        ## Display all leaderboard data merged from selected tournaments
+        print("Selected Tournaments: {}".format(", ".join(selected_tournaments)))
+        

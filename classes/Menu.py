@@ -351,7 +351,7 @@ class Menu():
             # Add Overall Rankings into Tournament View
             Builder.add_menu("ls_[{0}]".format(season.name()), "View Overall Leaderboard", "ls_[{0}]_overall".format(season.name()))
             Builder.add_info("ls_[{0}]_overall".format(season.name()), "View the overall leaderboard results of all tournaments.\n     This is only available if all tournaments have been played through.")
-            Builder.add_func("ls_[{0}]".format(season.name()), "ls_[{0}]_overall".format(season.name()), partial(print, "tournament overall view"))
+            Builder.add_func("ls_[{0}]".format(season.name()), "ls_[{0}]_overall".format(season.name()), partial(season.overall_view))
 
             ## LOAD TOURNAMENT
             for tournament_name in season.tournaments():
@@ -366,7 +366,6 @@ class Menu():
                 Builder.add_menu(tournament_option_name, "Edit Rounds", "{0}_{1}".format(tournament_option_name, "re"))
                 Builder.add_menu(tournament_option_name, "View Difficulty", "{0}_{1}".format(tournament_option_name, "vd"))
                 Builder.add_menu(tournament_option_name, "View Prize Money", "{0}_{1}".format(tournament_option_name, "vpm"))
-                #Builder.add_menu(tournament_option_name, "View Leaderboard", "{0}_{1}".format(tournament_option_name, "vlb"))
                 Builder.add_menu(tournament_option_name, "{0} Saving".format("Disable" if tournament.file_saving() else "Enable"), "{0}_{1}".format(tournament_option_name, "fs"))
 
                 # Import Menu Information
@@ -375,7 +374,6 @@ class Menu():
                 Builder.add_info("{0}_{1}".format(tournament_option_name, "re"), "Manage data for a specific round")
                 Builder.add_info("{0}_{1}".format(tournament_option_name, "vd"), "View the Difficulty for this specific tournament")
                 Builder.add_info("{0}_{1}".format(tournament_option_name, "vpm"), "View the Prize Money for this specific tournament")
-                #Builder.add_info("{0}_{1}".format(tournament_option_name, "vlb"), "View the current ranking of players")
                 Builder.add_info("{0}_{1}".format(tournament_option_name, "fs"), "Toggle the save state of whether or not to write round data to 'seasons.json'")
 
                 # Import Tournament Functions
