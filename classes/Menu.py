@@ -348,11 +348,6 @@ class Menu():
             # Import Season(s) into our menu
             Builder.add_menu("load_season", season.name(), "ls_[{0}]".format(season.name()))
 
-            # Add Overall Rankings into Tournament View
-            Builder.add_menu("ls_[{0}]".format(season.name()), "View Overall Leaderboard", "ls_[{0}]_overall".format(season.name()))
-            Builder.add_info("ls_[{0}]_overall".format(season.name()), "View the overall leaderboard results of all tournaments.\n     This is only available if all tournaments have been played through.")
-            Builder.add_func("ls_[{0}]".format(season.name()), "ls_[{0}]_overall".format(season.name()), partial(season.overall_view))
-
             ## LOAD TOURNAMENT
             for tournament_name in season.tournaments():
                 tournament = season.tournament(tournament_name)
@@ -436,6 +431,9 @@ class Menu():
                             Builder.add_func(r_view_round + "_edit", r_view_round + "_edit_es", partial(tournament.edit_round, gdr, r))
                             Builder.add_func(r_view_round + "_edit", r_view_round + "_edit_cs", partial(tournament.clear_round, gdr, r))
 
+            # Add Overall Rankings into Tournament View
+            Builder.add_menu("ls_[{0}]".format(season.name()), "View Overall Leaderboard", "ls_[{0}]_overall".format(season.name()))
+            Builder.add_func("ls_[{0}]".format(season.name()), "ls_[{0}]_overall".format(season.name()), partial(season.overall_view))
 
         # Display Menu
         Builder.show_current_menu()
