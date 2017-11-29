@@ -160,34 +160,48 @@ class Season():
 
             print("Select tournaments you would like to migrate together:")
             for i, tn in enumerate(self.tournaments(), 1):
-                if(len(self.tournament(tn).rounds()[gender_input]) == self.settings()["round_count"]):
-                    print("{0}. {1} ({2})".format(i, tn, ("Selected" if tn in selected_tournaments else "Not Selected")))
+                if(gender_input in self.tournament(tn).rounds()):
+                    if(len(self.tournament(tn).rounds()[gender_input]) == self.settings()["round_count"]):
+                        print("{0}. {1} ({2})".format(i, tn, ("Selected" if tn in selected_tournaments else "Not Selected")))
+                    else:
+                        print("{0}. {1} (Not Available, this tournament is incomplete at Round {2})".format(i, tn, len(self.tournament(tn).rounds()[gender_input])))
                 else:
-                    print("{0}. {1} (Not Available, this tournament is incomplete at Round {2})".format(i, tn, len(self.tournament(tn).rounds()[gender_input])))
+                    print("{0}. {1} (Not Available, this tournament has no data)".format(i, tn))
             print("b. Back")
 
             # Print Final
             if(len(selected_tournaments) > 0):
-                print("\n{0}. View Overall Leaderboard for {1}".format(i + 1, (", ".join(selected_tournaments) if len(selected_tournaments) != 0 else "[None Selected]")))
+                print("\nv. View Overall Leaderboard for {1}".format(i + 1, (", ".join(selected_tournaments) if len(selected_tournaments) != 0 else "[None Selected]")))
 
             # Debug
             resp = input(">>> ")
             if(resp.isdigit()):
                 got = int(resp)
-                if(got >= 1 and got <= len(self.tournaments()) + (1 if(len(selected_tournaments) > 0) else 0)):
-                    # Check if we're trying to view overall
-                    if(got == len(available_tournaments) + 1):
-                        all_selected = True
-                        break
-                    else:
-                        # Toggle state of selected tournament
-                        if(available_tournaments[got-1] in selected_tournaments):
-                            del selected_tournaments[selected_tournaments.index(available_tournaments[got-1])]
+                if(got >= 1 and got <= len(self.tournaments())):
+                    # Get tournament name from index
+                    tn = [ tn for i, tn in enumerate(self.tournaments(), 1) if (got == i) ][0]
+
+                    # Check if gender is valid in round (handle empty data)
+                    if(gender_input in self.tournament(tn).rounds()):
+                        # Check if tournament is available
+                        if(len(self.tournament(tn).rounds()[gender_input]) == self.settings()["round_count"]):
+                            # Toggle state of selected tournament
+                            if(available_tournaments[got-1] in selected_tournaments):
+                                del selected_tournaments[selected_tournaments.index(available_tournaments[got-1])]
+                            else:
+                                selected_tournaments.append(available_tournaments[got-1])
                         else:
-                            selected_tournaments.append(available_tournaments[got-1])
+                            error = True
+                        error_msg = "{0} is incomplete, therefore is unavailable.".format(tn)
+                    else:
+                        error = True
+                        error_msg = "{0} has no data, therefore is unavailable.".format(tn)
                 else:
                     error = True
                     error_msg = "Please input a valid option"
+            elif(resp == "v"):
+                all_selected = True
+                break
             elif(resp == "b"):
                 return "SKIP"
             else:
@@ -225,6 +239,7 @@ class Season():
                 p._total_wins = 0
                 p._total_prize_money = 0
                 p._total_score = 0
+                p._total_score_multiplier = 0
 
             # Process our leaderboard data
             players = [ ]
@@ -256,6 +271,7 @@ class Season():
                     # Increment Score
                     score_increment = (srt[i].score(tn, rnd_final_name) if (srt[i].score(tn, rnd_final_name) != 0) else srt[i].highest_score(tn, False))
                     srt[i]._total_score += score_increment
+                    srt[i]._total_score_multiplier += int(score_increment * t.difficulty())
 
                     # Increment Prize Money
                     money_increment = t._prize_money_unique[srt[i].wins(tn)]
@@ -279,40 +295,14 @@ class Season():
                 overall_place = 1
                 if(selected_order == 1):
                     for p in self.players()[selected_gender]:
-                        print("{0} — Score: {1:03d} — Wins: {2:03d} — Money: £{3:,}".format(p.name(), p._total_score, p._total_wins, p._total_prize_money))
-                # Prize Money
-                elif(selected_order == 2):
-                    try:
-                        srt_overall = attr_sort(self.players()[selected_gender], "prize_money")
-                        for i in reversed(range(len(srt_overall))):
-                            # Print Data
-                            print("#{0}: {1} — Score: {2:03d} — Wins: {3:03d} — Money: £{4:,}".format(f"{overall_place:02}", srt_overall[i].name(), srt_overall[i]._total_score, srt_overall[i]._total_wins, srt_overall[i]._total_prize_money))
-                            overall_place += 1
-                    except Exception as err:
-                        traceback.print_exc()
-                        input("hold")
-                # Score
-                elif(selected_order == 3):
-                    try:
-                        srt_overall = attr_sort(self.players()[selected_gender], "score")
-                        for i in reversed(range(len(srt_overall))):
-                            # Print Data
-                            print("#{0}: {1} — Score: {2:03d} — Wins: {3:03d} — Money: £{4:,}".format(f"{overall_place:02}", srt_overall[i].name(), srt_overall[i]._total_score, srt_overall[i]._total_wins, srt_overall[i]._total_prize_money))
-                            overall_place += 1
-                    except Exception as err:
-                        traceback.print_exc()
-                        input("hold")
-                # Wins
-                elif(selected_order == 4):
-                    try:
-                        srt_overall = attr_sort(self.players()[selected_gender], "wins")
-                        for i in reversed(range(len(srt_overall))):
-                            # Print Data
-                            print("#{0}: {1} — Score: {2:03d} — Wins: {3:03d} — Money: £{4:,}".format(f"{overall_place:02}", srt_overall[i].name(), srt_overall[i]._total_score, srt_overall[i]._total_wins, srt_overall[i]._total_prize_money))
-                            overall_place += 1
-                    except Exception as err:
-                        traceback.print_exc()
-                        input("hold")
+                        print("{0} — Score: {1:03d} — Score (Multiplier): {4:03d} — Wins: {2:03d} — Money: £{3:,}".format(p.name(), p._total_score, p._total_wins, p._total_prize_money, p._total_score_multiplier))
+                # Handle data sorting
+                elif(selected_order >= 2 and selected_order <= 4):
+                    srt_overall = attr_sort(self.players()[selected_gender], selected_order_name.lower().replace(" ", "_"))
+                    for i in reversed(range(len(srt_overall))):
+                        # Print Data
+                        print("#{0}: {1} — Score: {2:03d} — Score (Multiplier): {5:03d} — Wins: {3:03d} — Money: £{4:,}".format(f"{overall_place:02}", srt_overall[i].name(), srt_overall[i]._total_score, srt_overall[i]._total_wins, srt_overall[i]._total_prize_money, srt_overall[i]._total_score_multiplier))
+                        overall_place += 1
                 else:
                     pass
             else:
