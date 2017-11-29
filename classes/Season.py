@@ -102,7 +102,6 @@ class Season():
     def add_gender(self, name, cap):
         # Update Memory
         self._players.update({ name: [ ] })
-        self._rounds.update({ name: [ ] })
         self._j_data['settings'].update({ name + "_cap": cap })
 
         # Update Files
@@ -121,7 +120,6 @@ class Season():
     def add_player(self, name, gender):
         if(not gender in self.players()):
             self._players[gender] = [ ]
-            self._rounds[gender] = [ ]
 
         # Append our Players to their specific gender category
         self._players[gender].append(Player.Player(name, gender, len(self.players()[gender])))
