@@ -430,8 +430,6 @@ class Handler():
             tryAgainError = ""
             
             # Get our caps
-            print(players)
-            input("hold players")
             match_cap = (len(available_players) // 2) if (previous_round == None) else (len(previous_round.winners()) // 2)
 
             # Round Cap
