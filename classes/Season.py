@@ -6,6 +6,7 @@ from classes import Player
 from classes import Round
 from classes.File import File
 from classes.QuickSort import quick_sort as sort
+from classes.QuickSort import attr_quick_sort as attr_sort
 from os import system as call
 
 class Season():
@@ -193,8 +194,28 @@ class Season():
                 error = True
                 error_msg = "Please input a valid option"
 
+        # Find out the sorting method
+        selected_order = None
+        while(selected_order == None):
+            # Clear Terminal
+            call("cls")
+
+            # Print out options
+            print("How would you like to sort the leaderboard?")
+            print("1. Name")
+            print("2. Prize Money")
+            print("3. Score")
+            print("4. Wins")
+
+            # Get input
+            resp = input(">>> ")
+            if(resp.isdigit()):
+                resp_int = int(resp)
+                selected_order = resp_int if (resp_int >= 1 and resp_int <= 4) else None
+                break
+
         # Check if we have selected tournaments
-        if(all_selected and len(selected_tournaments) != 0):
+        if(selected_order != None and all_selected and len(selected_tournaments) != 0):
             # Clear Terminal
             call("cls")
 
@@ -249,15 +270,53 @@ class Season():
                     place += 1
 
             # Set our header text
-            print("Selected Tournaments: {}".format(", ".join(selected_tournaments)))
-            print("—————————————————————————————————————————————————————————")
+            selected_order_name = ("Name" if selected_order == 1 else ("Prize Money" if selected_order == 2 else ("Score" if selected_order == 3 else ("Wins" if selected_order == 4 else None))))
+            if(selected_order_name != None):
+                print("Selected Tournaments: {0} by '{1}'".format(", ".join(selected_tournaments), selected_order_name))
+                print("—————————————————————————————————————————————————————————")
 
-            # Print our data
-            srt_overall = sort(self.players()[selected_gender], tn)
-            overall_place = 1
-            for i in reversed(range(len(srt_overall))):
-                # Print Data
-                print("#{0}: {1} — Score: {2:03d} — Wins: {3:03d} — Money: £{4:,}".format(f"{overall_place:02}", srt_overall[i].name(), srt_overall[i]._total_score, srt_overall[i]._total_wins, srt_overall[i]._total_prize_money))
-                overall_place += 1
+                # Name
+                overall_place = 1
+                if(selected_order == 1):
+                    for p in self.players()[selected_gender]:
+                        print("{0} — Score: {1:03d} — Wins: {2:03d} — Money: £{3:,}".format(p.name(), p._total_score, p._total_wins, p._total_prize_money))
+                # Prize Money
+                elif(selected_order == 2):
+                    try:
+                        srt_overall = attr_sort(self.players()[selected_gender], "prize_money")
+                        for i in reversed(range(len(srt_overall))):
+                            # Print Data
+                            print("#{0}: {1} — Score: {2:03d} — Wins: {3:03d} — Money: £{4:,}".format(f"{overall_place:02}", srt_overall[i].name(), srt_overall[i]._total_score, srt_overall[i]._total_wins, srt_overall[i]._total_prize_money))
+                            overall_place += 1
+                    except Exception as err:
+                        traceback.print_exc()
+                        input("hold")
+                # Score
+                elif(selected_order == 3):
+                    try:
+                        srt_overall = attr_sort(self.players()[selected_gender], "score")
+                        for i in reversed(range(len(srt_overall))):
+                            # Print Data
+                            print("#{0}: {1} — Score: {2:03d} — Wins: {3:03d} — Money: £{4:,}".format(f"{overall_place:02}", srt_overall[i].name(), srt_overall[i]._total_score, srt_overall[i]._total_wins, srt_overall[i]._total_prize_money))
+                            overall_place += 1
+                    except Exception as err:
+                        traceback.print_exc()
+                        input("hold")
+                # Wins
+                elif(selected_order == 4):
+                    try:
+                        srt_overall = attr_sort(self.players()[selected_gender], "wins")
+                        for i in reversed(range(len(srt_overall))):
+                            # Print Data
+                            print("#{0}: {1} — Score: {2:03d} — Wins: {3:03d} — Money: £{4:,}".format(f"{overall_place:02}", srt_overall[i].name(), srt_overall[i]._total_score, srt_overall[i]._total_wins, srt_overall[i]._total_prize_money))
+                            overall_place += 1
+                    except Exception as err:
+                        traceback.print_exc()
+                        input("hold")
+                else:
+                    pass
+            else:
+                # Shouldn't ever get here...
+                pass
         
         return None
