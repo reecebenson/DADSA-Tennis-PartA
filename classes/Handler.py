@@ -174,46 +174,6 @@ class Handler():
             # Add our Tournament to our Season
             season.add_tournament(tournament_name, tournament)
 
-    # Input manual scores
-    def input_scores(self, seasonId, gender, roundId):
-        # Get our Season Object
-        season = self.get_season(seasonId)
-        _round = season.round(gender, roundId)
-
-        # Check if this round has any data
-        print("blah blah {}, round {}, gender {}".format(seasonId, roundId, gender))
-
-    # Start the manual input of data for the Season
-    def input_manual_rounds(self, seasonId):
-        # Get our Season Object
-        season = self.get_season(seasonId)
-
-        # Build our menu
-        Builder.init(self.app, "[Editing '{0}'] Please select an option:".format(season.name()))
-        Builder.add_menu("main", "Input Scores", "score_input")
-        Builder.add_menu("main", "End Editing", "end_manual_rounds")
-        Builder.add_menu("end_manual_rounds", "Stop Editing", "return")
-
-        # Add our rounds per gender
-        for gdr in season.players():
-            # Add Menu Items
-            Builder.add_menu("score_input", "{0} Rounds".format(gdr.title()), "score_input_{0}".format(gdr))
-
-            # Add Gender Specific Menu Items
-            for r in range(1, (season.settings()["{}_round_count".format(gdr)] + 1)):
-                # Display Round
-                rnd = season.round(seasonId, r)
-                Builder.add_menu("score_input_{0}".format(gdr), "Round {0} {1}".format(r, ("(No Previous Data)" if rnd == None else "")), "score_input_{0}_{1}".format(r, gdr))
-
-                # Add menu functionality
-                Builder.add_func("score_input", "score_input_{0}_{1}".format(r, gdr), partial(self.input_scores, seasonId, gdr, r))
-
-        # Add Functionality
-        Builder.add_func("end_manual_rounds", "return", None)
-
-        # Display Menu
-        Builder.show_current_menu()
-
     # Load empty rounds
     def load_empty_rounds(self, seasonId):
         # Get our Season Object
