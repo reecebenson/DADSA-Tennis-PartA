@@ -318,10 +318,6 @@ class Builder():
 class Menu():
     # Define the variables we will be using
     _app = None
-    _menu = None
-    _current = [ "main" ]
-    _current_menu = "main"
-    just_called_back = False
 
     def __init__(self, app):
         # Set our Application
