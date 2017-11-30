@@ -471,14 +471,11 @@ class Tournament():
         print("View Leaderboard for '{0}', Round {1}:".format(self.name(), rnd.id()))
         print("—————————————————————————————————————————————————————————")
 
-        try:
-            srt = sort(self.season().players()[gdr], self.name())
-            place = 1
-            for i in reversed(range(len(srt))):
-                print("#{0}: {1} — {2} — {3}".format(f"{place:02}", srt[i].name(), "{0:03d} score".format(srt[i].score(self.name(), rnd_name) if (srt[i].score(self.name(), rnd_name) != 0) else srt[i].highest_score(self.name(), False)), "{0:03d} diff score".format(int(srt[i].score(self.name(), rnd_name) * self.difficulty()) if (srt[i].score(self.name(), rnd_name) != 0) else int(srt[i].highest_score(self.name(), False) * self.difficulty()))))
-                place += 1
-        except Exception as err:
-            print("Error: {}".format(err))
+        srt = sort(self.season().players()[gdr], self.name())
+        place = 1
+        for i in reversed(range(len(srt))):
+            print("#{0}: {1} — {2} — {3}".format(f"{place:02}", srt[i].name(), "{0:03d} score".format(srt[i].score(self.name(), rnd_name) if (srt[i].score(self.name(), rnd_name) != 0) else srt[i].highest_score(self.name(), False)), "{0:03d} diff score".format(int(srt[i].score(self.name(), rnd_name) * self.difficulty()) if (srt[i].score(self.name(), rnd_name) != 0) else int(srt[i].highest_score(self.name(), False) * self.difficulty()))))
+            place += 1
         
         # Hold User
         input(">>> Press <Return> to continue...")
